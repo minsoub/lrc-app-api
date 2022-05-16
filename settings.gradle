@@ -1,0 +1,4 @@
+rootProject.name = 'lrc-mng-api'
+
+include("persistence:mongodb")
+include("api")
