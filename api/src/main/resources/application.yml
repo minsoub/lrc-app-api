@@ -7,6 +7,7 @@ spring:
   devtools:
     restart:
       enabled: false
+
 management:
   endpoints:
     web:
@@ -15,14 +16,14 @@ management:
 
 logging:
   level:
-    root: ${management.api.logging.level.root:INFO}
+    root: ${lrc.management.api.logging.level.root:INFO}
     org.springframework.data.convert.CustomConversions: ERROR
     org:
       springframework:
         data:
           mongodb:
             core:
-              MongoTemplate: ${management.api.logging.level.mongo:INFO}
+              MongoTemplate: ${lrc.management.api.logging.level.mongo:INFO}
     com:
       amazonaws:
         util:
@@ -39,9 +40,9 @@ spring:
       on-profile: local
   data:
     mongodb:
-      host: ${auth.mongo.host:localhost}
-      port: ${auth.mongo.port:27017}
-      database: ${auth.mongo.database:test}
+      host: ${lrc.mongo.host:localhost}
+      port: ${lrc.mongo.port:27017}
+      database: ${lrc.mongo.database:test}
 
 ---
 spring:
@@ -51,9 +52,9 @@ spring:
       on-profile: default
   data:
     mongodb:
-      host: ${auth.mongo.host:localhost}
-      port: ${auth.mongo.port:27017}
-      database: ${auth.mongo.database:test}
+      host: ${lrc.mongo.host:localhost}
+      port: ${lrc.mongo.port:27017}
+      database: ${lrc.mongo.database:test}
 
 ---
 spring:

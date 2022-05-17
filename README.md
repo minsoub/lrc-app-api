@@ -13,7 +13,7 @@
 
 ## **프로젝트 구조**
 
-- Management(API)
+- API
     - api
     - com.bithumbsystems.lrc.management.api.{project}
         - domain 
