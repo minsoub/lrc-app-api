@@ -9,14 +9,18 @@ import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfigurat
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.MongoReactiveAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.reactive.WebFluxProperties;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 import org.springframework.web.reactive.config.EnableWebFlux;
+import org.springframework.web.server.WebFilter;
 
 @SpringBootApplication(scanBasePackages = "com.bithumbsystems")
 @EnableWebFlux
-@ConfigurationPropertiesScan("com.bithumbsystems.lrc.management.api.core.config")
+@ConfigurationPropertiesScan
 @EnableReactiveMongoRepositories("com.bithumbsystems.persistence.mongodb")
 @OpenAPIDefinition(info = @Info(title = "Listing Reception Center Management API", version = "1.0", description = "Listing Reception Center Management APIs v1.0"))
 public class LrcManagementApiApplication {

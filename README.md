@@ -7,6 +7,7 @@
 - Spring Boot : 2.6.7
 - Build : Gradle 7.4.1
 - Spring Data MongoDB Reactive
+- Spring Boot Webflux
 - Spring Boot Actuator
 - Spring Boot Security
 - Spring Docs Openapi
@@ -70,7 +71,7 @@
 
 ## Running the tests
 - Swagger 참고
-    - management: http://127.0.0.1:8081/swagger-ui.html
+    - management: http://127.0.0.1:8080/v1/swagger-ui.html
 - Docker
     - ./docker/docker-compose.yml
     - ```shell
