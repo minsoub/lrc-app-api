@@ -19,24 +19,6 @@ management:
       exposure:
         include: metrics, prometheus, health
 
-logging:
-  level:
-    root: ${lrc.management.api.logging.level.root:INFO}
-    org.springframework.data.convert.CustomConversions: ERROR
-    org:
-      springframework:
-        data:
-          mongodb:
-            core:
-              MongoTemplate: ${lrc.management.api.logging.level.mongo:INFO}
-    com:
-      amazonaws:
-        util:
-          EC2MetadataUtils: error
-    io:
-      spring:
-        cloud: INFO
-
 ---
 spring:
   config:
@@ -45,9 +27,9 @@ spring:
       on-profile: local
   data:
     mongodb:
-      host: ${lrc.mongo.host:localhost}
-      port: ${lrc.mongo.port:27017}
-      database: ${lrc.mongo.database:test}
+      host: localhost
+      port: 27017
+      database: test
 
 ---
 spring:
@@ -57,14 +39,14 @@ spring:
       on-profile: default
   data:
     mongodb:
-      host: ${lrc.mongo.host:localhost}
-      port: ${lrc.mongo.port:27017}
-      database: ${lrc.mongo.database:test}
+      host: localhost
+      port: 27017
+      database: test
 
 ---
 spring:
   config:
-    import: classpath:aws-properties.yml, classpath:springdoc.yml
+    import: classpath:aws-properties-dev.yml, classpath:springdoc.yml
     activate:
       on-profile: dev
 
