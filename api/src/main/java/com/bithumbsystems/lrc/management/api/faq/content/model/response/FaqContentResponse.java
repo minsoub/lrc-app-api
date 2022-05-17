@@ -27,11 +27,4 @@ public class FaqContentResponse {
     private LocalDateTime updateDate; //수정날짜
     private String updateAdminAccountId; //수정자 id
 
-    /*public FaqContentResponse(String id, String userId, String category, String content, Boolean useYn,
-                                String costumer, String language, LocalDateTime createDate, String createAdminAccountId,
-                              LocalDateTime updateDate, String updateAdminAccountId
-    ) {
-
-    }*/
-
 }
