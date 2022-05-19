@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -30,6 +31,10 @@ public class FaqContent {
 
     @CreatedDate
     private LocalDateTime createDate; //생성날짜
+    private String createAdminAccountId;  //생성자 id
+
+    @LastModifiedDate
+    private LocalDateTime updateDate; //수정날짜
     @CreatedBy
     private LocalDateTime createAdminAccountid;  //생성자 id
 
