@@ -1,12 +1,17 @@
 package com.bithumbsystems.persistence.mongodb.faq.content.repository;
 
 import com.bithumbsystems.persistence.mongodb.faq.content.model.entity.FaqContent;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Repository
-public interface FaqContentRepository extends ReactiveMongoRepository<FaqContent, String> {
+public interface FaqContentRepository extends ReactiveMongoRepository<FaqContent, UUID> {
 
     /**
      * 콘텐츠DB userId 찾기
@@ -21,4 +26,11 @@ public interface FaqContentRepository extends ReactiveMongoRepository<FaqContent
      * @return FaqContentResponse
      */
     Mono<Void> deleteByUserId(String userId);
+
+    /**
+     * 페이징 데이터 만들기
+     * @param pageable
+     * @return FaqContentResponse paging
+     */
+    Flux<FaqContent> findAllBy(Pageable pageable);
 }
