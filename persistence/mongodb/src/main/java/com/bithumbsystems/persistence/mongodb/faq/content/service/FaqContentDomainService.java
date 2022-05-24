@@ -74,6 +74,15 @@ public class FaqContentDomainService {
     }
 
     /**
+     * 콘텐츠 삭제
+     * @param uuid
+     * @return FaqContentResponse
+     */
+    public Mono<Void> deleteContent(UUID uuid) {
+        return faqContentRepository.deleteById(uuid);
+    }
+
+    /**
      * 페이징 데이터 만들기
      * @param pageRequest
      * @return FaqContentResponse
@@ -90,7 +99,13 @@ public class FaqContentDomainService {
         return faqContentRepository.count();
     }
 
-
+    /**
+     * 콘텐츠 모든 정보
+     * @return
+     */
+    public Flux<FaqContent> search(String keyword) {
+        return faqContentRepository.findByTitleLike(keyword);
+    }
 
 
 }

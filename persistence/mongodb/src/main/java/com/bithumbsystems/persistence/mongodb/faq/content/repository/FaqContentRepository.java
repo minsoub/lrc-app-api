@@ -33,4 +33,12 @@ public interface FaqContentRepository extends ReactiveMongoRepository<FaqContent
      * @return FaqContentResponse paging
      */
     Flux<FaqContent> findAllBy(Pageable pageable);
+
+
+    /**
+     * 검색
+     * @param keyword
+     * @return FaqContent
+     */
+    Flux<FaqContent> findByTitleLike(String keyword);
 }

@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+import java.util.UUID;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("lrc")
@@ -34,19 +37,16 @@ public class FaqContentController {
 
     /**
      * 콘텐츠 1개 찾기
-     * @param userId
+     * @param id
      * @return FaqContentResponse object
      */
-    @GetMapping("/faq_content/{userId}")
-    public Mono<ResponseEntity<FaqContentResponse>> getContent(@PathVariable("userId") String userId) {
-
-        return faqContentService.findFaqByUserId(userId).flatMap(c -> {
-            return faqContentService.findFaqById(c.getId()).map(res -> {
-                return ResponseEntity.ok(res);
-            }).defaultIfEmpty(
-                    new ResponseEntity<>(HttpStatus.NOT_FOUND)
-            );
-        });
+    @GetMapping("/faq_content/{id}")
+    public Mono<ResponseEntity<FaqContentResponse>> getContent(@PathVariable("id") UUID id) {
+        return faqContentService.findFaqById(id).map(res -> {
+            return ResponseEntity.ok(res);
+        }).defaultIfEmpty(
+                new ResponseEntity<>(HttpStatus.NOT_FOUND)
+        );
     }
 
     /**
@@ -58,20 +58,6 @@ public class FaqContentController {
     public Mono<ResponseEntity<FaqContentResponse>> createContent(@RequestBody FaqContentRequest faqContentRequest) {
         return faqContentService.create(faqContentRequest).map(c -> {
             return new ResponseEntity<>(c, HttpStatus.CREATED);
-        }).defaultIfEmpty(
-                new ResponseEntity<>(HttpStatus.NOT_FOUND)
-        );
-    }
-
-    /**
-     * 콘텐츠 업데이트
-     * @param faqContentRequest
-     * @return FaqContentResponse
-     */
-    @PutMapping("/faq_content")
-    public Mono<ResponseEntity<FaqContentResponse>> updateContent(@RequestBody FaqContentRequest faqContentRequest) {
-        return faqContentService.updateContent(faqContentRequest).map(c -> {
-            return ResponseEntity.ok(c);
         }).defaultIfEmpty(
                 new ResponseEntity<>(HttpStatus.NOT_FOUND)
         );
@@ -100,5 +86,29 @@ public class FaqContentController {
     @GetMapping("/faq_content/all")
     public Mono<Page<FaqContent>> getAll(@RequestParam("page") int page, @RequestParam("size") int size){
         return faqContentService.getProducts(PageRequest.of(page, size));
+    }
+
+    /**
+     * 콘텐츠 다중 삭제
+     * @param ids
+     * @return FaqContentResponse
+     */
+    @DeleteMapping("/faq_content")
+    public Mono<ResponseEntity<Void>> deleteContent(@RequestParam List<UUID> ids) {
+        return faqContentService.deleteContents(ids).then(
+                Mono.just(new ResponseEntity<Void>(HttpStatus.OK))
+        ).defaultIfEmpty(
+                new ResponseEntity<>(HttpStatus.NOT_FOUND)
+        );
+    }
+
+    /**
+     * 콘텐츠 1개 찾기
+     * @param keyword
+     * @return FaqContentResponse object
+     */
+    @GetMapping("/faq_content/search")
+    public Flux<FaqContentResponse> search(@RequestParam String keyword) {
+        return faqContentService.search(keyword);
     }
 }

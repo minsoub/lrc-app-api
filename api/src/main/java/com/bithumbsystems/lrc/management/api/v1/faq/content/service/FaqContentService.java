@@ -15,6 +15,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -97,5 +98,24 @@ public class FaqContentService {
                 .collectList()
                 .zipWith(faqDomainService.getCount().map(c -> c))
                 .map(t -> new PageImpl<>(t.getT1(), pageRequest, t.getT2()));
+    }
+
+    /**
+     * 콘텐츠 삭제
+     * @param ids
+     * @return FaqContentResponse
+     */
+    public Flux<Void> deleteContents(List<UUID> ids) {
+        return Flux.fromIterable(ids).flatMap((uuid) -> {
+            return faqDomainService.deleteContent(uuid);
+        });
+    }
+
+    /**
+     * 콘텐츠 검색
+     * @return
+     */
+    public Flux<FaqContentResponse> search(String keyword) {
+        return faqDomainService.search(keyword).map(FaqContentMapper.INSTANCE::faqContentRespone);
     }
 }
