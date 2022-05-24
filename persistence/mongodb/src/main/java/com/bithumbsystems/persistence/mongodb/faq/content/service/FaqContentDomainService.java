@@ -100,7 +100,7 @@ public class FaqContentDomainService {
     }
 
     /**
-     * 콘텐츠 모든 정보
+     * 콘텐츠 검색
      * @return
      */
     public Flux<FaqContent> search(String keyword) {
