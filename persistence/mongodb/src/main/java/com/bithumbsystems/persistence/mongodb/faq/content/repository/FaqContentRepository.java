@@ -1,7 +1,6 @@
 package com.bithumbsystems.persistence.mongodb.faq.content.repository;
 
 import com.bithumbsystems.persistence.mongodb.faq.content.model.entity.FaqContent;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
@@ -33,4 +32,12 @@ public interface FaqContentRepository extends ReactiveMongoRepository<FaqContent
      * @return FaqContentResponse paging
      */
     Flux<FaqContent> findAllBy(Pageable pageable);
+
+
+    /**
+     * 검색
+     * @param keyword
+     * @return FaqContent
+     */
+    Flux<FaqContent> findByTitleLike(String keyword);
 }
