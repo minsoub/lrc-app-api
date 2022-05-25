@@ -26,7 +26,7 @@ public class FaqCategory {
     private LocalDateTime updateDate; //수정날짜
     private String updateAdminAccountId; //수정자 id
 
-    public FaqCategory(String order, String category, String code, boolean useYn, String user, String language) {
+    public FaqCategory(String order, String category, String code, Boolean useYn, String user, String language) {
         this.id = UUID.randomUUID();
         this.order = order;
         this.category = category;

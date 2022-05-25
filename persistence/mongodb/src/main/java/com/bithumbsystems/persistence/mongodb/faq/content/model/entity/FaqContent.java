@@ -28,7 +28,7 @@ public class FaqContent {
     private LocalDateTime updateDate; //수정날짜
     private String updateAdminAccountId; //수정자 id
 
-    public FaqContent(String userId, String order, String category, String title, String content, boolean useYn, String customer, String language) {
+    public FaqContent(String userId, String order, String category, String title, String content, Boolean useYn, String customer, String language) {
         this.id = UUID.randomUUID();
         this.userId = userId;
         this.order = order;
