@@ -49,7 +49,7 @@ public class FaqContentDomainService {
      * @return FaqContentResponse
      */
     public Mono<FaqContent> save(FaqContent faqContent) {
-        faqContent.setCreateAdminAccountId("최초사용자 (세션에서 가져와야함)"); //최초사용자 (세션에서 가져와야함)
+        faqContent.setCreateAdminAccountId("콘텐츠 최초사용자 (세션에서 가져와야함)"); //최초사용자 (세션에서 가져와야함)
         return faqContentRepository.insert(faqContent);
     }
 
@@ -60,7 +60,7 @@ public class FaqContentDomainService {
      */
     public Mono<FaqContent> updateContent(FaqContent faqContent) {
         faqContent.setUpdateDate(LocalDateTime.now());
-        faqContent.setUpdateAdminAccountId("변경된 사용자 (세션에서 가져와야함)");   //변경된 사용자 (세션에서 가져와야함)
+        faqContent.setUpdateAdminAccountId("콘텐츠 변경된 사용자 (세션에서 가져와야함)");   //변경된 사용자 (세션에서 가져와야함)
         return faqContentRepository.save(faqContent);
     }
 

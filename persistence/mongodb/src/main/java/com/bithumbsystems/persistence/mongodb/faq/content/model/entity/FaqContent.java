@@ -1,7 +1,7 @@
 package com.bithumbsystems.persistence.mongodb.faq.content.model.entity;
 
 import lombok.Data;
-import org.springframework.data.annotation.*;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
