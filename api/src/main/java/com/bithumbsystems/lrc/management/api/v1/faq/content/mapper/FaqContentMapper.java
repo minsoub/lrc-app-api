@@ -11,7 +11,7 @@ public interface FaqContentMapper {
 
     FaqContentMapper INSTANCE = Mappers.getMapper(FaqContentMapper.class);
 
-    FaqContentResponse faqContentRespone(FaqContent faqContent);
+    FaqContentResponse faqContentResponse(FaqContent faqContent);
 
     FaqContent faqRequestToFaqContent(FaqContentRequest faqContentRequest);
 }

@@ -1,35 +1,53 @@
 package com.bithumbsystems.lrc.management.api.v1.faq.content.controller;
 
+import com.bithumbsystems.lrc.management.api.core.model.response.MultiResponse;
+import com.bithumbsystems.lrc.management.api.core.model.response.SingleResponse;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.model.request.FaqContentRequest;
-import com.bithumbsystems.lrc.management.api.v1.faq.content.model.response.FaqContentResponse;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.service.FaqContentService;
-import com.bithumbsystems.persistence.mongodb.faq.content.model.entity.FaqContent;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("lrc")
+@RequestMapping("lrc/faq")
 public class FaqContentController {
 
-    @Autowired
     private final FaqContentService faqContentService;
 
     /**
      * 콘텐츠 모든 정보
+     *
      * @return FaqContentResponse object
      */
-    @GetMapping(value = "/faq_content")
-    public Flux<FaqContentResponse> getAllContent() {
-        return faqContentService.findAll();
+    @GetMapping(value = "/content")
+    public ResponseEntity<Mono<?>> getAllContent() {
+        return ResponseEntity.ok().body(faqContentService.findAll()
+            .collectList()
+            .map((faqContentFlux) -> new MultiResponse(faqContentFlux)));
+    }
+
+
+    /**
+     * 콘텐츠 삭제
+     * @param page - 페이지
+     * @param size - 페이지 사이즈
+     * @return FaqContentResponse paging
+     */
+    @GetMapping("/content/all")
+    public ResponseEntity<Mono<?>> getAll(@RequestParam("page") int page, @RequestParam("size") int size){
+        return ResponseEntity.ok().body(faqContentService.getProducts(PageRequest.of(page, size))
+            .map((faqContent) -> new SingleResponse(faqContent)));
     }
 
     /**
@@ -37,16 +55,13 @@ public class FaqContentController {
      * @param userId
      * @return FaqContentResponse object
      */
-    @GetMapping("/faq_content/{userId}")
-    public Mono<ResponseEntity<FaqContentResponse>> getContent(@PathVariable("userId") String userId) {
-
-        return faqContentService.findFaqByUserId(userId).flatMap(c -> {
-            return faqContentService.findFaqById(c.getId()).map(res -> {
-                return ResponseEntity.ok(res);
-            }).defaultIfEmpty(
-                    new ResponseEntity<>(HttpStatus.NOT_FOUND)
+    @GetMapping("/content/{userId}")
+    public ResponseEntity<Mono<?>> getContent(@PathVariable("userId") String userId) {
+        return ResponseEntity.ok().body(faqContentService.findFaqByUserId(userId)
+            .flatMap(c ->
+                faqContentService.findFaqById(c.getId())
+                    .map(res -> new SingleResponse(res)))
             );
-        });
     }
 
     /**
@@ -54,12 +69,10 @@ public class FaqContentController {
      * @param faqContentRequest
      * @return FaqContentResponse
      */
-    @PostMapping("/faq_content")
-    public Mono<ResponseEntity<FaqContentResponse>> createContent(@RequestBody FaqContentRequest faqContentRequest) {
-        return faqContentService.create(faqContentRequest).map(c -> {
-            return new ResponseEntity<>(c, HttpStatus.CREATED);
-        }).defaultIfEmpty(
-                new ResponseEntity<>(HttpStatus.NOT_FOUND)
+    @PostMapping("/content")
+    public ResponseEntity<Mono<?>> createContent(@RequestBody FaqContentRequest faqContentRequest) {
+        return ResponseEntity.ok().body(faqContentService.create(faqContentRequest).map(c ->
+            new SingleResponse(c))
         );
     }
 
@@ -68,12 +81,10 @@ public class FaqContentController {
      * @param faqContentRequest
      * @return FaqContentResponse
      */
-    @PutMapping("/faq_content")
-    public Mono<ResponseEntity<FaqContentResponse>> updateContent(@RequestBody FaqContentRequest faqContentRequest) {
-        return faqContentService.updateContent(faqContentRequest).map(c -> {
-            return ResponseEntity.ok(c);
-        }).defaultIfEmpty(
-                new ResponseEntity<>(HttpStatus.NOT_FOUND)
+    @PutMapping("/content")
+    public ResponseEntity<Mono<?>> updateContent(@RequestBody FaqContentRequest faqContentRequest) {
+        return ResponseEntity.ok().body(faqContentService.updateContent(faqContentRequest).map(c ->
+            new SingleResponse(c))
         );
     }
 
@@ -82,23 +93,10 @@ public class FaqContentController {
      * @param userId
      * @return FaqContentResponse
      */
-    @DeleteMapping("/faq_content/{userId}")
-    public Mono<ResponseEntity<Void>> deleteContent(@PathVariable("userId") String userId) {
-        return faqContentService.deleteContent(userId).then(
-                Mono.just(new ResponseEntity<Void>(HttpStatus.OK))
-        ).defaultIfEmpty(
-                new ResponseEntity<>(HttpStatus.NOT_FOUND)
+    @DeleteMapping("/content/{userId}")
+    public ResponseEntity<Mono<?>> deleteContent(@PathVariable("userId") String userId) {
+        return ResponseEntity.ok().body(faqContentService.deleteContent(userId).then(
+            Mono.just(new SingleResponse()))
         );
-    }
-
-    /**
-     * 콘텐츠 삭제
-     * @param page - 페이지
-     * @param size - 페이지 사이즈
-     * @return FaqContentResponse paging
-     */
-    @GetMapping("/faq_content/all")
-    public Mono<Page<FaqContent>> getAll(@RequestParam("page") int page, @RequestParam("size") int size){
-        return faqContentService.getProducts(PageRequest.of(page, size));
     }
 }

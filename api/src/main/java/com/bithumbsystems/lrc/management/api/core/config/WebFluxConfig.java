@@ -15,14 +15,26 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
 @RequiredArgsConstructor
 public class WebFluxConfig implements WebFluxConfigurer {
 
-  private final ApplicationProperties applicationProperties;
+    private final ApplicationProperties applicationProperties;
 
-  @Override
-  public void configurePathMatching(PathMatchConfigurer configurer) {
-    configurer.addPathPrefix( applicationProperties.getPrefix() + applicationProperties.getVersion()
-        , (path) -> Arrays
-            .stream(applicationProperties.getExcludePrefixPath())
-            .anyMatch(p -> !(path.getName().indexOf(p) > 0))
-    );
-  }
+    @Override
+    public void configurePathMatching(PathMatchConfigurer configurer) {
+        configurer.addPathPrefix( applicationProperties.getPrefix() + applicationProperties.getVersion()
+            , (path) -> Arrays
+                .stream(applicationProperties.getExcludePrefixPath())
+                .anyMatch(p -> !(path.getName().indexOf(p) > 0))
+        );
+    }
+
+//    @Override
+//    public void configureHttpMessageCodecs(ServerCodecConfigurer configurer) {
+//
+//        configurer.defaultCodecs().jackson2JsonEncoder(encoder);
+//        configurer.defaultCodecs().jackson2JsonDecoder(decoder);
+//    }
+//
+//    @Override
+//    public void addFormatters(FormatterRegistry registry) {
+//        registry.
+//    }
 }

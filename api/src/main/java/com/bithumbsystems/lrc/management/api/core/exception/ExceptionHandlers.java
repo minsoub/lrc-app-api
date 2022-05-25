@@ -1,19 +1,30 @@
 package com.bithumbsystems.lrc.management.api.core.exception;
 
+import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
+import com.bithumbsystems.lrc.management.api.core.model.response.ErrorResponse;
+import com.bithumbsystems.lrc.management.api.v1.file.exception.FileException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @RestControllerAdvice
 public class ExceptionHandlers {
 
   @ExceptionHandler(Exception.class)
-  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  public String serverExceptionHandler(Exception ex) {
+  public ResponseEntity<Mono<?>> serverExceptionHandler(Exception ex) {
     log.error(ex.getMessage(), ex);
-    return ex.getMessage();
+    ErrorData errorData = new ErrorData(ErrorCode.UNKNOWN_ERROR);
+    return ResponseEntity.internalServerError().body(Mono.just(new ErrorResponse(errorData)));
+  }
+
+  @ExceptionHandler(FileException.class)
+  public ResponseEntity<Mono<?>> fileExceptionHandler(FileException ex) {
+    log.error(ex.getMessage(), ex);
+    ErrorResponse errorResponse = new ErrorResponse(new ErrorData(ex.getErrorCode()));
+    return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(Mono.just(errorResponse));
   }
 }

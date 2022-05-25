@@ -1,10 +1,13 @@
 package com.bithumbsystems.lrc.management.api.v1.faq.content.service;
 
+import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
+import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContentException;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.mapper.FaqContentMapper;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.model.request.FaqContentRequest;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.model.response.FaqContentResponse;
 import com.bithumbsystems.persistence.mongodb.faq.content.model.entity.FaqContent;
 import com.bithumbsystems.persistence.mongodb.faq.content.service.FaqContentDomainService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -13,9 +16,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -29,7 +29,8 @@ public class FaqContentService {
      * @return
      */
     public Flux<FaqContentResponse> findAll() {
-        return faqDomainService.findAll().map(FaqContentMapper.INSTANCE::faqContentRespone);
+        return faqDomainService.findAll().map(FaqContentMapper.INSTANCE::faqContentResponse)
+            .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
     }
 
     /**
@@ -38,7 +39,8 @@ public class FaqContentService {
      * @return
      */
     public Mono<FaqContentResponse> findFaqById(UUID userId) {
-        return faqDomainService.findFaqById(userId).map(FaqContentMapper.INSTANCE::faqContentRespone);
+        return faqDomainService.findFaqById(userId).map(FaqContentMapper.INSTANCE::faqContentResponse)
+            .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
     }
 
     /**
@@ -47,7 +49,8 @@ public class FaqContentService {
      * @return
      */
     public Mono<FaqContentResponse> findFaqByUserId(String userId) {
-        return faqDomainService.findFaqByUserId(userId).map(FaqContentMapper.INSTANCE::faqContentRespone);
+        return faqDomainService.findFaqByUserId(userId).map(FaqContentMapper.INSTANCE::faqContentResponse)
+            .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
     }
 
     /**
@@ -58,7 +61,8 @@ public class FaqContentService {
     public Mono<FaqContentResponse> create(FaqContentRequest faqContentRequest) {
 
         return faqDomainService.save(FaqContentMapper.INSTANCE.faqRequestToFaqContent(faqContentRequest))
-                .map(FaqContentMapper.INSTANCE::faqContentRespone);
+                .map(FaqContentMapper.INSTANCE::faqContentResponse)
+            .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.FAIL_CREATE_CONTENT)));
     }
 
     /**
@@ -72,8 +76,9 @@ public class FaqContentService {
             c.setOrder(faqContentRequest.getOrder());
             c.setTitle(faqContentRequest.getTitle());
             c.setContent(faqContentRequest.getContent());
-            return faqDomainService.updateContent(c).map(FaqContentMapper.INSTANCE::faqContentRespone);
-        });
+            return faqDomainService.updateContent(c).map(FaqContentMapper.INSTANCE::faqContentResponse);
+        }).switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.FAIL_UPDATE_CONTENT)));
+
     }
 
     /**
@@ -82,9 +87,7 @@ public class FaqContentService {
      * @return FaqContentResponse
      */
     public Mono<Void> deleteContent(String userId) {
-        return faqDomainService.findFaqByUserId(userId).flatMap(faqContent -> {
-                return faqDomainService.deleteContent(faqContent);
-        });
+        return faqDomainService.findFaqByUserId(userId).flatMap(faqDomainService::deleteContent);
     }
 
     /**
@@ -92,7 +95,7 @@ public class FaqContentService {
      * @param pageRequest
      * @return FaqContentResponse paging
      */
-    public Mono<Page<FaqContent>> getProducts(PageRequest pageRequest){
+    public Mono<Page<FaqContent>> getProducts(PageRequest pageRequest) {
         return faqDomainService.findAllBy(pageRequest)
                 .collectList()
                 .zipWith(faqDomainService.getCount().map(c -> c))
