@@ -109,9 +109,7 @@ public class FaqContentService {
      * @return FaqContentResponse
      */
     public Flux<Void> deleteContents(List<UUID> ids) {
-        return Flux.fromIterable(ids).flatMap((uuid) -> {
-            return faqDomainService.deleteContent(uuid);
-        });
+        return Flux.fromIterable(ids).flatMap((uuid) -> faqDomainService.deleteContent(uuid));
     }
 
     /**
@@ -119,6 +117,6 @@ public class FaqContentService {
      * @return
      */
     public Flux<FaqContentResponse> search(String keyword) {
-        return faqDomainService.search(keyword).map(FaqContentMapper.INSTANCE::faqContentRespone);
+        return faqDomainService.search(keyword).map(FaqContentMapper.INSTANCE::faqContentResponse);
     }
 }
