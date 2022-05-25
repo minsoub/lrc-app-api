@@ -30,6 +30,7 @@ spring:
       host: localhost
       port: 27017
       database: test
+      field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
 
 ---
 spring:
