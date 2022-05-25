@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 @Repository
-public interface FaqContentRepository extends ReactiveMongoRepository<FaqContent, UUID> {
+public interface FaqContentRepository extends ReactiveMongoRepository<FaqContent, String> {
 
     /**
      * 콘텐츠DB userId 찾기

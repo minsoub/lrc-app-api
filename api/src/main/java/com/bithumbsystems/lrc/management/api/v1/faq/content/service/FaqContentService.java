@@ -39,7 +39,7 @@ public class FaqContentService {
      * @param userId
      * @return
      */
-    public Mono<FaqContentResponse> findFaqById(UUID userId) {
+    public Mono<FaqContentResponse> findFaqById(String  userId) {
         return faqDomainService.findFaqById(userId).map(FaqContentMapper.INSTANCE::faqContentResponse)
             .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
     }
@@ -72,8 +72,8 @@ public class FaqContentService {
      * @return FaqContentResponse
      */
     public Mono<FaqContentResponse> updateContent(FaqContentRequest faqContentRequest) {
-        String userId = faqContentRequest.getUserId();
-        return faqDomainService.findFaqByUserId(userId).flatMap(c -> {
+        String id = faqContentRequest.getId();
+        return faqDomainService.findFaqById(id).flatMap(c -> {
             c.setOrder(faqContentRequest.getOrder());
             c.setTitle(faqContentRequest.getTitle());
             c.setContent(faqContentRequest.getContent());
@@ -108,7 +108,7 @@ public class FaqContentService {
      * @param ids
      * @return FaqContentResponse
      */
-    public Flux<Void> deleteContents(List<UUID> ids) {
+    public Flux<Void> deleteContents(List<String> ids) {
         return Flux.fromIterable(ids).flatMap((uuid) -> faqDomainService.deleteContent(uuid));
     }
 
