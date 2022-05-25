@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import io.swagger.v3.core.jackson.ModelResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -64,15 +65,8 @@ public class WebFluxConfig implements WebFluxConfigurer {
         return objectMapper;
     }
 
-//    @Override
-//    public void configureHttpMessageCodecs(ServerCodecConfigurer configurer) {
-//
-//        configurer.defaultCodecs().jackson2JsonEncoder(encoder);
-//        configurer.defaultCodecs().jackson2JsonDecoder(decoder);
-//    }
-//
-//    @Override
-//    public void addFormatters(FormatterRegistry registry) {
-//        registry.
-//    }
+    @Bean
+    public ModelResolver modelResolver(ObjectMapper objectMapper) {
+        return new ModelResolver(objectMapper);
+    }
 }
