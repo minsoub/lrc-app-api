@@ -3,14 +3,13 @@ package com.bithumbsystems.lrc.management.api.v1.faq.content.model.request;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class FaqContentRequest {
-
+    private String id;
     private String userId;      //사용자 id
     private String order;       //노출순서
     private String category;    //카테고리

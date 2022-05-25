@@ -58,8 +58,8 @@ public class FaqContentController {
      * @return FaqContentResponse object
      */
 
-    @GetMapping("/faq_content/{id}")
-    public ResponseEntity<Mono<?>> getContent(@PathVariable("id") UUID id) {
+    @GetMapping("/content/{id}")
+    public ResponseEntity<Mono<?>> getContent(@PathVariable("id") String id) {
         return ResponseEntity.ok().body(
             faqContentService.findFaqById(id).map(res -> new SingleResponse(res))
         );
@@ -108,7 +108,7 @@ public class FaqContentController {
      * @return FaqContentResponse
      */
     @DeleteMapping("/content")
-    public ResponseEntity<Mono<?>> deleteContent(@RequestParam List<UUID> ids) {
+    public ResponseEntity<Mono<?>> deleteContent(@RequestParam List<String> ids) {
         return ResponseEntity.ok().body(faqContentService.deleteContents(ids).then(
             Mono.just(new SingleResponse()))
         );

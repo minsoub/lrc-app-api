@@ -71,7 +71,7 @@
 
 ## Running the tests
 - Swagger 참고
-    - management: http://127.0.0.1:8080/v1/swagger-ui.html
+    - management: http://127.0.0.1:8080/swagger-ui.html
 - Docker
     - ./docker/docker-compose.yml
     - ```shell

@@ -12,7 +12,7 @@ import java.util.UUID;
 public class FaqContent {
 
     @Id
-    private UUID id;
+    private String id;
     private String userId;      //사용자 id
     private String order;       //노출순서
     private String category;    //카테고리
@@ -29,7 +29,7 @@ public class FaqContent {
     private String updateAdminAccountId; //수정자 id
 
     public FaqContent(String userId, String order, String category, String title, String content, Boolean useYn, String customer, String language) {
-        this.id = UUID.randomUUID();
+        this.id = UUID.randomUUID().toString();
         this.userId = userId;
         this.order = order;
         this.category = category;

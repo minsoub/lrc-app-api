@@ -30,7 +30,7 @@ public class FaqContentDomainService {
      * @param contentId
      * @return
      */
-    public Mono<FaqContent> findFaqById(UUID contentId) {
+    public Mono<FaqContent> findFaqById(String contentId) {
         return faqContentRepository.findById(contentId);
     }
 
@@ -78,7 +78,7 @@ public class FaqContentDomainService {
      * @param uuid
      * @return FaqContentResponse
      */
-    public Mono<Void> deleteContent(UUID uuid) {
+    public Mono<Void> deleteContent(String uuid) {
         return faqContentRepository.deleteById(uuid);
     }
 
