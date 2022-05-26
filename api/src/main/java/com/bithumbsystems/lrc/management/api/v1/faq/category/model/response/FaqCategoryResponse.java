@@ -12,7 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class FaqCategoryResponse {
 
-    private UUID id;
+    private String id;
     private String order;       //노출순서
     private String category;    //카테고리명
     private String code;        //카테고리 코드

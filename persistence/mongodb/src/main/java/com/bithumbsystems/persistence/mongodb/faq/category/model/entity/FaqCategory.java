@@ -8,11 +8,11 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
-@Document
+@Document("faq_category")
 public class FaqCategory {
 
     @Id
-    private UUID id;
+    private String id;
     private String order;       //노출순서
     private String category;    //카테고리명
     private String code;        //카테고리 코드
@@ -27,7 +27,7 @@ public class FaqCategory {
     private String updateAdminAccountId; //수정자 id
 
     public FaqCategory(String order, String category, String code, Boolean useYn, String user, String language) {
-        this.id = UUID.randomUUID();
+        this.id = UUID.randomUUID().toString();
         this.order = order;
         this.category = category;
         this.code = code;
