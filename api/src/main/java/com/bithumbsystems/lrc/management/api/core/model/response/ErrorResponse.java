@@ -8,13 +8,16 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ErrorResponse {
+public class ErrorResponse<T> {
 
   private final ReturnCode result;
-  private final ErrorData data;
+  private final ErrorData error;
 
-  public ErrorResponse(ErrorData data) {
-    this.result = ReturnCode.ERROR;
-    this.data = data;
+  private final Object data;
+
+  public ErrorResponse(ErrorData error) {
+    this.result = ReturnCode.FAIL;
+    this.error = error;
+    this.data = null;
   }
 }
