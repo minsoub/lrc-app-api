@@ -8,18 +8,19 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
-@Document
+@Document("faq_content")
 public class FaqContent {
 
     @Id
     private String id;
     private String userId;      //사용자 id
     private String order;       //노출순서
-    private String category;    //카테고리
+    private String categoryCode;    //카테고리 코드
     private String title;       //제목
     private String content;     //내용
     private Boolean useYn;       //사용여부
     private String customer;    //등록자
+    private String email;       //등록자 이메일
     private String language;    //언어
 
     private LocalDateTime createDate; //생성날짜
@@ -28,15 +29,16 @@ public class FaqContent {
     private LocalDateTime updateDate; //수정날짜
     private String updateAdminAccountId; //수정자 id
 
-    public FaqContent(String userId, String order, String category, String title, String content, Boolean useYn, String customer, String language) {
+    public FaqContent(String userId, String order, String categoryCode, String title, String content, Boolean useYn, String customer, String email, String language) {
         this.id = UUID.randomUUID().toString();
         this.userId = userId;
         this.order = order;
-        this.category = category;
+        this.categoryCode = categoryCode;
         this.title = title;
         this.content = content;
         this.useYn = useYn;
         this.customer = customer;
+        this.email = email;
         this.language = language;
         this.createDate = LocalDateTime.now();
     }

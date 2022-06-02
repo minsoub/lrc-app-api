@@ -60,9 +60,9 @@ public class FaqCategoryController {
      * @param faqCategoryRequest
      * @return FaqCategoryResponse
      */
-    @PutMapping("/category")
-    public ResponseEntity<Mono<?>> updateCategory(@RequestBody FaqCategoryRequest faqCategoryRequest) {
-        return ResponseEntity.ok().body(faqCategoryService.updateCategory(faqCategoryRequest)
+    @PutMapping("/category/{id}")
+    public ResponseEntity<Mono<?>> updateCategory(@PathVariable("id") String id, @RequestBody FaqCategoryRequest faqCategoryRequest) {
+        return ResponseEntity.ok().body(faqCategoryService.updateCategory(id, faqCategoryRequest)
                 .map(c -> new SingleResponse(c))
         );
     }

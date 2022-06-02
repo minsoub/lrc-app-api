@@ -4,21 +4,13 @@ import com.bithumbsystems.lrc.management.api.core.model.response.MultiResponse;
 import com.bithumbsystems.lrc.management.api.core.model.response.SingleResponse;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.model.request.FaqContentRequest;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.service.FaqContentService;
-import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -34,11 +26,22 @@ public class FaqContentController {
      */
     @GetMapping(value = "/content")
     public ResponseEntity<Mono<?>> getAllContent() {
+        return ResponseEntity.ok().body(faqContentService.findJoinAll()
+                .collectList()
+                .map((faqContentFlux) -> new MultiResponse(faqContentFlux)));
+    }
+
+    /**
+     * 콘텐츠 모든 정보 테스트
+     *
+     * @return FaqContentResponse object
+     */
+    @GetMapping(value = "/contenttest")
+    public ResponseEntity<Mono<?>> getAllContent1111() {
         return ResponseEntity.ok().body(faqContentService.findAll()
             .collectList()
             .map((faqContentFlux) -> new MultiResponse(faqContentFlux)));
     }
-
 
     /**
      * 콘텐츠 삭제
@@ -82,21 +85,21 @@ public class FaqContentController {
      * @param faqContentRequest
      * @return FaqContentResponse
      */
-    @PutMapping("/content")
-    public ResponseEntity<Mono<?>> updateContent(@RequestBody FaqContentRequest faqContentRequest) {
-        return ResponseEntity.ok().body(faqContentService.updateContent(faqContentRequest).map(c ->
+    @PutMapping("/content/{id}")
+    public ResponseEntity<Mono<?>> updateContent(@PathVariable("id") String id, @RequestBody FaqContentRequest faqContentRequest) {
+        return ResponseEntity.ok().body(faqContentService.updateContent(id, faqContentRequest).map(c ->
             new SingleResponse(c))
         );
     }
 
     /**
      * 콘텐츠 삭제
-     * @param userId
+     * @param id
      * @return FaqContentResponse
      */
-    @DeleteMapping("/content/{userId}")
-    public ResponseEntity<Mono<?>> deleteContent(@PathVariable("userId") String userId) {
-        return ResponseEntity.ok().body(faqContentService.deleteContent(userId).then(
+    @DeleteMapping("/content/{id}")
+    public ResponseEntity<Mono<?>> deleteContent(@PathVariable("id") String id) {
+        return ResponseEntity.ok().body(faqContentService.deleteContent(id).then(
             Mono.just(new SingleResponse()))
         );
     }

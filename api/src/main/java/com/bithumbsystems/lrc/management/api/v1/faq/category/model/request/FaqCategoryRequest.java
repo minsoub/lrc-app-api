@@ -14,5 +14,6 @@ public class FaqCategoryRequest {
     private String code;        //카테고리 코드
     private Boolean useYn;      //사용여부
     private String user;        //등록자
+    private String email;       //등록자 이메일
     private String language;    //언어
 }

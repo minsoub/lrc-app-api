@@ -5,9 +5,9 @@ import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContent
 import com.bithumbsystems.lrc.management.api.v1.faq.content.mapper.FaqContentMapper;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.model.request.FaqContentRequest;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.model.response.FaqContentResponse;
+import com.bithumbsystems.persistence.mongodb.faq.category.service.FaqCategoryDomainService;
 import com.bithumbsystems.persistence.mongodb.faq.content.model.entity.FaqContent;
 import com.bithumbsystems.persistence.mongodb.faq.content.service.FaqContentDomainService;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
 import java.util.List;
 
 @Slf4j
@@ -24,6 +25,7 @@ import java.util.List;
 public class FaqContentService {
 
     private final FaqContentDomainService faqDomainService;
+    private final FaqCategoryDomainService faqCategoryDomainService;
 
     /**
      * 콘텐츠 모든 정보
@@ -32,6 +34,18 @@ public class FaqContentService {
     public Flux<FaqContentResponse> findAll() {
         return faqDomainService.findAll().map(FaqContentMapper.INSTANCE::faqContentResponse)
             .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+    }
+
+    public Flux<FaqContentResponse> findJoinAll() {
+        return faqDomainService.findAll()
+            .flatMap(c -> Mono.just(c)
+                .zipWith(faqCategoryDomainService.findCategoryByCode(c.getCategoryCode()))
+                .map(m -> {
+                    FaqContentResponse faqContentResponse = FaqContentMapper.INSTANCE.faqContentResponse(m.getT1());
+                    faqContentResponse.setCategory(m.getT2().getCategory());
+                    return faqContentResponse;
+                })
+                    .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT))));
     }
 
     /**
@@ -71,8 +85,7 @@ public class FaqContentService {
      * @param faqContentRequest
      * @return FaqContentResponse
      */
-    public Mono<FaqContentResponse> updateContent(FaqContentRequest faqContentRequest) {
-        String id = faqContentRequest.getId();
+    public Mono<FaqContentResponse> updateContent(String id, FaqContentRequest faqContentRequest) {
         return faqDomainService.findFaqById(id).flatMap(c -> {
             c.setOrder(faqContentRequest.getOrder());
             c.setTitle(faqContentRequest.getTitle());
@@ -88,7 +101,7 @@ public class FaqContentService {
      * @return FaqContentResponse
      */
     public Mono<Void> deleteContent(String userId) {
-        return faqDomainService.findFaqByUserId(userId).flatMap(faqDomainService::deleteContent);
+        return faqDomainService.findFaqById(userId).flatMap(faqDomainService::deleteContent);
     }
 
     /**

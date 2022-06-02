@@ -71,9 +71,8 @@ public class FaqCategoryService {
      * @param faqCategoryRequest
      * @return FaqCategoryResponse Object
      */
-    public Mono<FaqCategoryResponse> updateCategory(FaqCategoryRequest faqCategoryRequest) {
-        String code = faqCategoryRequest.getCode();
-        return faqCategoryDomainService.findCategoryByCode(code)
+    public Mono<FaqCategoryResponse> updateCategory(String id, FaqCategoryRequest faqCategoryRequest) {
+        return faqCategoryDomainService.findCategoryByCode(id)
                 .flatMap(c -> {
                     c.setOrder(faqCategoryRequest.getOrder());
                     c.setCategory(faqCategoryRequest.getCategory());

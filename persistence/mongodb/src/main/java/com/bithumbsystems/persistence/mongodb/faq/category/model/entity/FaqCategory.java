@@ -18,6 +18,7 @@ public class FaqCategory {
     private String code;        //카테고리 코드
     private Boolean useYn;      //사용여부
     private String user;        //등록자
+    private String email;       //등록자 이메일
     private String language;    //언어
 
     private LocalDateTime createDate; //생성날짜
@@ -26,13 +27,14 @@ public class FaqCategory {
     private LocalDateTime updateDate; //수정날짜
     private String updateAdminAccountId; //수정자 id
 
-    public FaqCategory(String order, String category, String code, Boolean useYn, String user, String language) {
+    public FaqCategory(String order, String category, String code, Boolean useYn, String user, String email, String language) {
         this.id = UUID.randomUUID().toString();
         this.order = order;
         this.category = category;
         this.code = code;
         this.useYn = useYn;
         this.user = user;
+        this.email = email;
         this.language = language;
         this.createDate = LocalDateTime.now();
     }

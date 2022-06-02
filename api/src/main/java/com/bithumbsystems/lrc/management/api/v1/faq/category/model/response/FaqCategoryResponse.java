@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -18,6 +17,7 @@ public class FaqCategoryResponse {
     private String code;        //카테고리 코드
     private Boolean useYn;      //사용여부
     private String user;        //등록자
+    private String email;       //등록자 이메일
     private String language;    //언어
 
     private LocalDateTime createDate; //생성날짜
