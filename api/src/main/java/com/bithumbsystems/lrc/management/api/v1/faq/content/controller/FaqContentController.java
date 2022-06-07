@@ -20,7 +20,7 @@ public class FaqContentController {
     private final FaqContentService faqContentService;
 
     /**
-     * 콘텐츠 모든 정보
+     * 콘텐츠 모든 정보 (카테고리명 가져오기)
      *
      * @return FaqContentResponse object
      */
@@ -56,6 +56,19 @@ public class FaqContentController {
     }
 
     /**
+     * 콘텐츠 카테고리별로 찾기
+     * @param categoryCode
+     * @return FaqContentResponse object
+     */
+    @GetMapping("/content/category/{categoryCode}")
+    public ResponseEntity<Mono<?>> getContentCategory(@PathVariable String categoryCode) {
+        return ResponseEntity.ok().body(faqContentService.findCategoryCode(categoryCode)
+                    .collectList()
+                    .map(res -> new SingleResponse(res))
+        );
+    }
+
+    /**
      * 콘텐츠 1개 찾기
      * @param id
      * @return FaqContentResponse object
@@ -64,7 +77,7 @@ public class FaqContentController {
     @GetMapping("/content/{id}")
     public ResponseEntity<Mono<?>> getContent(@PathVariable("id") String id) {
         return ResponseEntity.ok().body(
-            faqContentService.findFaqById(id).map(res -> new SingleResponse(res))
+                faqContentService.findFaqById(id).map(res -> new SingleResponse(res))
         );
     }
 

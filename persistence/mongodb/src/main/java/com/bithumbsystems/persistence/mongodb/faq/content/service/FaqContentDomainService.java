@@ -9,7 +9,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +40,15 @@ public class FaqContentDomainService {
      */
     public Mono<FaqContent> findFaqByUserId(String userId) {
         return faqContentRepository.findByUserId(userId);
+    }
+
+    /**
+     * 콘텐츠 카테고리별로 찾기
+     * @param categoryCode
+     * @return FaqContent
+     */
+    public Flux<FaqContent> findFaqByCategoryCode(String categoryCode) {
+        return faqContentRepository.findByCategoryCode(categoryCode);
     }
 
     /**

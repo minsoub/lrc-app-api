@@ -36,6 +36,10 @@ public class FaqContentService {
             .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
     }
 
+    /**
+     * 콘텐츠 모든 정보 (카테고리명 가져오기)
+     * @return
+     */
     public Flux<FaqContentResponse> findJoinAll() {
         return faqDomainService.findAll()
             .flatMap(c -> Mono.just(c)
@@ -46,6 +50,23 @@ public class FaqContentService {
                     return faqContentResponse;
                 })
                     .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT))));
+    }
+
+    /**
+     * 콘텐츠 카테고리별로 찾기
+     * @param categoryCode
+     * @return
+     */
+    public Flux<FaqContentResponse> findCategoryCode(String categoryCode) {
+        return faqDomainService.findFaqByCategoryCode(categoryCode)
+                .flatMap(c -> Mono.just(c)
+                        .zipWith(faqCategoryDomainService.findCategoryByCode(c.getCategoryCode()))
+                        .map(m -> {
+                            FaqContentResponse faqContentResponse = FaqContentMapper.INSTANCE.faqContentResponse(m.getT1());
+                            faqContentResponse.setCategory(m.getT2().getCategory());
+                            return faqContentResponse;
+                        })
+                        .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT))));
     }
 
     /**

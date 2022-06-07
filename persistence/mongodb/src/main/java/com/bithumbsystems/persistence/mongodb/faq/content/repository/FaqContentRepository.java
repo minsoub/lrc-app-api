@@ -18,6 +18,13 @@ public interface FaqContentRepository extends ReactiveMongoRepository<FaqContent
     Mono<FaqContent> findByUserId(String userId);
 
     /**
+     * 콘텐츠DB 카테고리 코드 찾기
+     * @param categoryCode
+     * @return FaqContentResponse
+     */
+    Flux<FaqContent> findByCategoryCode(String categoryCode);
+
+    /**
      * 콘텐츠DB userId 삭제
      * @param userId
      * @return FaqContentResponse
