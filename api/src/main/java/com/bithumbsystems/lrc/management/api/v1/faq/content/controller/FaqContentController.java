@@ -27,7 +27,6 @@ public class FaqContentController {
     @GetMapping(value = "/content")
     public ResponseEntity<Mono<?>> getAllContent() {
         return ResponseEntity.ok().body(faqContentService.findJoinAll()
-                .collectList()
                 .map((faqContentFlux) -> new MultiResponse(faqContentFlux)));
     }
 
@@ -44,14 +43,14 @@ public class FaqContentController {
     }
 
     /**
-     * 콘텐츠 삭제
+     * 콘텐츠 페이징 데이터 만들기
      * @param page - 페이지
      * @param size - 페이지 사이즈
      * @return FaqContentResponse paging
      */
     @GetMapping("/content/all")
-    public ResponseEntity<Mono<?>> getAll(@RequestParam("page") int page, @RequestParam("size") int size){
-        return ResponseEntity.ok().body(faqContentService.getProducts(PageRequest.of(page, size))
+    public ResponseEntity<Mono<?>> getPagingAll(@RequestParam("page") int page, @RequestParam("size") int size){
+        return ResponseEntity.ok().body(faqContentService.getPagingContent(PageRequest.of(page, size))
             .map((faqContent) -> new SingleResponse(faqContent)));
     }
 
@@ -63,7 +62,6 @@ public class FaqContentController {
     @GetMapping("/content/category/{categoryCode}")
     public ResponseEntity<Mono<?>> getContentCategory(@PathVariable String categoryCode) {
         return ResponseEntity.ok().body(faqContentService.findCategoryCode(categoryCode)
-                    .collectList()
                     .map(res -> new SingleResponse(res))
         );
     }

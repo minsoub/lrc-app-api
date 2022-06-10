@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class FaqContentRequest {
     private String userId;      //사용자 id
-    private String order;       //노출순서
+    private Integer order;       //노출순서
     private String categoryCode;    //카테고리
     private String title;       //제목
     private String content;     //내용

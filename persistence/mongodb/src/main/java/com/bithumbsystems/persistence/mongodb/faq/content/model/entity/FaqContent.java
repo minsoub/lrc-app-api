@@ -14,7 +14,7 @@ public class FaqContent {
     @Id
     private String id;
     private String userId;      //사용자 id
-    private String order;       //노출순서
+    private Integer order;       //노출순서
     private String categoryCode;    //카테고리 코드
     private String title;       //제목
     private String content;     //내용
@@ -29,7 +29,7 @@ public class FaqContent {
     private LocalDateTime updateDate; //수정날짜
     private String updateAdminAccountId; //수정자 id
 
-    public FaqContent(String userId, String order, String categoryCode, String title, String content, Boolean useYn, String customer, String email, String language) {
+    public FaqContent(String userId, Integer order, String categoryCode, String title, String content, Boolean useYn, String customer, String email, String language) {
         this.id = UUID.randomUUID().toString();
         this.userId = userId;
         this.order = order;

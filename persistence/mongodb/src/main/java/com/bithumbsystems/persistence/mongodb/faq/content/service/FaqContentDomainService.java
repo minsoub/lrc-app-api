@@ -95,7 +95,7 @@ public class FaqContentDomainService {
      * @param pageRequest
      * @return FaqContentResponse
      */
-    public Flux<FaqContent> findAllBy(PageRequest pageRequest) {
+    public Flux<FaqContent> findPagingAll(PageRequest pageRequest) {
         return faqContentRepository.findAllBy(pageRequest);
     }
 

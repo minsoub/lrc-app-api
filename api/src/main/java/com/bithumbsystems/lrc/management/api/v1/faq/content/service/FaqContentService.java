@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
@@ -29,7 +30,7 @@ public class FaqContentService {
 
     /**
      * 콘텐츠 모든 정보
-     * @return
+     * @return FaqContentResponse
      */
     public Flux<FaqContentResponse> findAll() {
         return faqDomainService.findAll().map(FaqContentMapper.INSTANCE::faqContentResponse)
@@ -38,9 +39,9 @@ public class FaqContentService {
 
     /**
      * 콘텐츠 모든 정보 (카테고리명 가져오기)
-     * @return
+     * @return FaqContentResponse
      */
-    public Flux<FaqContentResponse> findJoinAll() {
+    public Mono<List<FaqContentResponse>> findJoinAll() {
         return faqDomainService.findAll()
             .flatMap(c -> Mono.just(c)
                 .zipWith(faqCategoryDomainService.findCategoryByCode(c.getCategoryCode()))
@@ -49,15 +50,16 @@ public class FaqContentService {
                     faqContentResponse.setCategory(m.getT2().getCategory());
                     return faqContentResponse;
                 })
-                    .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT))));
+                    .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT))))
+                .collectSortedList(Comparator.comparing(FaqContentResponse::getOrder));
     }
 
     /**
      * 콘텐츠 카테고리별로 찾기
      * @param categoryCode
-     * @return
+     * @return FaqContentResponse
      */
-    public Flux<FaqContentResponse> findCategoryCode(String categoryCode) {
+    public Mono<List<FaqContentResponse>> findCategoryCode(String categoryCode) {
         return faqDomainService.findFaqByCategoryCode(categoryCode)
                 .flatMap(c -> Mono.just(c)
                         .zipWith(faqCategoryDomainService.findCategoryByCode(c.getCategoryCode()))
@@ -66,13 +68,14 @@ public class FaqContentService {
                             faqContentResponse.setCategory(m.getT2().getCategory());
                             return faqContentResponse;
                         })
-                        .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT))));
+                        .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT))))
+                .collectSortedList(Comparator.comparing(FaqContentResponse::getOrder));
     }
 
     /**
      * 콘텐츠 1개 찾기
      * @param userId
-     * @return
+     * @return FaqContentResponse
      */
     public Mono<FaqContentResponse> findFaqById(String  userId) {
         return faqDomainService.findFaqById(userId).map(FaqContentMapper.INSTANCE::faqContentResponse)
@@ -82,7 +85,7 @@ public class FaqContentService {
     /**
      * 콘텐츠 userId 찾기
      * @param userId
-     * @return
+     * @return FaqContentResponse
      */
     public Mono<FaqContentResponse> findFaqByUserId(String userId) {
         return faqDomainService.findFaqByUserId(userId).map(FaqContentMapper.INSTANCE::faqContentResponse)
@@ -126,12 +129,12 @@ public class FaqContentService {
     }
 
     /**
-     * 페이징 데이터 만들기
+     * 콘텐츠 페이징 데이터 만들기
      * @param pageRequest
      * @return FaqContentResponse paging
      */
-    public Mono<Page<FaqContent>> getProducts(PageRequest pageRequest) {
-        return faqDomainService.findAllBy(pageRequest)
+    public Mono<Page<FaqContent>> getPagingContent(PageRequest pageRequest) {
+        return faqDomainService.findPagingAll(pageRequest)
                 .collectList()
                 .zipWith(faqDomainService.getCount().map(c -> c))
                 .map(t -> new PageImpl<>(t.getT1(), pageRequest, t.getT2()));
@@ -148,7 +151,7 @@ public class FaqContentService {
 
     /**
      * 콘텐츠 검색
-     * @return
+     * @return FaqContentResponse
      */
     public Flux<FaqContentResponse> search(String keyword) {
         return faqDomainService.search(keyword).map(FaqContentMapper.INSTANCE::faqContentResponse);
