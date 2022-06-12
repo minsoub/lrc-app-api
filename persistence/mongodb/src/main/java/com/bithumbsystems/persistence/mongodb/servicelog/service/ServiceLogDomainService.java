@@ -18,6 +18,6 @@ public class ServiceLogDomainService {
     }
 
     public Mono<ServiceLog> save(ServiceLog serviceLog) {
-        return serviceLogRepository.save(serviceLog);
+        return serviceLogRepository.insert(serviceLog);
     }
 }
