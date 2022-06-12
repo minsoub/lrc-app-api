@@ -53,10 +53,10 @@ public class NetworkListDomainService {
 
     /**
      * 네트워크계열 1개 삭제
-     * @param id
+     * @param networkList
      * @return null
      */
-    public Mono<Void> deleteNetwork(String id) {
-        return networkListRepository.deleteById(id);
+    public Mono<Void> deleteNetwork(NetworkList networkList) {
+        return networkListRepository.delete(networkList);
     }
 }

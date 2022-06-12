@@ -68,4 +68,13 @@ public class StatusValueListService {
                 .map(StatusValueListMapper.INSTANCE::statusValueListResponse)
                 .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
     }
+
+    /**
+     * 상태값 관리 1개 삭제
+     * @param id
+     * @return N/A
+     */
+    public Mono<Void> deleteStatusValue(String id) {
+        return statusValueDomainService.findStatusValueById(id).flatMap(statusValueDomainService::deleteStatusValue);
+    }
 }

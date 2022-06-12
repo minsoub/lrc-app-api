@@ -58,8 +58,6 @@ public class BusinessListService {
      * @return null
      */
     public Mono<Void> deleteBusiness(String id) {
-        return businessListDomainService.findById(id).flatMap(c -> {
-            return businessListDomainService.deleteBusiness(id);
-        });
+        return businessListDomainService.findById(id).flatMap(businessListDomainService::deleteBusiness);
     }
 }

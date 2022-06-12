@@ -53,4 +53,16 @@ public class StatusValueListController {
                 .map(c -> new SingleResponse(c))
         );
     }
+
+    /**
+     * 상태값 관리 1개 삭제
+     * @param id
+     * @return StatusValueListResponse
+     */
+    @DeleteMapping("/status-code/{id}")
+    public ResponseEntity<Mono<?>> deleteStatusValue(@PathVariable("id") String id) {
+        return ResponseEntity.ok().body(statusValueListService.deleteStatusValue(id).then(
+                Mono.just(new SingleResponse())
+        ));
+    }
 }

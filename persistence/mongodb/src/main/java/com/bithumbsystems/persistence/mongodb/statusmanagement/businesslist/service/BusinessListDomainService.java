@@ -53,11 +53,11 @@ public class BusinessListDomainService {
 
     /**
      * 비즈니스 1개 삭제
-     * @param id
+     * @param businessList
      * @return null
      */
-    public Mono<Void> deleteBusiness(String id) {
-        return businessRepository.deleteById(id);
+    public Mono<Void> deleteBusiness(BusinessList businessList) {
+        return businessRepository.delete(businessList);
     }
 
 }

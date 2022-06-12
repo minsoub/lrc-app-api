@@ -38,6 +38,15 @@ public class StatusValueDomainService {
     }
 
     /**
+     * 상태값 관리 1개 찾기
+     * @param id
+     * @return
+     */
+    public Mono<StatusValueList> findStatusValueById(String id) {
+        return statusValueRepository.findById(id);
+    }
+
+    /**
      * 상태값 관리 1개 저장
      * @param statusValueList
      * @return StatusValueList
@@ -45,4 +54,14 @@ public class StatusValueDomainService {
     public Mono<StatusValueList> save(StatusValueList statusValueList) {
         return statusValueRepository.insert(statusValueList);
     }
+
+    /**
+     * 상태값 관리 1개 삭제
+     * @return N/A
+     */
+    public Mono<Void> deleteStatusValue(StatusValueList statusValueList) {
+        return statusValueRepository.delete(statusValueList);
+    }
+
+
 }

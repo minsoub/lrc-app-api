@@ -62,8 +62,6 @@ public class NetworkListService {
      * @return null
      */
     public Mono<Void> deleteNetwork(String id) {
-        return networkListDomainService.findById(id).flatMap(c -> {
-            return networkListDomainService.deleteNetwork(id);
-        });
+        return networkListDomainService.findById(id).flatMap(networkListDomainService::deleteNetwork);
     }
 }
