@@ -18,7 +18,7 @@ cloud:
 
 logging:
   level:
-    root: ${management.api.logging.level.root:DEBUG}
+    root: ${management.api.logging.level.root:INFO}
     org.springframework.data.convert.CustomConversions: ERROR
     org:
       springframework:
