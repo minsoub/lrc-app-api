@@ -4,11 +4,6 @@ import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.v1.file.exception.FileException;
 import com.bithumbsystems.persistence.mongodb.file.model.entity.File;
 import com.bithumbsystems.persistence.mongodb.file.service.FileDomainService;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -18,11 +13,15 @@ import reactor.core.publisher.Mono;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.async.AsyncResponseTransformer;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
+import software.amazon.awssdk.services.s3.model.*;
+
+import java.io.InputStream;
+import java.net.URLEncoder;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -99,7 +98,7 @@ public class FileService {
         // String fileName = part.filename();
         log.debug("save => fileKey : " + fileKey);
         Map<String, String> metadata = new HashMap<String, String>();
-        metadata.put("filename", fileName);
+        metadata.put("filename", URLEncoder.encode(fileName, StandardCharsets.UTF_8));
         metadata.put("filesize", String.valueOf(fileSize));
 
         PutObjectRequest objectRequest = PutObjectRequest.builder()
