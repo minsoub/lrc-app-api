@@ -16,9 +16,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 import java.nio.ByteBuffer;
+import java.text.Normalizer;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -51,7 +53,6 @@ public class ReviewEstimateService {
 
     /**
      * 검토 평가 여러개 저장 및 업데이트
-     * @param projectId
      * @param reviewEstimateRequest
      * @return ReviewEstimateResponse Object
      */
@@ -79,7 +80,7 @@ public class ReviewEstimateService {
                                     fileSize.set((long) buf.array().length);
                                     fileKey.set(UUID.randomUUID().toString());
                                     fileName.set(reviewEstimate.getFilePart().filename());
-                                    log.info("byte size ===>  {}  {}  {} : ", buf.array().length, fileKey.toString(), fileName.toString());
+                                    log.info("byte size ===>  {}   :   {}   :   {} : ", buf.array().length, fileKey.toString(), fileName.toString());
 
                                     return fileService.upload(fileKey.toString(), fileName.toString(), fileSize.get(), awsProperties.getBucket(), buf)
                                             .flatMap(res -> {
@@ -87,14 +88,18 @@ public class ReviewEstimateService {
                                                 log.info("service upload fileName   =>       {}", fileName.toString());
                                                 File info = File.builder()
                                                         .fileKey(fileKey.toString())
-                                                        .fileName(fileName.toString())
+                                                        .fileName(Normalizer.normalize(fileName.toString(), Normalizer.Form.NFC))
                                                         .createdAt(new Date())
                                                         .createdId("test")
                                                         .delYn(false)
                                                         .build();
 
-                                                fileService.save(info);
-                                                reviewEstimate.setReferenceFile(info.getFileKey());
+                                                return fileService.save(info);
+                                            })
+                                            .publishOn(Schedulers.boundedElastic())
+                                            .flatMap(file -> {
+                                                reviewEstimate.setFileKey(file.getFileKey());
+                                                reviewEstimate.setReference(file.getFileName());
                                                 return reviewEstimateDomainService.save(ReviewEstimateMapper.INSTANCE.requestToReviewEstimate(reviewEstimate));
                                             });
                                 });

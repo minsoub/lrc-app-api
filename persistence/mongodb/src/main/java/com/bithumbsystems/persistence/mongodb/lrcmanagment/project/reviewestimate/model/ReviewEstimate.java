@@ -18,5 +18,5 @@ public class ReviewEstimate {
     private String organization;    //평가 기관
     private String result;          //평가 결과
     private String reference;       //평가 자료
-    private String referenceFile;   //평가 자료 파일
+    private String fileKey;         //평가 자료 파일
 }
