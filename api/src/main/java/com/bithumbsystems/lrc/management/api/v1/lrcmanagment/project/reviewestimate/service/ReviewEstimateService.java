@@ -17,14 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 import java.nio.ByteBuffer;
 import java.text.Normalizer;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 @Service
@@ -34,7 +32,6 @@ public class ReviewEstimateService {
     private final ReviewEstimateDomainService reviewEstimateDomainService;
 
     private final AwsProperties awsProperties;
-    private final S3AsyncClient s3AsyncClient;
     private final FileService fileService;
 
 
@@ -48,7 +45,6 @@ public class ReviewEstimateService {
                 .map(ReviewEstimateMapper.INSTANCE::reviewEstimateResponse)
                 .collectList()
                 .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
-
     }
 
     /**
@@ -70,25 +66,21 @@ public class ReviewEstimateService {
         return reviewEstimateRequest
                 .flatMap(reviewEstimate -> {
                     if(reviewEstimate.getFilePart() != null) {  //첨부파일 확인
-                        AtomicReference<String> fileKey = new AtomicReference<>();
-                        AtomicReference<String> fileName = new AtomicReference<>();
-                        AtomicReference<Long> fileSize = new AtomicReference<>();
-
                         return DataBufferUtils.join(reviewEstimate.getFilePart().content())
                                 .flatMap(dataBuffer -> {
                                     ByteBuffer buf = dataBuffer.asByteBuffer();
-                                    fileSize.set((long) buf.array().length);
-                                    fileKey.set(UUID.randomUUID().toString());
-                                    fileName.set(reviewEstimate.getFilePart().filename());
-                                    log.info("byte size ===>  {}   :   {}   :   {} : ", buf.array().length, fileKey.toString(), fileName.toString());
+                                    String fileKey = UUID.randomUUID().toString();
+                                    String fileName = reviewEstimate.getFilePart().filename();
+                                    Long fileSize = (long) buf.array().length;
+                                    log.info("byte size ===>  {}   :   {}   :   {} : ", fileKey, fileName, fileSize);
 
-                                    return fileService.upload(fileKey.toString(), fileName.toString(), fileSize.get(), awsProperties.getBucket(), buf)
+                                    return fileService.upload(fileKey, fileName, fileSize, awsProperties.getBucket(), buf)
                                             .flatMap(res -> {
                                                 log.info("service upload res   =>       {}", res);
                                                 log.info("service upload fileName   =>       {}", fileName.toString());
                                                 File info = File.builder()
-                                                        .fileKey(fileKey.toString())
-                                                        .fileName(Normalizer.normalize(fileName.toString(), Normalizer.Form.NFC))
+                                                        .fileKey(fileKey)
+                                                        .fileName(Normalizer.normalize(fileName, Normalizer.Form.NFC))
                                                         .createdAt(new Date())
                                                         .createdId("test")
                                                         .delYn(false)

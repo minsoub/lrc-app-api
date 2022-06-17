@@ -23,7 +23,6 @@ import java.text.Normalizer;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 @Service
@@ -31,7 +30,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public class SubmittedDocumentService {
 
     private final SubmittedDocumentDomainService submittedDocumentDomainService;
-
     private final AwsProperties awsProperties;
     private final FileService fileService;
 
@@ -45,7 +43,6 @@ public class SubmittedDocumentService {
                 .map(SubmittedDocumentMapper.INSTANCE::submittedDocumentResponse)
                 .collectList()
                 .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
-
     }
 
     /**
@@ -58,26 +55,22 @@ public class SubmittedDocumentService {
         return submittedDocumentRequest
                 .flatMap(submittedDocument -> {
                     if(submittedDocument.getFilePart() != null) {  //첨부파일 확인
-                        AtomicReference<String> fileKey = new AtomicReference<>();
-                        AtomicReference<String> fileName = new AtomicReference<>();
-                        AtomicReference<Long> fileSize = new AtomicReference<>();
-
                         return DataBufferUtils.join(submittedDocument.getFilePart().content())
                                 .flatMap(dataBuffer -> {
                                     ByteBuffer buf = dataBuffer.asByteBuffer();
-                                    fileSize.set((long) buf.array().length);
-                                    fileKey.set(UUID.randomUUID().toString());
-                                    fileName.set(submittedDocument.getFilePart().filename());
-                                    log.info("byte size ===>  {}   :   {}   :   {} : ", buf.array().length, fileKey.toString(), fileName.toString());
+                                    String fileKey = UUID.randomUUID().toString();
+                                    String fileName = submittedDocument.getFilePart().filename();
+                                    Long fileSize = (long) buf.array().length;
+                                    log.info("byte size ===>  {}   :   {}   :   {} : ", fileKey, fileName, fileSize);
 
-                                    return fileService.upload(fileKey.toString(), fileName.toString(), fileSize.get(), awsProperties.getBucket(), buf)
+                                    return fileService.upload(fileKey, fileName, fileSize, awsProperties.getBucket(), buf)
                                             .publishOn(Schedulers.boundedElastic())
                                             .flatMap(res -> {
                                                 log.info("service upload res   =>       {}", res);
                                                 log.info("service upload fileName   =>       {}", fileName.toString());
                                                 File info = File.builder()
-                                                        .fileKey(fileKey.toString())
-                                                        .fileName(Normalizer.normalize(fileName.toString(), Normalizer.Form.NFC))
+                                                        .fileKey(fileKey)
+                                                        .fileName(Normalizer.normalize(fileName, Normalizer.Form.NFC))
                                                         .createdAt(new Date())
                                                         .createdId("test")
                                                         .delYn(false)
