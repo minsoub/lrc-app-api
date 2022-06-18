@@ -14,7 +14,7 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("lrc/lrcmanagment")
+@RequestMapping("lrc/lrcmanagment/project")
 public class ReviewEstimateController {
 
     private final ReviewEstimateService reviewEstimateService;

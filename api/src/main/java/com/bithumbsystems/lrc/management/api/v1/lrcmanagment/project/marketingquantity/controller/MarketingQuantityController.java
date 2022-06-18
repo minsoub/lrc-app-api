@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("lrc/lrcmanagment")
+@RequestMapping("lrc/lrcmanagment/project")
 public class MarketingQuantityController {
 
     private final MarketingQuantityService marketingQuantityService;
