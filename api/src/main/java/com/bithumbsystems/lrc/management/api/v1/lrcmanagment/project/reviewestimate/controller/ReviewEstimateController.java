@@ -4,6 +4,10 @@ package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewesti
 import com.bithumbsystems.lrc.management.api.core.model.response.SingleResponse;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.model.request.ReviewEstimateRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.service.ReviewEstimateService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +19,7 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("lrc/lrcmanagment/project")
+@Tag(name = "검토 평가", description = "검포 평가 API")
 public class ReviewEstimateController {
 
     private final ReviewEstimateService reviewEstimateService;
@@ -25,7 +30,9 @@ public class ReviewEstimateController {
      * @return ReviewEstimateResponse Object
      */
     @GetMapping("/review-estimate/{projectId}")
-    public ResponseEntity<Mono<?>> getReviewEstimate(@PathVariable("projectId") String projectId) {
+    @Operation(summary = "검토 평가 id로 찾기", description = "projectId를 이용하여 검토 평가 정보를 조회합니다.")
+    public ResponseEntity<Mono<?>> getReviewEstimate(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
+                                                         @PathVariable("projectId") String projectId) {
         return ResponseEntity.ok().body(reviewEstimateService.findByProjectId(projectId)
                 .map(c -> new SingleResponse(c))
         );
@@ -71,7 +78,9 @@ public class ReviewEstimateController {
      * @return ReviewEstimateResponse Object
      */
     @PostMapping(value = "/review-estimate/upload/s3", consumes = MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Mono<SingleResponse>> createReviewEstimateFile(@ModelAttribute(value = "reviewEstimateRequest") ReviewEstimateRequest reviewEstimateRequest) {
+    @Operation(summary = "검토 평가 여러개 저장 및 업데이트", description = "projectId를 이용하여 검토 평가 정보를 여러개 저장합니다.")
+    public ResponseEntity<Mono<SingleResponse>> createReviewEstimateFile(@Parameter(name = "reviewModelView", description = "검토평가 의 model", in = ParameterIn.PATH)
+                                                                             @ModelAttribute(value = "reviewEstimateRequest") ReviewEstimateRequest reviewEstimateRequest) {
         return ResponseEntity.ok().body(reviewEstimateService.saveAll(Flux.just(reviewEstimateRequest))
                 .map(c -> new SingleResponse(c)));
     }

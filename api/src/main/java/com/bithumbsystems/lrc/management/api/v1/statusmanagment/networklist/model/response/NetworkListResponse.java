@@ -13,13 +13,21 @@ import java.time.LocalDateTime;
 public class NetworkListResponse {
 
     private String id;
-    @Schema(name = "네트워크 계열명")
+    @Schema(description = "네트워크 계열 명")
     private String name;    //네트워크 계열 명
-    private String code;    //네트워크 계열 코열
 
+    @Schema(description = "네트워크 계열 코드")
+    private String code;    //네트워크 계열 코드
+
+    @Schema(description = "생성날짜")
     private LocalDateTime createDate; //생성날짜
+
+    @Schema(description = "생성자 id")
     private String createAdminAccountId;  //생성자 id
 
+    @Schema(description = "수정날짜")
     private LocalDateTime updateDate; //수정날짜
+
+    @Schema(description = "수정자 id")
     private String updateAdminAccountId; //수정자 id
 }

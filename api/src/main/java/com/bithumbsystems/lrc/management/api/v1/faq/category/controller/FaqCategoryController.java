@@ -4,6 +4,10 @@ import com.bithumbsystems.lrc.management.api.core.model.response.MultiResponse;
 import com.bithumbsystems.lrc.management.api.core.model.response.SingleResponse;
 import com.bithumbsystems.lrc.management.api.v1.faq.category.model.request.FaqCategoryRequest;
 import com.bithumbsystems.lrc.management.api.v1.faq.category.service.FaqCategoryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -14,6 +18,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("lrc/faq")
+@Tag(name = "카테고리 관리", description = "카테고리 관리 API")
 public class FaqCategoryController {
 
     @Autowired
@@ -24,6 +29,7 @@ public class FaqCategoryController {
      * @return FaqCategoryResponse object
      */
     @GetMapping("/category")
+    @Operation(summary = "카테고리 모든 정보", description = "카테고리 모든 정보를 조회합니다.")
     public ResponseEntity<Mono<?>> getAllCategory() {
         return ResponseEntity.ok().body(faqCategoryService.findAll()
                 .collectList()
@@ -37,7 +43,9 @@ public class FaqCategoryController {
      * @return FaqContentResponse object
      */
     @GetMapping("/category/{id}")
-    public ResponseEntity<Mono<?>> getCategory(@PathVariable("id") String id) {
+    @Operation(summary = "카테고리 1개 찾기", description = "카테고리 정보 1개 조회합니다.")
+    public ResponseEntity<Mono<?>> getCategory(@Parameter(name = "id", description = "id 정보", in = ParameterIn.PATH)
+                                                   @PathVariable("id") String id) {
         return ResponseEntity.ok().body(faqCategoryService.findCategoryById(id)
                 .map(c -> new SingleResponse(c))
         );
@@ -49,7 +57,9 @@ public class FaqCategoryController {
      * @return FaqCategoryResponse
      */
     @PostMapping("/category")
-    public ResponseEntity<Mono<?>> createCategory(@RequestBody FaqCategoryRequest faqCategoryRequest) {
+    @Operation(summary = "카테고리 1개 저장", description = "카테고리 정보 저장합니다.")
+    public ResponseEntity<Mono<?>> createCategory(@Parameter(name = "category Object", description = "카테고리 Model", in = ParameterIn.PATH)
+                                                      @RequestBody FaqCategoryRequest faqCategoryRequest) {
         return ResponseEntity.ok().body(faqCategoryService.create(faqCategoryRequest)
                 .map(c -> new SingleResponse(c))
         );
@@ -61,7 +71,9 @@ public class FaqCategoryController {
      * @return FaqCategoryResponse
      */
     @PutMapping("/category/{id}")
-    public ResponseEntity<Mono<?>> updateCategory(@PathVariable("id") String id, @RequestBody FaqCategoryRequest faqCategoryRequest) {
+    @Operation(summary = "카테고리 업데이트", description = "카테고리 정보 수정합니다.")
+    public ResponseEntity<Mono<?>> updateCategory(@Parameter(name = "id", description = "id 정보", in = ParameterIn.PATH)
+                                                      @PathVariable("id") String id, @RequestBody FaqCategoryRequest faqCategoryRequest) {
         return ResponseEntity.ok().body(faqCategoryService.updateCategory(id, faqCategoryRequest)
                 .map(c -> new SingleResponse(c))
         );
@@ -73,7 +85,9 @@ public class FaqCategoryController {
      * @return FaqCategoryResponse
      */
     @DeleteMapping("/category/{code}")
-    public ResponseEntity<Mono<?>> deleteCategory(@PathVariable("code") String code) {
+    @Operation(summary = "카테고리 삭제", description = "카테고리 정보 삭제합니다.")
+    public ResponseEntity<Mono<?>> deleteCategory(@Parameter(name = "code", description = "code Id", in = ParameterIn.PATH)
+                                                      @PathVariable("code") String code) {
         return ResponseEntity.ok().body(faqCategoryService.deleteCategory(code)
                 .then(Mono.just(new SingleResponse()))
         );
@@ -86,7 +100,11 @@ public class FaqCategoryController {
      * @return FaqContentResponse paging
      */
     @GetMapping("/category/all")
-    public ResponseEntity<Mono<?>> getAll(@RequestParam("page") int page, @RequestParam("size") int size){
+    @Operation(summary = "카테고리 페이징", description = "카테고리 정보를 페이징 조회합니다.")
+    public ResponseEntity<Mono<?>> getAll(@Parameter(name = "page", description = "page 정보", in = ParameterIn.PATH)
+                                              @RequestParam("page") int page,
+                                          @Parameter(name = "size", description = "page size 정보", in = ParameterIn.PATH)
+                                          @RequestParam("size") int size){
         return ResponseEntity.ok().body(faqCategoryService.getProducts(PageRequest.of(page, size))
                 .map(c -> new SingleResponse(c)));
     }
