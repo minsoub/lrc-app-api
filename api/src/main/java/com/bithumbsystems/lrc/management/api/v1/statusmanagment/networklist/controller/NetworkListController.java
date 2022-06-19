@@ -3,6 +3,8 @@ package com.bithumbsystems.lrc.management.api.v1.statusmanagment.networklist.con
 import com.bithumbsystems.lrc.management.api.core.model.response.SingleResponse;
 import com.bithumbsystems.lrc.management.api.v1.statusmanagment.networklist.model.request.NetworkListRequest;
 import com.bithumbsystems.lrc.management.api.v1.statusmanagment.networklist.service.NetworkListService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,15 +13,16 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("lrc/statusmanagment")
+@Tag(name = "네트워크")
 public class NetworkListController {
 
     private final NetworkListService networkListService;
-
     /**
      * 네트워크계열 모두 가져오기
      * @return NetworkListResponse
      */
     @GetMapping("/network-list")
+    @Operation(summary = "네트워크계열 모두 가져오기", description = "네트워크계열 모두 가져오기")
     public ResponseEntity<Mono<?>> getNetwork() {
         return ResponseEntity.ok().body(networkListService.getNetwork()
                 .collectList()

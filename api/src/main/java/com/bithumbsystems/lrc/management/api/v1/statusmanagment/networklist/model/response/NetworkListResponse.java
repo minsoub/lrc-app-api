@@ -1,5 +1,6 @@
 package com.bithumbsystems.lrc.management.api.v1.statusmanagment.networklist.model.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 public class NetworkListResponse {
 
     private String id;
+    @Schema(name = "네트워크 계열명")
     private String name;    //네트워크 계열 명
     private String code;    //네트워크 계열 코열
 
