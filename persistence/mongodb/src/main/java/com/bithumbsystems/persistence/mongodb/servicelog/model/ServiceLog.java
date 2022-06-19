@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
-@Document("service_log")
+@Document("lrc_service_log")
 public class ServiceLog {
 
     @Id

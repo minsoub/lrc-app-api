@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
-@Document("status_value_list")
+@Document("lrc_status_value_list")
 public class StatusValueList {
 
     @Transient

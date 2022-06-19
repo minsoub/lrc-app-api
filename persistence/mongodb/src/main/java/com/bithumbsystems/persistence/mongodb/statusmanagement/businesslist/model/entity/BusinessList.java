@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
-@Document("business_list")
+@Document("lrc_business_list")
 public class BusinessList {
 
     @Id

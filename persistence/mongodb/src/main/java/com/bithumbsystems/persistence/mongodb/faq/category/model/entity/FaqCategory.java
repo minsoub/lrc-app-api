@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
-@Document("faq_category")
+@Document("lrc_faq_category")
 public class FaqCategory {
 
     @Id

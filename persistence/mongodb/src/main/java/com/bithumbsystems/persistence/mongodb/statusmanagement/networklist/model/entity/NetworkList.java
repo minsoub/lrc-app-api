@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
-@Document("network_list")
+@Document("lrc_network_list")
 public class NetworkList {
 
     @Id
