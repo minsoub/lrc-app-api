@@ -1,14 +1,14 @@
-package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.service;
+package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.service;
 
 import com.bithumbsystems.lrc.management.api.core.config.property.AwsProperties;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContentException;
 import com.bithumbsystems.lrc.management.api.v1.file.service.FileService;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.mapper.SubmittedDocumentMapper;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.model.request.SubmittedDocumentRequest;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.model.response.SubmittedDocumentResponse;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.mapper.SubmittedDocumentFileMapper;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.model.request.SubmittedDocumentFileRequest;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.model.response.SubmittedDocumentFileResponse;
 import com.bithumbsystems.persistence.mongodb.file.model.entity.File;
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.service.SubmittedDocumentDomainService;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.file.service.SubmittedDocumentFileDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -27,35 +27,35 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SubmittedDocumentService {
+public class SubmittedDocumentFileService {
 
-    private final SubmittedDocumentDomainService submittedDocumentDomainService;
+    private final SubmittedDocumentFileDomainService submittedDocumentFileDomainService;
     private final AwsProperties awsProperties;
     private final FileService fileService;
 
     /**
-     * 제출 서류 관리 id로 찾기
+     * 제출 서류 관리 id, type 으로 file 찾기
      * @param projectId
+     * @param type
      * @return ReviewEstimateResponse Object
      */
-    public Mono<List<SubmittedDocumentResponse>> findByProjectId(String projectId) {
-        return submittedDocumentDomainService.findByProjectId(projectId)
-                .map(SubmittedDocumentMapper.INSTANCE::submittedDocumentResponse)
+    public Mono<List<SubmittedDocumentFileResponse>> findByProjectIdAndType(String projectId, String type) {
+        return submittedDocumentFileDomainService.findByProjectIdAndType(projectId, type)
+                .map(SubmittedDocumentFileMapper.INSTANCE::submittedDocumentFileResponse)
                 .collectList()
                 .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
     }
 
     /**
-     * 제출 서류 관리 여러개 저장 및 업데이트
+     * 제출 서류 관리 file 저장
      * @param submittedDocumentRequest
      * @return SubmittedDocumentResponse Object
      */
     @Transactional
-    public Mono<List<SubmittedDocumentResponse>> saveAll(Flux<SubmittedDocumentRequest> submittedDocumentRequest) {
+    public Mono<List<SubmittedDocumentFileResponse>> saveAll(Flux<SubmittedDocumentFileRequest> submittedDocumentRequest) {
         return submittedDocumentRequest
-                .flatMap(submittedDocument -> {
-                    if(submittedDocument.getFilePart() != null) {  //첨부파일 확인
-                        return DataBufferUtils.join(submittedDocument.getFilePart().content())
+                .flatMap(submittedDocument ->
+                        DataBufferUtils.join(submittedDocument.getFilePart().content())
                                 .flatMap(dataBuffer -> {
                                     ByteBuffer buf = dataBuffer.asByteBuffer();
                                     String fileKey = UUID.randomUUID().toString();
@@ -64,6 +64,7 @@ public class SubmittedDocumentService {
                                     log.info("byte size ===>  {}   :   {}   :   {} : ", fileKey, fileName, fileSize);
 
                                     return fileService.upload(fileKey, fileName, fileSize, awsProperties.getBucket(), buf)
+
                                             .publishOn(Schedulers.boundedElastic())
                                             .flatMap(res -> {
                                                 log.info("service upload res   =>       {}", res);
@@ -82,13 +83,23 @@ public class SubmittedDocumentService {
                                             .flatMap(file -> {
                                                 submittedDocument.setFileKey(file.getFileKey());
                                                 submittedDocument.setFileName(file.getFileName());
-                                                return submittedDocumentDomainService.save(SubmittedDocumentMapper.INSTANCE.requestToSubmittedDocument(submittedDocument));
+                                                return submittedDocumentFileDomainService.save(SubmittedDocumentFileMapper.INSTANCE.requestToSubmittedDocumentFile(submittedDocument));
                                             });
-                                });
-                    } else {
-                        return submittedDocumentDomainService.save(SubmittedDocumentMapper.INSTANCE.requestToSubmittedDocument(submittedDocument));
-                    }
-                }).collectList()
-                .then(this.findByProjectId("PRJ001"));  //프로젝트 명은 바꾸어야 함
+                                })
+                )
+                .flatMap(res ->
+                        submittedDocumentFileDomainService.findByProjectIdAndType(res.getProjectId(), res.getType())
+                                .map(SubmittedDocumentFileMapper.INSTANCE::submittedDocumentFileResponse)
+                ).collectList();
+    }
+
+    /**
+     * 제출 서류 관리 file 저장
+     * @param id
+     * @return SubmittedDocumentResponse Object
+     */
+    public Mono<Void> deleteSubmittedDocumentFile(String id) {
+        return submittedDocumentFileDomainService.findSubmittedDocumentFileById(id)
+                .flatMap(submittedDocumentFileDomainService::deleteSubmittedDocumentFile);
     }
 }

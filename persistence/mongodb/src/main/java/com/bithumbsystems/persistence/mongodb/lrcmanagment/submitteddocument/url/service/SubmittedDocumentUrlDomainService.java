@@ -1,0 +1,56 @@
+package com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.service;
+
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.model.SubmittedDocumentUrl;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.repository.SubmittedDocumentUrlRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.time.LocalDateTime;
+
+@Service
+@RequiredArgsConstructor
+public class SubmittedDocumentUrlDomainService {
+
+    private final SubmittedDocumentUrlRepository submittedDocumentUrlRepository;
+
+    /**
+     * 제출 서류 관리 url id 찾기
+     * @param contentId
+     * @return
+     */
+    public Mono<SubmittedDocumentUrl> findSubmittedDocumentUrlById(String contentId) {
+        return submittedDocumentUrlRepository.findById(contentId);
+    }
+
+    /**
+     * 제출 서류 관리 id, type 으로 url 찾기
+     * @param projectId
+     * @param type
+     * @return SubmittedDocumentUrlResponse Object
+     */
+    public Flux<SubmittedDocumentUrl> findByProjectIdAndType(String projectId, String type) {
+        return submittedDocumentUrlRepository.findByProjectIdAndType(projectId, type);
+    }
+
+    /**
+     * 제출 서류 관리 url 저장
+     * @param submittedDocumentUrl
+     * @return SubmittedDocumentUrlResponse Object
+     */
+    public Mono<SubmittedDocumentUrl> save(SubmittedDocumentUrl submittedDocumentUrl) {
+        submittedDocumentUrl.setCreateDate(LocalDateTime.now());
+        submittedDocumentUrl.setCreateAdminAccountId("등록자 누구지?");
+        return submittedDocumentUrlRepository.insert(submittedDocumentUrl);
+    }
+
+    /**
+     * 제출 서류 관리 url 삭제
+     * @param submittedDocumentUrl
+     * @return N/A
+     */
+    public Mono<Void> deleteSubmittedDocumentUrl(SubmittedDocumentUrl submittedDocumentUrl) {
+        return submittedDocumentUrlRepository.delete(submittedDocumentUrl);
+    }
+}

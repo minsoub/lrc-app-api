@@ -1,4 +1,4 @@
-package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.model.response;
+package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.model.response;
 
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Schema(description = "제출 서류 관리")
-public class SubmittedDocumentResponse {
+@Schema(description = "제출 서류 관리 file")
+public class SubmittedDocumentFileResponse {
 
     private String id;
 
@@ -21,9 +21,6 @@ public class SubmittedDocumentResponse {
 
     @Schema(description = "구분")
     private String type;            //구분
-
-    @Schema(description = "url")
-    private String url;             //url
 
     @Schema(description = "파일 키")
     private String fileKey;         //파일코드
@@ -36,10 +33,4 @@ public class SubmittedDocumentResponse {
 
     @Schema(description = "생성자 id")
     private String createAdminAccountId;  //생성자 id
-
-    @Schema(description = "수정 날짜")
-    private LocalDateTime updateDate; //수정날짜
-
-    @Schema(description = "수정자 id")
-    private String updateAdminAccountId; //수정자 id
 }
