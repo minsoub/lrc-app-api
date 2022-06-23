@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -52,7 +53,11 @@ public class FoundationService {
                 .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
     }
 
-
+    /**
+     * 재단정보 1개 업데이트
+     * @param foundationRequest
+     * @return FoundationResponse
+     */
     public Mono<FoundationResponse> updateFoundationInfo(String id, FoundationRequest foundationRequest) {
         return foundationDomainService.findByProjectId(id)
                 .flatMap(c -> {
@@ -73,6 +78,24 @@ public class FoundationService {
                             .map(FoundationMapper.INSTANCE::foundationResponse);
                 })
                 .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.FAIL_UPDATE_CONTENT)));
+    }
+
+    /**
+     * 재단정보 검색 하기
+     * @param fromDate 이전
+     * @param toDate 다음
+     * @param contrectCode 계약상태
+     * @param progressCode 진행상태
+     * @param business 사업계열
+     * @param network 네트워크계열
+     * @param keyword 프로젝트명,심볼 조건 검색
+     * @return Foundation Object
+     */
+    public Mono<List<FoundationResponse>> findSearch(LocalDateTime fromDate, LocalDateTime toDate, String contrectCode, String progressCode,
+                                                     List<String> business, List<String> network, String keyword) {
+        return foundationDomainService.findSearch(fromDate, toDate, contrectCode, progressCode, business, network, keyword)
+                .map(FoundationMapper.INSTANCE::foundationResponse)
+                .collectList();
     }
 
 }

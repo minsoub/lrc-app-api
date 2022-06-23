@@ -9,9 +9,17 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -59,6 +67,34 @@ public class FoundationController {
                                                      @Parameter(name = "foundation Object", description = "재단의 Model", in = ParameterIn.PATH)
                                                      @RequestBody FoundationRequest foundationRequest) {
         return ResponseEntity.ok().body(foundationService.updateFoundationInfo(projectId, foundationRequest)
+                .map(c -> new SingleResponse(c))
+        );
+    }
+
+    @GetMapping("foundation/search")
+    public ResponseEntity<Mono<?>> findSearch(@RequestParam(required = false) String fromDate,
+                                              @RequestParam(required = false) String toDate,
+                                              @RequestParam(required = false) String contrectCode,
+                                              @RequestParam(required = false) String progressCode,
+                                              @RequestParam(required = false) String businessList,
+                                              @RequestParam(required = false) String networkList,
+                                              @RequestParam(required = false) String keyword) throws UnsupportedEncodingException {
+
+        LocalDateTime nFromDate = LocalDateTime.parse(fromDate);
+        LocalDateTime nToDate = LocalDateTime.parse(toDate);
+
+        List<String> business = new ArrayList<String>();
+        if(StringUtils.isNotEmpty(businessList)) {
+            business = Arrays.asList(URLDecoder.decode(businessList, "UTF-8").split(";"));
+        }
+
+        List<String> network = new ArrayList<String>();
+        if(StringUtils.isNotEmpty(networkList)) {
+            network = Arrays.asList(URLDecoder.decode(networkList, "UTF-8").split(";"));
+        }
+
+
+        return ResponseEntity.ok().body(foundationService.findSearch(nFromDate, nToDate, contrectCode, progressCode, business, network, keyword)
                 .map(c -> new SingleResponse(c))
         );
     }
