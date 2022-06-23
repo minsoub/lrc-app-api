@@ -1,23 +1,47 @@
 server:
   shutdown: graceful
-  port: 8080
+  port: 8081
 spring:
   main:
     allow-bean-definition-overriding: true
   devtools:
     restart:
       enabled: false
+  data:
+    mongodb:
+      auto-index-creation: true
+      uuid-representation: standard
+      field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
 
 application:
   version: /v1
   prefix: /api
+  route: /mng
   exclude-prefix-path: springdoc
+
+jwt:
+  secret: ${management.api.jwt.secret:eyJzdWIiOiJtaW5zb3ViQGJpdGh1bWJzeXN0ZW1zLmNvbSIsIm5hbWUiOiJCaXRodW1iU3lzdGVtcyIsImlhdCI6MjA5OTEyMzExMjF9.Lpo86rOQtvBRfVKDGhICUWuZ92rgBIVPM9PVAUiRhAM}
 
 management:
   endpoints:
     web:
       exposure:
         include: metrics, prometheus, health
+
+logging:
+  level:
+    root: ${management.api.logging.level.root:DEBUG}
+    org.springframework.data.convert.CustomConversions: ERROR
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: ${management.api.logging.level.mongo:DEBUG}
+    io:
+      spring:
+        cloud: INFO
+  config: classpath:logback-spring-${spring.profiles.active}.xml
 
 ---
 spring:
@@ -30,8 +54,9 @@ spring:
       host: localhost
       port: 27017
       database: test
-      field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
 
+logging:
+  config: classpath:logback-spring-${spring.profiles.active}.xml
 ---
 spring:
   config:
@@ -43,14 +68,24 @@ spring:
       host: localhost
       port: 27017
       database: test
-
+logging:
+  config: classpath:logback-spring-local.xml
 ---
 spring:
   config:
     import: classpath:aws-properties-dev.yml, classpath:springdoc.yml
     activate:
       on-profile: dev
-
+logging:
+  config: classpath:logback-spring-${spring.profiles.active}.xml
+---
+spring:
+  config:
+    import: classpath:aws-properties-eks-dev.yml, classpath:springdoc.yml
+    activate:
+      on-profile: eks-dev
+logging:
+  config: classpath:logback-spring-dev.xml
 ---
 spring:
   config:
@@ -60,3 +95,5 @@ spring:
 springdoc:
   api-docs:
     enabled: false
+logging:
+  config: classpath:logback-spring-${spring.profiles.active}.xml
