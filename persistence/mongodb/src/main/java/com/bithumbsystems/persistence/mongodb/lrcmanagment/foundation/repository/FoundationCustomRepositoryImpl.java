@@ -3,6 +3,7 @@ package com.bithumbsystems.persistence.mongodb.lrcmanagment.foundation.repositor
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.foundation.model.entity.Foundation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -37,11 +38,12 @@ public class FoundationCustomRepositoryImpl implements FoundationCustomRepositor
 
         query.addCriteria(Criteria.where("create_date").gte(fromDate).lte(toDate)); //날짜
 
-        if(contrectCode != null && !contrectCode.equals("")) {
+
+        if(StringUtils.isNotEmpty(contrectCode)) {
             query.addCriteria(Criteria.where("contrect_code").is(contrectCode));    //계약상태
         }
 
-        if(progressCode != null) {
+        if(StringUtils.isNotEmpty(progressCode)) {
             query.addCriteria(Criteria.where("progress_code").is(progressCode));    //진행상테
         }
 
@@ -53,7 +55,7 @@ public class FoundationCustomRepositoryImpl implements FoundationCustomRepositor
             query.addCriteria(Criteria.where("network_list").in(network));          //네트워크 계열
         }
 
-        if(keyword != null) {   //프로젝트명 심볼
+        if(StringUtils.isNotEmpty(keyword)) {   //프로젝트명 심볼
             query.addCriteria(new Criteria().orOperator(
                     Criteria.where("project_name").regex(".*" + keyword + ".*", "i"),
                     Criteria.where("symbol").regex(".*" + keyword + ".*", "i")
