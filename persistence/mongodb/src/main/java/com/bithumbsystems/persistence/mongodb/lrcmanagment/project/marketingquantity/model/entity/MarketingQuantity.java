@@ -1,4 +1,4 @@
-package com.bithumbsystems.persistence.mongodb.lrcmanagment.project.marketingquantity.model;
+package com.bithumbsystems.persistence.mongodb.lrcmanagment.project.marketingquantity.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

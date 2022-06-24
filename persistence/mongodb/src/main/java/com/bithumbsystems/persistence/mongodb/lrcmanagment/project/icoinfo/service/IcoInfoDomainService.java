@@ -1,6 +1,6 @@
 package com.bithumbsystems.persistence.mongodb.lrcmanagment.project.icoinfo.service;
 
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.icoinfo.model.IcoInfo;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.icoinfo.model.entity.IcoInfo;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.icoinfo.repository.IcoInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

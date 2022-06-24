@@ -1,4 +1,4 @@
-package com.bithumbsystems.persistence.mongodb.servicelog.model;
+package com.bithumbsystems.persistence.mongodb.servicelog.model.entity;
 
 
 import lombok.Data;

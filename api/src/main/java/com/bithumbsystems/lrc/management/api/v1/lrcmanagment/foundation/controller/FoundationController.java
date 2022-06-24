@@ -71,14 +71,27 @@ public class FoundationController {
         );
     }
 
+    /**
+     * 재단 검색 하기
+     * @param fromDate 이전
+     * @param toDate 다음
+     * @param contractCode 계약상태
+     * @param progressCode 진행상태
+     * @param businessList 사업계열
+     * @param networkList 네트워크계열
+     * @param keyword 프로젝트명,심볼 조건 검색
+     * @return Foundation Object
+     */
     @GetMapping("foundation/search")
-    public ResponseEntity<Mono<?>> findSearch(@RequestParam(required = false) String fromDate,
-                                              @RequestParam(required = false) String toDate,
-                                              @RequestParam(required = false) String contrectCode,
-                                              @RequestParam(required = false) String progressCode,
-                                              @RequestParam(required = false) String businessList,
-                                              @RequestParam(required = false) String networkList,
-                                              @RequestParam(required = false) String keyword) throws UnsupportedEncodingException {
+    @Operation(summary = "재단 검색 하기", description = "재단 정보를 저장합니다.")
+    public ResponseEntity<Mono<?>> findSearch(@Parameter(name = "fromDate", description = "fromDate 이전 날짜", in = ParameterIn.PATH) @RequestParam(required = false) String fromDate,
+                                              @Parameter(name = "toDate", description = "toDate 다음 날짜", in = ParameterIn.PATH) @RequestParam(required = false) String toDate,
+                                              @Parameter(name = "contractCode", description = "계약상태", in = ParameterIn.PATH) @RequestParam(required = false) String contractCode,
+                                              @Parameter(name = "progressCode", description = "진행상태", in = ParameterIn.PATH) @RequestParam(required = false) String progressCode,
+                                              @Parameter(name = "businessList", description = "사업계열", in = ParameterIn.PATH) @RequestParam(required = false) String businessList,
+                                              @Parameter(name = "networkList", description = "네트워크계열", in = ParameterIn.PATH) @RequestParam(required = false) String networkList,
+                                              @Parameter(name = "keyword", description = "프로젝트명,심볼 조건 검색", in = ParameterIn.PATH) @RequestParam(required = false) String keyword)
+            throws UnsupportedEncodingException {
 
         LocalDateTime nFromDate = LocalDateTime.parse(fromDate);
         LocalDateTime nToDate = LocalDateTime.parse(toDate);
@@ -94,7 +107,7 @@ public class FoundationController {
         }
 
 
-        return ResponseEntity.ok().body(foundationService.findSearch(nFromDate, nToDate, contrectCode, progressCode, business, network, keyword)
+        return ResponseEntity.ok().body(foundationService.findSearch(nFromDate, nToDate, contractCode, progressCode, business, network, keyword)
                 .map(c -> new SingleResponse(c))
         );
     }

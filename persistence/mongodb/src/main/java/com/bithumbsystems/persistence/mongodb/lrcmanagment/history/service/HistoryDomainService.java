@@ -1,6 +1,6 @@
 package com.bithumbsystems.persistence.mongodb.lrcmanagment.history.service;
 
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.history.model.History;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.history.model.entity.History;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.history.repository.HistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

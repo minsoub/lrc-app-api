@@ -2,7 +2,7 @@ package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.
 
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.model.request.SubmittedDocumentUrlRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.model.response.SubmittedDocumentUrlResponse;
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.model.SubmittedDocumentUrl;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.model.entity.SubmittedDocumentUrl;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

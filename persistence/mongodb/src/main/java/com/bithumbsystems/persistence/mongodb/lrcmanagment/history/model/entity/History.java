@@ -1,4 +1,4 @@
-package com.bithumbsystems.persistence.mongodb.lrcmanagment.history.model;
+package com.bithumbsystems.persistence.mongodb.lrcmanagment.history.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

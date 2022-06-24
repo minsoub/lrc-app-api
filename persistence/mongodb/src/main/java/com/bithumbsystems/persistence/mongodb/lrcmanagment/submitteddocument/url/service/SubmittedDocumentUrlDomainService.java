@@ -1,6 +1,6 @@
 package com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.service;
 
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.model.SubmittedDocumentUrl;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.model.entity.SubmittedDocumentUrl;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.repository.SubmittedDocumentUrlRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
