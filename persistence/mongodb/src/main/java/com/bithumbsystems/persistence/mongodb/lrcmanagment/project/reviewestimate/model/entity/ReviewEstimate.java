@@ -1,4 +1,4 @@
-package com.bithumbsystems.persistence.mongodb.lrcmanagment.project.reviewestimate.model;
+package com.bithumbsystems.persistence.mongodb.lrcmanagment.project.reviewestimate.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,6 +1,6 @@
 package com.bithumbsystems.persistence.mongodb.servicelog.service;
 
-import com.bithumbsystems.persistence.mongodb.servicelog.model.ServiceLog;
+import com.bithumbsystems.persistence.mongodb.servicelog.model.entity.ServiceLog;
 import com.bithumbsystems.persistence.mongodb.servicelog.repository.ServiceLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

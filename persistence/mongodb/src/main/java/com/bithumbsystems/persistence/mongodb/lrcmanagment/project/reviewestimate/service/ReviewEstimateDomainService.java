@@ -1,6 +1,6 @@
 package com.bithumbsystems.persistence.mongodb.lrcmanagment.project.reviewestimate.service;
 
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.reviewestimate.model.ReviewEstimate;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.reviewestimate.model.entity.ReviewEstimate;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.reviewestimate.repository.ReviewEstimateRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

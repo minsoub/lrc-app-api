@@ -2,7 +2,7 @@ package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewesti
 
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.model.request.ReviewEstimateRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.model.response.ReviewEstimateResponse;
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.reviewestimate.model.ReviewEstimate;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.reviewestimate.model.entity.ReviewEstimate;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

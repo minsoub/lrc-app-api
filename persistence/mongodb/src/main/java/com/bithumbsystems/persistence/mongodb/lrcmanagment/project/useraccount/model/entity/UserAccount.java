@@ -1,4 +1,4 @@
-package com.bithumbsystems.persistence.mongodb.lrcmanagment.project.useraccount.model;
+package com.bithumbsystems.persistence.mongodb.lrcmanagment.project.useraccount.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

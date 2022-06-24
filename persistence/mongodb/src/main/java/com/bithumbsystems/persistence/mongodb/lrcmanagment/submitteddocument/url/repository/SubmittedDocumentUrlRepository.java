@@ -1,6 +1,6 @@
 package com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.repository;
 
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.model.SubmittedDocumentUrl;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.model.entity.SubmittedDocumentUrl;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;

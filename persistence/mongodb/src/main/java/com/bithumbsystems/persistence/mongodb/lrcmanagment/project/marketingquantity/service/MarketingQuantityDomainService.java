@@ -1,6 +1,6 @@
 package com.bithumbsystems.persistence.mongodb.lrcmanagment.project.marketingquantity.service;
 
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.marketingquantity.model.MarketingQuantity;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.marketingquantity.model.entity.MarketingQuantity;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.marketingquantity.repository.MarketingQuantityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

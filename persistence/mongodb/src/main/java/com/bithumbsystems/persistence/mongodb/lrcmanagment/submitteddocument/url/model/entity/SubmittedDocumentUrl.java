@@ -1,4 +1,4 @@
-package com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.model;
+package com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.model.entity;
 
 
 import lombok.AllArgsConstructor;

@@ -2,7 +2,7 @@ package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.mapper;
 
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.model.request.HistoryRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.model.response.HistoryResponse;
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.history.model.History;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.history.model.entity.History;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

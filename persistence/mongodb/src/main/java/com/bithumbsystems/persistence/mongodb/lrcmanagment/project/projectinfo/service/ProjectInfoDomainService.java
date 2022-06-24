@@ -1,6 +1,6 @@
 package com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectinfo.service;
 
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectinfo.model.ProjectInfo;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectinfo.model.entity.ProjectInfo;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectinfo.repository.ProjectInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

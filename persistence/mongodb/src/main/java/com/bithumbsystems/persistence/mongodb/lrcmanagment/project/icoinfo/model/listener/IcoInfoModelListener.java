@@ -1,6 +1,6 @@
 package com.bithumbsystems.persistence.mongodb.lrcmanagment.project.icoinfo.model.listener;
 
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.icoinfo.model.IcoInfo;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.icoinfo.model.entity.IcoInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import org.springframework.data.mongodb.core.mapping.event.BeforeConvertEvent;

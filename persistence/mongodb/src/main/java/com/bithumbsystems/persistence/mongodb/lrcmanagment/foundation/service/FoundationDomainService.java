@@ -20,7 +20,7 @@ public class FoundationDomainService {
     private final FoundationCustomRepository foundationCustomRepository;
 
     /**
-     * 재단정보 모두 가져오기
+     * 재단 모두 가져오기
      * @return Foundation Object
      */
     public Flux<Foundation> findAll() {
@@ -28,7 +28,7 @@ public class FoundationDomainService {
     }
 
     /**
-     * 재단정보 id로 찾기
+     * 재단 id로 찾기
      * @param projectId
      * @return Foundation Object
      */
@@ -37,7 +37,7 @@ public class FoundationDomainService {
     }
 
     /**
-     * 재단정보 1개 저장
+     * 재단 1개 저장
      * @param foundation
      * @return Foundation Object
      */
@@ -48,19 +48,19 @@ public class FoundationDomainService {
     }
 
     /**
-     * 재단정보 검색 하기개 저장
+     * 재단 검색 하기개 저장
      * @param fromDate 이전
      * @param toDate 다음
-     * @param contrectCode 계약상태
+     * @param contractCode 계약상태
      * @param progressCode 진행상태
      * @param business 사업계열
      * @param network 네트워크계열
      * @param keyword 프로젝트명,심볼 조건 검색
      * @return Foundation Object
      */
-    public Flux<Foundation> findSearch(LocalDateTime fromDate, LocalDateTime toDate, String contrectCode, String progressCode,
+    public Flux<Foundation> findSearch(LocalDateTime fromDate, LocalDateTime toDate, String contractCode, String progressCode,
                                        List<String> business, List<String> network, String keyword)
     {
-        return foundationCustomRepository.findBySearch(fromDate, toDate, contrectCode, progressCode, business, network, keyword);
+        return foundationCustomRepository.findBySearch(fromDate, toDate, contractCode, progressCode, business, network, keyword);
     }
 }

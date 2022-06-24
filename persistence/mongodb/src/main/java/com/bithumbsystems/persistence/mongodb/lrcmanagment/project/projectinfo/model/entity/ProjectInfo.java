@@ -1,4 +1,4 @@
-package com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectinfo.model;
+package com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectinfo.model.entity;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;

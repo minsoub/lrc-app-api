@@ -1,6 +1,6 @@
 package com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.model.listener;
 
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.model.SubmittedDocumentUrl;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.model.entity.SubmittedDocumentUrl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import org.springframework.data.mongodb.core.mapping.event.BeforeConvertEvent;

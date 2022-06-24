@@ -1,6 +1,6 @@
 package com.bithumbsystems.persistence.mongodb.lrcmanagment.project.useraccount.model.listener;
 
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.useraccount.model.UserAccount;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.useraccount.model.entity.UserAccount;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import org.springframework.data.mongodb.core.mapping.event.BeforeConvertEvent;
