@@ -1,9 +1,12 @@
 package com.bithumbsystems.lrc.management.api.v1.faq.category.controller;
 
+import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
+import com.bithumbsystems.lrc.management.api.core.config.resolver.CurrentUser;
 import com.bithumbsystems.lrc.management.api.core.model.response.MultiResponse;
 import com.bithumbsystems.lrc.management.api.core.model.response.SingleResponse;
 import com.bithumbsystems.lrc.management.api.v1.faq.category.model.request.FaqCategoryRequest;
 import com.bithumbsystems.lrc.management.api.v1.faq.category.service.FaqCategoryService;
+import com.bithumbsystems.persistence.mongodb.faq.category.model.enums.LanguageType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -30,8 +33,8 @@ public class FaqCategoryController {
      */
     @GetMapping("/category")
     @Operation(summary = "카테고리 모든 정보", description = "카테고리 모든 정보를 조회합니다.")
-    public ResponseEntity<Mono<?>> getAllCategory() {
-        return ResponseEntity.ok().body(faqCategoryService.findAll()
+    public ResponseEntity<Mono<?>> getAllCategory( @RequestParam(required = true) LanguageType language) {
+        return ResponseEntity.ok().body(faqCategoryService.findAll(language)
                 .collectList()
                 .map(c -> new MultiResponse(c))
         );
@@ -59,8 +62,9 @@ public class FaqCategoryController {
     @PostMapping("/category")
     @Operation(summary = "카테고리 1개 저장", description = "카테고리 정보 저장합니다.")
     public ResponseEntity<Mono<?>> createCategory(@Parameter(name = "category Object", description = "카테고리 Model", in = ParameterIn.PATH)
-                                                      @RequestBody FaqCategoryRequest faqCategoryRequest) {
-        return ResponseEntity.ok().body(faqCategoryService.create(faqCategoryRequest)
+                                                      @RequestBody FaqCategoryRequest faqCategoryRequest,
+                                                  @Parameter(hidden = true) @CurrentUser Account account) {
+        return ResponseEntity.ok().body(faqCategoryService.create(faqCategoryRequest, account)
                 .map(c -> new SingleResponse(c))
         );
     }
@@ -73,8 +77,9 @@ public class FaqCategoryController {
     @PutMapping("/category/{id}")
     @Operation(summary = "카테고리 업데이트", description = "카테고리 정보 수정합니다.")
     public ResponseEntity<Mono<?>> updateCategory(@Parameter(name = "id", description = "id 정보", in = ParameterIn.PATH)
-                                                      @PathVariable("id") String id, @RequestBody FaqCategoryRequest faqCategoryRequest) {
-        return ResponseEntity.ok().body(faqCategoryService.updateCategory(id, faqCategoryRequest)
+                                                      @PathVariable("id") String id, @RequestBody FaqCategoryRequest faqCategoryRequest,
+                                                  @Parameter(hidden = true) @CurrentUser Account account) {
+        return ResponseEntity.ok().body(faqCategoryService.updateCategory(id, faqCategoryRequest, account)
                 .map(c -> new SingleResponse(c))
         );
     }
@@ -87,8 +92,9 @@ public class FaqCategoryController {
     @DeleteMapping("/category/{code}")
     @Operation(summary = "카테고리 삭제", description = "카테고리 정보 삭제합니다.")
     public ResponseEntity<Mono<?>> deleteCategory(@Parameter(name = "code", description = "code Id", in = ParameterIn.PATH)
-                                                      @PathVariable("code") String code) {
-        return ResponseEntity.ok().body(faqCategoryService.deleteCategory(code)
+                                                      @PathVariable("code") String code,
+                                                  @Parameter(hidden = true) @CurrentUser Account account) {
+        return ResponseEntity.ok().body(faqCategoryService.deleteCategory(code, account)
                 .then(Mono.just(new SingleResponse()))
         );
     }

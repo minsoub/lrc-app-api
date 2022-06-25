@@ -9,14 +9,6 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface FaqCategoryRepository extends ReactiveMongoRepository<FaqCategory, String> {
-
-    /**
-     * code 찾기
-     * @param code
-     * @return FaqContentResponse Object
-     */
-    Mono<FaqCategory> findByCode(String code);
-
     /**
      * 페이징 데이터 만들기
      * @param pageable

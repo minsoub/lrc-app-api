@@ -1,8 +1,9 @@
 package com.bithumbsystems.lrc.management.api.v1.statusmanagment.statusvaluelist.mapper;
 
-import com.bithumbsystems.lrc.management.api.v1.statusmanagment.statusvaluelist.model.request.StatusValueListRequest;
-import com.bithumbsystems.lrc.management.api.v1.statusmanagment.statusvaluelist.model.response.StatusValueListResponse;
-import com.bithumbsystems.persistence.mongodb.statusmanagement.statusvalue.model.entity.StatusValueList;
+import com.bithumbsystems.lrc.management.api.v1.statusmanagment.statusvaluelist.model.request.StatusCodeRequest;
+import com.bithumbsystems.lrc.management.api.v1.statusmanagment.statusvaluelist.model.request.StatusModifyRequest;
+import com.bithumbsystems.lrc.management.api.v1.statusmanagment.statusvaluelist.model.response.StatusCodeResponse;
+import com.bithumbsystems.persistence.mongodb.statusmanagement.statusvalue.model.entity.StatusCode;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -11,7 +12,11 @@ public interface StatusValueListMapper {
 
     StatusValueListMapper INSTANCE = Mappers.getMapper(StatusValueListMapper.class);
 
-    StatusValueListResponse statusValueListResponse(StatusValueList statusValueList);
+    StatusCodeResponse statusValueListResponse(StatusCode lrcStatusCode);
 
-    StatusValueList statusValueRequestToStatusValueList(StatusValueListRequest statusValueListRequest);
+    StatusCode statusCodeRequestToStatusValueList(StatusCodeRequest statusValueListRequest);
+
+    StatusCode statusCodeModifyRequestToStatusValueList(StatusModifyRequest statusModifyRequest);
+
+
 }

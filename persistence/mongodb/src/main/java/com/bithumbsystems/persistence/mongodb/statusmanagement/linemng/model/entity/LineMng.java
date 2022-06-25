@@ -1,6 +1,6 @@
-package com.bithumbsystems.persistence.mongodb.faq.category.model.entity;
+package com.bithumbsystems.persistence.mongodb.statusmanagement.linemng.model.entity;
 
-import com.bithumbsystems.persistence.mongodb.faq.category.model.enums.LanguageType;
+import com.bithumbsystems.persistence.mongodb.statusmanagement.linemng.model.enums.LineType;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -10,26 +10,22 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Document("lrc_faq_category")
+@Document("lrc_line_mng")
 @AllArgsConstructor
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
-public class FaqCategory {
+public class LineMng {
 
     @MongoId(value = FieldType.STRING, targetType = FieldType.STRING)
     private String id;
-    private String name;    //카테고리명
-    private String order_no;       //노출순서
-
-    private Boolean useYn;      //사용여부
-    private LanguageType language;    //언어
-
+    private String name;        // 계열명
+    private LineType type;        // 계열 타입
+    private boolean useYn;
     private LocalDateTime createDate; //생성날짜
     private String createAdminAccountId;  //생성자 id
 
     private LocalDateTime updateDate; //수정날짜
     private String updateAdminAccountId; //수정자 id
-
 }

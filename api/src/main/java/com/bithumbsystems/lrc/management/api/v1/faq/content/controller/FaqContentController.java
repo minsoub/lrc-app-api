@@ -1,9 +1,12 @@
 package com.bithumbsystems.lrc.management.api.v1.faq.content.controller;
 
+import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
+import com.bithumbsystems.lrc.management.api.core.config.resolver.CurrentUser;
 import com.bithumbsystems.lrc.management.api.core.model.response.MultiResponse;
 import com.bithumbsystems.lrc.management.api.core.model.response.SingleResponse;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.model.request.FaqContentRequest;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.service.FaqContentService;
+import com.bithumbsystems.persistence.mongodb.faq.category.model.enums.LanguageType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -26,13 +29,13 @@ public class FaqContentController {
 
     /**
      * 콘텐츠 모든 정보 (카테고리명 가져오기)
-     *
+     * @param language
      * @return FaqContentResponse object
      */
     @GetMapping(value = "/content")
     @Operation(summary = "FAQ 콘텐츠 모든 정보 (카테고리명 가져오기)", description = "FAQ 콘텐츠 모든 정보를 조회합니다.")
-    public ResponseEntity<Mono<?>> getAllContent() {
-        return ResponseEntity.ok().body(faqContentService.findJoinAll()
+    public ResponseEntity<Mono<?>> getAllContent(LanguageType language) {
+        return ResponseEntity.ok().body(faqContentService.findJoinAll(language)
                 .map((faqContentFlux) -> new MultiResponse(faqContentFlux)));
     }
 
@@ -101,8 +104,9 @@ public class FaqContentController {
     @PostMapping("/content")
     @Operation(summary = "FAQ 콘텐츠 1개 저장", description = "FAQ 콘텐츠 카테고리 정보를 1개 저장합니다.")
     public ResponseEntity<Mono<?>> createContent(@Parameter(name = "content Object", description = "콘텐츠 Model", in = ParameterIn.PATH)
-                                                     @RequestBody FaqContentRequest faqContentRequest) {
-        return ResponseEntity.ok().body(faqContentService.create(faqContentRequest).map(c ->
+                                                     @RequestBody FaqContentRequest faqContentRequest,
+                                                 @Parameter(hidden = true) @CurrentUser Account account) {
+        return ResponseEntity.ok().body(faqContentService.create(faqContentRequest, account).map(c ->
             new SingleResponse(c))
         );
     }
@@ -117,8 +121,9 @@ public class FaqContentController {
     public ResponseEntity<Mono<?>> updateContent(@Parameter(name = "id", description = "id 정보", in = ParameterIn.PATH)
                                                      @PathVariable("id") String id,
                                                  @Parameter(name = "content Object", description = "콘텐츠 Model", in = ParameterIn.PATH)
-                                                 @RequestBody FaqContentRequest faqContentRequest) {
-        return ResponseEntity.ok().body(faqContentService.updateContent(id, faqContentRequest).map(c ->
+                                                 @RequestBody FaqContentRequest faqContentRequest,
+                                                 @Parameter(hidden = true) @CurrentUser Account account) {
+        return ResponseEntity.ok().body(faqContentService.updateContent(id, faqContentRequest, account).map(c ->
             new SingleResponse(c))
         );
     }
@@ -131,8 +136,9 @@ public class FaqContentController {
     @DeleteMapping("/content/{id}")
     @Operation(summary = "FAQ 콘텐츠 1개 삭제", description = "FAQ 콘텐츠 카테고리 정보를 1개 삭제합니다.")
     public ResponseEntity<Mono<?>> deleteContent(@Parameter(name = "id", description = "id 정보", in = ParameterIn.PATH)
-                                                     @PathVariable("id") String id) {
-        return ResponseEntity.ok().body(faqContentService.deleteContent(id).then(
+                                                     @PathVariable("id") String id,
+                                                 @Parameter(hidden = true) @CurrentUser Account account) {
+        return ResponseEntity.ok().body(faqContentService.deleteContent(id, account).then(
             Mono.just(new SingleResponse()))
         );
     }

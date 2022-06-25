@@ -10,4 +10,6 @@ public class Account {
   private final String accountId;
 
   private final Set<String> roles;
+
+  private final String email;
 }
