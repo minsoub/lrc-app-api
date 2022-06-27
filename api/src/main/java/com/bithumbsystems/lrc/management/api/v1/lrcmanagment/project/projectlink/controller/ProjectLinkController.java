@@ -19,16 +19,28 @@ public class ProjectLinkController {
 
     private final ProjectLinkService projectLinkService;
 
-
     /**
      * 프로젝트 링크 가져오기
      * @param projectId
      * @return FoundationResponse
      */
-    @GetMapping("/project-link/{projectId}")
+    @GetMapping("/project-link/link/{projectId}")
     @Operation(summary = "프로젝트 링크 가져오기", description = "프로젝크 링크 정보를 조회 합니다.")
     public ResponseEntity<Mono<?>> getProjectLink(@PathVariable String projectId) {
         return ResponseEntity.ok().body(projectLinkService.findByProjectLinkList(projectId)
+                .map(c -> new SingleResponse(c))
+        );
+    }
+
+    /**
+     * 프로젝트 연결 재단 조회
+     * @param symbol
+     * @return FoundationResponse
+     */
+    @GetMapping("/project-link/foundation/{symbol}")
+    @Operation(summary = "프로젝트 연결 재단 검색", description = "프로젝트 연결 재단을 조회 합니다.")
+    public ResponseEntity<Mono<?>> getFoundationList(@PathVariable String symbol) {
+        return ResponseEntity.ok().body(projectLinkService.findBySymbolLike(symbol)
                 .map(c -> new SingleResponse(c))
         );
     }

@@ -37,6 +37,15 @@ public class FoundationDomainService {
     }
 
     /**
+     * 재단 symbol로 찾기
+     * @param symbol
+     * @return Foundation Object
+     */
+    public Flux<Foundation> findBySymbolLike(String symbol) {
+        return foundationRepository.findBySymbolLike(symbol);
+    }
+
+    /**
      * 재단 1개 저장
      * @param foundation
      * @return Foundation Object

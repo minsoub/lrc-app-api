@@ -4,8 +4,9 @@ import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContentException;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectlink.mapper.ProjectLinkMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectlink.model.request.ProjectLinkRequest;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectlink.model.response.FoundationLinkResponse;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectlink.model.response.ProjectLinkResponse;
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectlink.model.entity.ProjectLink;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.foundation.service.FoundationDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectlink.service.ProjectLinkDomainService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,8 @@ public class ProjectLinkService {
 
     private final ProjectLinkDomainService projectLinkDomainService;
 
+    private final FoundationDomainService foundationDomainService;
+
     /**
      * 프로젝트 링크 가져오기
      * @param projectId
@@ -29,6 +32,25 @@ public class ProjectLinkService {
     public Mono<List<ProjectLinkResponse>> findByProjectLinkList(String projectId) {
         return projectLinkDomainService.findByProjectLinkList(projectId)
                 .map(ProjectLinkMapper.INSTANCE::projectLinkResponse)
+                .collectList()
+                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+    }
+
+    /**
+     * 프로젝트 연결 재단 조회
+     * @param symbol
+     * @return FoundationResponse
+     */
+    public Mono<List<FoundationLinkResponse>> findBySymbolLike(String symbol) {
+        return foundationDomainService.findBySymbolLike(symbol)
+                .map(c -> {
+                    FoundationLinkResponse foundationLinkResponse = FoundationLinkResponse.builder()
+                            .id(c.getId())
+                            .projectId(c.getProjectId())
+                            .symbol(c.getSymbol())
+                            .build();
+                    return foundationLinkResponse;
+                })
                 .collectList()
                 .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
     }
@@ -74,7 +96,7 @@ public class ProjectLinkService {
      * @param projectLinkRequest
      * @return FoundationResponse
      */
-    public Flux<ProjectLink> deleteLinkProject(ProjectLinkRequest projectLinkRequest) {
+    public Flux<ProjectLinkResponse> deleteLinkProject(ProjectLinkRequest projectLinkRequest) {
         return projectLinkDomainService.findByLinkProject(projectLinkRequest.getProjectId(), projectLinkRequest.getLinkProjectId())
                 .flatMap(projectLink ->
                         projectLinkDomainService.deleteLinkProject(ProjectLinkMapper.INSTANCE.projectLinkRequestToProjectLink(projectLink))
@@ -84,6 +106,7 @@ public class ProjectLinkService {
                         projectLinkDomainService.findByLinkProject(projectLink1.getLinkProjectId(), projectLink1.getProjectId())
                                 .flatMap(projectLink2 ->
                                         projectLinkDomainService.deleteLinkProject(ProjectLinkMapper.INSTANCE.projectLinkRequestToProjectLink(projectLink2))
+                                                .map(ProjectLinkMapper.INSTANCE::projectLinkResponse)
                                 )
                 )
                 .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
