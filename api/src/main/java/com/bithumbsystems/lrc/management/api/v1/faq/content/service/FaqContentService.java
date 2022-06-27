@@ -5,6 +5,7 @@ import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContentException;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.mapper.FaqContentMapper;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.model.request.FaqContentRequest;
+import com.bithumbsystems.lrc.management.api.v1.faq.content.model.request.FaqOrderRequest;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.model.response.FaqContentResponse;
 import com.bithumbsystems.persistence.mongodb.faq.category.model.enums.LanguageType;
 import com.bithumbsystems.persistence.mongodb.faq.category.service.FaqCategoryDomainService;
@@ -48,6 +49,7 @@ public class FaqContentService {
     public Mono<List<FaqContentResponse>> findJoinAll(LanguageType languageType) {
         return faqDomainService.findAll()
                 .filter(f -> f.getLanguage().equals(languageType))
+                .filter(f -> f.getUseYn().equals(true))
             .flatMap(c -> Mono.just(c)
                 .zipWith(faqCategoryDomainService.findCategoryById(c.getCategoryCode()))
                 .map(m -> {
@@ -135,7 +137,24 @@ public class FaqContentService {
             c.setUpdateAdminAccountId(account.getAccountId());
             return faqDomainService.updateContent(c).map(FaqContentMapper.INSTANCE::faqContentResponse);
         }).switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.FAIL_UPDATE_CONTENT)));
+    }
 
+    /**
+     * 노출 순서 저장
+     * @param faqOrderRequest
+     * @param account
+     * @return
+     */
+    public Mono<List<FaqContentResponse>> updateOrderContent(FaqOrderRequest faqOrderRequest, Account account) {
+        return Flux.fromIterable(faqOrderRequest.getOrderList())
+                .flatMap(item -> faqDomainService.findFaqById(item.getId())
+                        .flatMap(result -> {
+                            result.setOrder(item.getOrder());
+                            result.setUpdateDate(LocalDateTime.now());
+                            result.setUpdateAdminAccountId(account.getAccountId());
+                            return faqDomainService.updateContent(result)
+                                    .map(FaqContentMapper.INSTANCE::faqContentResponse);
+                        })).collectList();
     }
 
     /**

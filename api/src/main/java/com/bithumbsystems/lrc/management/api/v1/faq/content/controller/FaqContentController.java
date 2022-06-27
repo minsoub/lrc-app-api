@@ -5,6 +5,7 @@ import com.bithumbsystems.lrc.management.api.core.config.resolver.CurrentUser;
 import com.bithumbsystems.lrc.management.api.core.model.response.MultiResponse;
 import com.bithumbsystems.lrc.management.api.core.model.response.SingleResponse;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.model.request.FaqContentRequest;
+import com.bithumbsystems.lrc.management.api.v1.faq.content.model.request.FaqOrderRequest;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.service.FaqContentService;
 import com.bithumbsystems.persistence.mongodb.faq.category.model.enums.LanguageType;
 import io.swagger.v3.oas.annotations.Operation;
@@ -127,7 +128,21 @@ public class FaqContentController {
             new SingleResponse(c))
         );
     }
-
+    /**
+     * 콘텐츠 Order 순서 저장
+     * @param faqOrderRequest
+     * @return FaqContentResponse
+     */
+    @PutMapping("/content")
+    @Operation(summary = "FAQ 콘텐츠 Order 업데이트", description = "FAQ 콘텐츠 Order 수정합니다.")
+    public ResponseEntity<Mono<?>> updateContent(
+            @Parameter(name = "Order List Object", description = "콘텐츠 Order Model", in = ParameterIn.PATH)
+                                                 @RequestBody FaqOrderRequest faqOrderRequest,
+            @Parameter(hidden = true) @CurrentUser Account account) {
+        return ResponseEntity.ok().body(faqContentService.updateOrderContent(faqOrderRequest, account).map(c ->
+                new SingleResponse(c))
+        );
+    }
     /**
      * 콘텐츠 삭제
      * @param id
