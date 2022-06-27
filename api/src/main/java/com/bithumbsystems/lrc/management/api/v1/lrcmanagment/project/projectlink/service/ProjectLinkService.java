@@ -42,7 +42,7 @@ public class ProjectLinkService {
      * @return FoundationResponse
      */
     public Mono<List<FoundationLinkResponse>> findBySymbolLike(String symbol) {
-        return foundationDomainService.findBySymbolLike(symbol)
+        return foundationDomainService.findBySymbolLikeIgnoreCase(symbol)
                 .map(c -> {
                     FoundationLinkResponse foundationLinkResponse = FoundationLinkResponse.builder()
                             .id(c.getId())

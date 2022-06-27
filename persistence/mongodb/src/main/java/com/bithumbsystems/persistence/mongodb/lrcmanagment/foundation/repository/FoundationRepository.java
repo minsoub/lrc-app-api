@@ -11,7 +11,5 @@ public interface FoundationRepository extends ReactiveMongoRepository<Foundation
 
     Mono<Foundation> findByProjectId(String projectId);
 
-    Flux<Foundation> findBySymbolLike(String symbol);
-
-    Mono<Foundation> findByProjectIdAndSymbol(String projectId, String symbol);
+    Flux<Foundation> findBySymbolLikeIgnoreCase(String symbol);
 }

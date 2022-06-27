@@ -41,8 +41,8 @@ public class FoundationDomainService {
      * @param symbol
      * @return Foundation Object
      */
-    public Flux<Foundation> findBySymbolLike(String symbol) {
-        return foundationRepository.findBySymbolLike(symbol);
+    public Flux<Foundation> findBySymbolLikeIgnoreCase(String symbol) {
+        return foundationRepository.findBySymbolLikeIgnoreCase(symbol);
     }
 
     /**
