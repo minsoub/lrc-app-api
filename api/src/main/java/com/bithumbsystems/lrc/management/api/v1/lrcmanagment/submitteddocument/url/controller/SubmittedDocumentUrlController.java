@@ -1,5 +1,7 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.controller;
 
+import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
+import com.bithumbsystems.lrc.management.api.core.config.resolver.CurrentUser;
 import com.bithumbsystems.lrc.management.api.core.model.response.SingleResponse;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.model.request.SubmittedDocumentUrlRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.service.SubmittedDocumentUrlService;
@@ -57,8 +59,9 @@ public class SubmittedDocumentUrlController {
     @PostMapping(value = "/submitted-document/url")
     @Operation(summary = "제출 서류 관리 url 저장", description = "제출 서류 관리 url 정보를 저장 합니다.")
     public ResponseEntity<Mono<?>> createSubmittedDocumentUrl(@Parameter(name = "document Object", description = "제출 서류 Model", in = ParameterIn.PATH)
-                                                                @RequestBody SubmittedDocumentUrlRequest submittedDocumentUrlRequest) {
-        return ResponseEntity.ok().body(submittedDocumentUrlService.saveAll(submittedDocumentUrlRequest)
+                                                                @RequestBody SubmittedDocumentUrlRequest submittedDocumentUrlRequest,
+                                                              @Parameter(hidden = true) @CurrentUser Account account) {
+        return ResponseEntity.ok().body(submittedDocumentUrlService.saveAll(submittedDocumentUrlRequest, account)
                 .map(c -> new SingleResponse(c)));
     }
 

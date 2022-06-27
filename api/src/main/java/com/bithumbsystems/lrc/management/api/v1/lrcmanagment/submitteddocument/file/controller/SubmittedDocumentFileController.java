@@ -1,5 +1,7 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.controller;
 
+import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
+import com.bithumbsystems.lrc.management.api.core.config.resolver.CurrentUser;
 import com.bithumbsystems.lrc.management.api.core.model.response.SingleResponse;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.model.request.SubmittedDocumentFileRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.service.SubmittedDocumentFileService;
@@ -61,8 +63,9 @@ public class SubmittedDocumentFileController {
     @PostMapping(value = "/submitted-document/file", consumes = MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "제출 서류 관리 file 저장", description = "제출 서류 관리 file 정보를 저장 합니다.")
     public ResponseEntity<Mono<?>> createSubmittedDocumentFile(@Parameter(name = "document Object", description = "제출 서류 Model", in = ParameterIn.PATH)
-                                                                @ModelAttribute(value = "submittedDocumentRequest") SubmittedDocumentFileRequest submittedDocumentRequest) {
-        return ResponseEntity.ok().body(submittedDocumentService.saveAll(Flux.just(submittedDocumentRequest))
+                                                                @ModelAttribute(value = "submittedDocumentRequest") SubmittedDocumentFileRequest submittedDocumentRequest,
+                                                               @Parameter(hidden = true) @CurrentUser Account account) {
+        return ResponseEntity.ok().body(submittedDocumentService.saveAll(Flux.just(submittedDocumentRequest), account)
                 .map(c -> new SingleResponse(c)));
     }
 

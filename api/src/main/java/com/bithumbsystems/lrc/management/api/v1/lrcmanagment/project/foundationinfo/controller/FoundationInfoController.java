@@ -1,5 +1,7 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.foundationinfo.controller;
 
+import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
+import com.bithumbsystems.lrc.management.api.core.config.resolver.CurrentUser;
 import com.bithumbsystems.lrc.management.api.core.model.response.SingleResponse;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.foundationinfo.model.request.FoundationInfoRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.foundationinfo.service.FoundationInfoService;
@@ -44,8 +46,9 @@ public class FoundationInfoController {
     @Operation(summary = "재단 정보 업데이트", description = "projectId를 이용하여 project를 수정 합니다.")
     public ResponseEntity<Mono<?>> updateFoundationInfo(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
                                                             @PathVariable("projectId") String projectId,
-                                                        @RequestBody FoundationInfoRequest foundationInfoRequest) {
-        return ResponseEntity.ok().body(foundationInfoService.updateFoundationInfo(projectId, foundationInfoRequest)
+                                                        @RequestBody FoundationInfoRequest foundationInfoRequest,
+                                                        @Parameter(hidden = true) @CurrentUser Account account) {
+        return ResponseEntity.ok().body(foundationInfoService.updateFoundationInfo(projectId, foundationInfoRequest, account)
                 .map(c -> new SingleResponse(c))
         );
     }

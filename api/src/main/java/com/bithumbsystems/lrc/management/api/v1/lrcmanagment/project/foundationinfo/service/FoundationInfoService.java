@@ -1,5 +1,6 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.foundationinfo.service;
 
+import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContentException;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.foundationinfo.mapper.FoundationInfoMapper;
@@ -9,6 +10,8 @@ import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.foundationinf
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -35,17 +38,19 @@ public class FoundationInfoService {
      * @param foundationInfoRequest
      * @return FoundationInfoResponse Object
      */
-    public Mono<FoundationInfoResponse> updateFoundationInfo(String projectId, FoundationInfoRequest foundationInfoRequest) {
+    public Mono<FoundationInfoResponse> updateFoundationInfo(String projectId, FoundationInfoRequest foundationInfoRequest, Account account) {
         return foundationInfoDomainService.findByProjectId(projectId)
                 .flatMap(c -> {
                     c.setProjectId(foundationInfoRequest.getProjectId());
                     c.setProjectName(foundationInfoRequest.getProjectName());
                     c.setSymbol(foundationInfoRequest.getSymbol());
-                    c.setContrectCode(foundationInfoRequest.getContrectCode());
-                    c.setContrectName(foundationInfoRequest.getContrectName());
+                    c.setContractCode(foundationInfoRequest.getContractCode());
+                    c.setContractName(foundationInfoRequest.getContractName());
                     c.setProgressCode(foundationInfoRequest.getProgressCode());
                     c.setProgressName(foundationInfoRequest.getProgressName());
                     c.setAdminMemo(foundationInfoRequest.getAdminMemo());
+                    c.setUpdateDate(LocalDateTime.now());
+                    c.setUpdateAdminAccountId(account.getAccountId());
 
                     return foundationInfoDomainService.updateFoundationInfo(c)
                             .map(FoundationInfoMapper.INSTANCE::foundationInfoResponse);
@@ -53,7 +58,8 @@ public class FoundationInfoService {
                 .switchIfEmpty(
                         foundationInfoDomainService.updateFoundationInfo(FoundationInfoMapper.INSTANCE.foundationInfoRequestToFoundationInfo(foundationInfoRequest))
                                 .map(FoundationInfoMapper.INSTANCE::foundationInfoResponse)
-                        //Mono.error(new FaqContentException(ErrorCode.FAIL_UPDATE_CONTENT))
+                                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.FAIL_UPDATE_CONTENT)))
+                        //
                 );
     }
 }

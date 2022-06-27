@@ -1,9 +1,7 @@
 package com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.file.model.entity;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -12,6 +10,9 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
+@Builder
 @Document("lrc_project_submitted_document_file")
 public class SubmittedDocumentFile {
 

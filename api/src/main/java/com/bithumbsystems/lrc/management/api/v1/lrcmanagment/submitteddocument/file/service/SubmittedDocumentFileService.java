@@ -1,6 +1,7 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.service;
 
 import com.bithumbsystems.lrc.management.api.core.config.property.AwsProperties;
+import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContentException;
 import com.bithumbsystems.lrc.management.api.v1.file.service.FileService;
@@ -8,6 +9,7 @@ import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.f
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.model.request.SubmittedDocumentFileRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.model.response.SubmittedDocumentFileResponse;
 import com.bithumbsystems.persistence.mongodb.file.model.entity.File;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.file.model.entity.SubmittedDocumentFile;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.file.service.SubmittedDocumentFileDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.nio.ByteBuffer;
 import java.text.Normalizer;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -52,7 +55,7 @@ public class SubmittedDocumentFileService {
      * @return SubmittedDocumentResponse Object
      */
     @Transactional
-    public Mono<List<SubmittedDocumentFileResponse>> saveAll(Flux<SubmittedDocumentFileRequest> submittedDocumentRequest) {
+    public Mono<List<SubmittedDocumentFileResponse>> saveAll(Flux<SubmittedDocumentFileRequest> submittedDocumentRequest, Account account) {
         return submittedDocumentRequest
                 .flatMap(submittedDocument ->
                         DataBufferUtils.join(submittedDocument.getFilePart().content())
@@ -83,7 +86,16 @@ public class SubmittedDocumentFileService {
                                             .flatMap(file -> {
                                                 submittedDocument.setFileKey(file.getFileKey());
                                                 submittedDocument.setFileName(file.getFileName());
-                                                return submittedDocumentFileDomainService.save(SubmittedDocumentFileMapper.INSTANCE.requestToSubmittedDocumentFile(submittedDocument));
+                                                return submittedDocumentFileDomainService.save(
+                                                        SubmittedDocumentFile.builder()
+                                                                .projectId(submittedDocument.getProjectId())
+                                                                .type(submittedDocument.getType())
+                                                                .fileKey(submittedDocument.getFileKey())
+                                                                .fileName(submittedDocument.getFileName())
+                                                                .createDate(LocalDateTime.now())
+                                                                .createAdminAccountId(account.getAccountId())
+                                                                .build()
+                                                );
                                             });
                                 })
                 )

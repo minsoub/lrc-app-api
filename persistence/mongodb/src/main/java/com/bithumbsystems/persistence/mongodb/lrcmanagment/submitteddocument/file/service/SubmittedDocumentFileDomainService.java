@@ -7,8 +7,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
-
 @Service
 @RequiredArgsConstructor
 public class SubmittedDocumentFileDomainService {
@@ -40,8 +38,6 @@ public class SubmittedDocumentFileDomainService {
      * @return SubmittedDocumentFileResponse Object
      */
     public Mono<SubmittedDocumentFile> save(SubmittedDocumentFile submittedDocumentFile) {
-        submittedDocumentFile.setCreateDate(LocalDateTime.now());
-        submittedDocumentFile.setCreateAdminAccountId("등록자 누구지?");
         return submittedDocumentFileRepository.insert(submittedDocumentFile);
     }
 
