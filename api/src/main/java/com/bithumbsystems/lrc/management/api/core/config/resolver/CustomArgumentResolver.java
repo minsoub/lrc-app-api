@@ -48,7 +48,8 @@ public class CustomArgumentResolver implements HandlerMethodArgumentResolver {
           log.debug("Role => {}", jwt.getClaimAsString("ROLE"));
           final var accountId = jwt.getClaimAsString("account_id");
           final var roles = (JSONArray)jwt.getClaim("ROLE");
-          return Mono.just(new Account(accountId, roles.stream().map(Object::toString).collect(Collectors.toSet())));
+          final var email = jwt.getClaimAsString("user_id");
+          return Mono.just(new Account(accountId, roles.stream().map(Object::toString).collect(Collectors.toSet()), email));
         });
   }
 }

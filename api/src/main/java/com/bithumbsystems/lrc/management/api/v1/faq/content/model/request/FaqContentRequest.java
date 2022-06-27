@@ -1,5 +1,6 @@
 package com.bithumbsystems.lrc.management.api.v1.faq.content.model.request;
 
+import com.bithumbsystems.persistence.mongodb.faq.category.model.enums.LanguageType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,12 +30,12 @@ public class FaqContentRequest {
     @Schema(description = "사용여부")
     private Boolean useYn;       //사용여부
 
-    @Schema(description = "등록자")
-    private String customer;    //등록자
-
-    @Schema(description = "등록자 이메일")
-    private String email;       //등록자 이메일
+//    @Schema(description = "등록자")
+//    private String customer;    //등록자
+//
+//    @Schema(description = "등록자 이메일")
+//    private String email;       //등록자 이메일
 
     @Schema(description = "언어")
-    private String language;    //언어
+    private LanguageType language;    //언어
 }

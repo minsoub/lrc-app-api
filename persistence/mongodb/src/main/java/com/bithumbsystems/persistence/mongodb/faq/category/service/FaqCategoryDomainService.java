@@ -35,20 +35,11 @@ public class FaqCategoryDomainService {
 
     /**
      * 카테고리 1개 저장
-     * @param code
-     * @return FaqCategoryResponse Object
-     */
-    public Mono<FaqCategory> findCategoryByCode(String code) {
-        return faqCategoryRepository.findByCode(code);
-    }
-
-    /**
-     * 카테고리 1개 저장
      * @param faqCategory
      * @return FaqCategoryResponse Object
      */
     public Mono<FaqCategory> save(FaqCategory faqCategory) {
-        faqCategory.setCreateAdminAccountId("카테고리 최초사용자 (세션에서 가져와야함)"); //최초사용자 (세션에서 가져와야함)
+        //faqCategory.setCreateAdminAccountId("카테고리 최초사용자 (세션에서 가져와야함)"); //최초사용자 (세션에서 가져와야함)
         return faqCategoryRepository.insert(faqCategory);
     }
 
@@ -59,7 +50,7 @@ public class FaqCategoryDomainService {
      */
     public Mono<FaqCategory> updateCategory(FaqCategory faqCategory) {
         faqCategory.setUpdateDate(LocalDateTime.now());
-        faqCategory.setUpdateAdminAccountId("카테고리 변경된 사용자 (세션에서 가져와야함)");   //변경된 사용자 (세션에서 가져와야함)
+        //faqCategory.setUpdateAdminAccountId("카테고리 변경된 사용자 (세션에서 가져와야함)");   //변경된 사용자 (세션에서 가져와야함)
         return faqCategoryRepository.save(faqCategory);
     }
 

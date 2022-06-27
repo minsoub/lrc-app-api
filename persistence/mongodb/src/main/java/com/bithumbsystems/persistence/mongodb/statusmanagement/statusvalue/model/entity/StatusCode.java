@@ -1,30 +1,25 @@
-package com.bithumbsystems.persistence.mongodb.faq.category.model.entity;
+package com.bithumbsystems.persistence.mongodb.statusmanagement.statusvalue.model.entity;
 
-import com.bithumbsystems.persistence.mongodb.faq.category.model.enums.LanguageType;
 import lombok.*;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
-@Document("lrc_faq_category")
+@Document(collection = "lrc_status_code")
 @AllArgsConstructor
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
-public class FaqCategory {
-
+public class StatusCode {
     @MongoId(value = FieldType.STRING, targetType = FieldType.STRING)
-    private String id;
-    private String name;    //카테고리명
-    private String order_no;       //노출순서
-
-    private Boolean useYn;      //사용여부
-    private LanguageType language;    //언어
+    private String id;          //상태코드
+    private String name;        //상태명
+    private Integer orderNo;       //순서
+    private String parentCode;  //상위분류코드
+    private Boolean useYn;      //사용 여부
 
     private LocalDateTime createDate; //생성날짜
     private String createAdminAccountId;  //생성자 id

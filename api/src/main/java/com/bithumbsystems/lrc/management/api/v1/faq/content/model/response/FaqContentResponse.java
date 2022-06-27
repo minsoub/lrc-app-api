@@ -1,5 +1,6 @@
 package com.bithumbsystems.lrc.management.api.v1.faq.content.model.response;
 
+import com.bithumbsystems.persistence.mongodb.faq.category.model.enums.LanguageType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -42,7 +43,7 @@ public class FaqContentResponse {
     private String email;       //등록자 이메일
 
     @Schema(description = "언어")
-    private String language;    //언어
+    private LanguageType language;    //언어
 
     @Schema(description = "생성날짜")
     private LocalDateTime createDate; //생성날짜
