@@ -47,8 +47,8 @@ public class ProjectInfoService {
     public Mono<ProjectInfoResponse> updateProjectInfo(String id, ProjectInfoRequest projectInfoRequest) {
         return projectInfoDomainService.findByProjectId(id)
                 .flatMap(c -> {
-                    c.setBusinessList(projectInfoRequest.getBusinessList());
-                    c.setNetworkList(projectInfoRequest.getNetworkList());
+                    c.setBusinessLine(projectInfoRequest.getBusinessLine());
+                    c.setNetworkLine(projectInfoRequest.getNetworkLine());
                     c.setWhitepaperLink(projectInfoRequest.getWhitepaperLink());
                     c.setContractAddress(projectInfoRequest.getContractAddress());
                     return projectInfoDomainService.updateProjectInfo(c)

@@ -17,10 +17,10 @@ public class ProjectInfoRequest {
     private String projectId;               //프로젝트 코드
 
     @Schema(description = "사업계열")
-    private String businessList;            //사업계열
+    private String businessLine;            //사업계열
 
     @Schema(description = "네트워크")
-    private String networkList;             //네트워크계열
+    private String networkLine;             //네트워크계열
 
     @Schema(description = "백서링크")
     private String whitepaperLink;          //백서링크
