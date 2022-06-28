@@ -44,11 +44,11 @@ public class ProjectInfoService {
      * @param projectInfoRequest
      * @return ProjectInfoResponse Object
      */
-    public Mono<ProjectInfoResponse> updateProjectInfo(String id, ProjectInfoRequest projectInfoRequest) {
-        return projectInfoDomainService.findByProjectId(id)
+    public Mono<ProjectInfoResponse> updateProjectInfo(String projectId, ProjectInfoRequest projectInfoRequest) {
+        return projectInfoDomainService.findByProjectId(projectId)
                 .flatMap(c -> {
-                    c.setBusinessLine(projectInfoRequest.getBusinessLine());
-                    c.setNetworkLine(projectInfoRequest.getNetworkLine());
+                    c.setBusinessCode(projectInfoRequest.getBusinessCode());
+                    c.setNetworkCode(projectInfoRequest.getNetworkCode());
                     c.setWhitepaperLink(projectInfoRequest.getWhitepaperLink());
                     c.setContractAddress(projectInfoRequest.getContractAddress());
                     return projectInfoDomainService.updateProjectInfo(c)

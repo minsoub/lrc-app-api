@@ -13,8 +13,8 @@ public class ProjectInfo {
     @Id
     private String id;
     private String projectId;               //프로젝트 코드
-    private String businessLine;            //사업계열
-    private String networkLine;             //네트워크계열
+    private String businessCode;            //사업계열
+    private String networkCode;             //네트워크계열
     private String whitepaperLink;          //백서링크
     private String contractAddress;         //컨트렉트 주소
     private LocalDateTime createDate;       //최초 발행일
