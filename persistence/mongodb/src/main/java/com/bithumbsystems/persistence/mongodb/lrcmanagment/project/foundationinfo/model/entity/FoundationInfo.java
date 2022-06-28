@@ -17,7 +17,6 @@ public class FoundationInfo {
 
     @Id
     private String id;
-    private String projectId;       //프로젝트 id
     private String projectName;     //프로젝트 명
     private String symbol;          //심볼
     private String contractCode;    //계약상태 code

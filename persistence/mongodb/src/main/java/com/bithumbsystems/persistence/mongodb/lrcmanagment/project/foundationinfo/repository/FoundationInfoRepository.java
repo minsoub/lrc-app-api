@@ -8,5 +8,5 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface FoundationInfoRepository extends ReactiveMongoRepository<FoundationInfo, String> {
 
-    Mono<FoundationInfo> findByProjectId(String projectId);
+    Mono<FoundationInfo> findById(String id);
 }

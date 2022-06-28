@@ -22,11 +22,11 @@ public class FoundationInfoService {
     /**
      * 재단 정보 1개 id 찾기
      *
-     * @param projectId
+     * @param id
      * @return FoundationInfoResponse Object
      */
-    public Mono<FoundationInfoResponse> findByProjectId(String projectId) {
-        return foundationInfoDomainService.findByProjectId(projectId)
+    public Mono<FoundationInfoResponse> findById(String id) {
+        return foundationInfoDomainService.findById(id)
                 .map(FoundationInfoMapper.INSTANCE::foundationInfoResponse)
                 .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
 
@@ -38,10 +38,9 @@ public class FoundationInfoService {
      * @param foundationInfoRequest
      * @return FoundationInfoResponse Object
      */
-    public Mono<FoundationInfoResponse> updateFoundationInfo(String projectId, FoundationInfoRequest foundationInfoRequest, Account account) {
-        return foundationInfoDomainService.findByProjectId(projectId)
+    public Mono<FoundationInfoResponse> updateFoundationInfo(String id, FoundationInfoRequest foundationInfoRequest, Account account) {
+        return foundationInfoDomainService.findById(id)
                 .flatMap(c -> {
-                    c.setProjectId(foundationInfoRequest.getProjectId());
                     c.setProjectName(foundationInfoRequest.getProjectName());
                     c.setSymbol(foundationInfoRequest.getSymbol());
                     c.setContractCode(foundationInfoRequest.getContractCode());

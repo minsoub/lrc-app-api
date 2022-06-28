@@ -14,11 +14,11 @@ public class FoundationInfoDomainService {
 
     /**
      * 재단정보 id로 찾기
-     * @param projectId
+     * @param id
      * @return SubmittedDocumentResponse Object
      */
-    public Mono<FoundationInfo> findByProjectId(String projectId) {
-        return foundationInfoRepository.findByProjectId(projectId);
+    public Mono<FoundationInfo> findById(String id) {
+        return foundationInfoRepository.findById(id);
     }
 
     /**

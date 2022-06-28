@@ -14,9 +14,6 @@ public class FoundationInfoResponse {
     @Schema(description = "id")
     private String id;
 
-    @Schema(description = "프로젝트 id")
-    private String projectId;       //프로젝트 id
-
     @Schema(description = "프로젝트 명")
     private String projectName;     //프로젝트 명
 

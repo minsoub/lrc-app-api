@@ -24,31 +24,31 @@ public class FoundationInfoController {
 
     /**
      * 재단 정보 찾기
-     * @param projectId
+     * @param id
      * @return FoundationInfoResponse Object
      */
-    @GetMapping("/foundation-info/{projectId}")
+    @GetMapping("/foundation-info/{id}")
     @Operation(summary = "재단 정보 조회", description = "projectId를 이용하여 project를 조회합니다.")
-    public ResponseEntity<Mono<?>> getFoundationInfo(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
-                                                     @PathVariable("projectId") String projectId) {
-        return ResponseEntity.ok().body(foundationInfoService.findByProjectId(projectId)
+    public ResponseEntity<Mono<?>> getFoundationInfo(@Parameter(name = "id", description = "project 의 id", in = ParameterIn.PATH)
+                                                     @PathVariable("id") String id) {
+        return ResponseEntity.ok().body(foundationInfoService.findById(id)
                 .map(c -> new SingleResponse(c))
         );
     }
 
     /**
      * 프로젝트 정보 업데이트
-     * @param projectId
+     * @param id
      * @param foundationInfoRequest
      * @return FoundationInfoResponse Object
      */
-    @PostMapping("/foundation-info/{projectId}")
+    @PostMapping("/foundation-info/{id}")
     @Operation(summary = "재단 정보 업데이트", description = "projectId를 이용하여 project를 수정 합니다.")
-    public ResponseEntity<Mono<?>> updateFoundationInfo(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
-                                                            @PathVariable("projectId") String projectId,
+    public ResponseEntity<Mono<?>> updateFoundationInfo(@Parameter(name = "projectId", description = "project 의 id", in = ParameterIn.PATH)
+                                                            @PathVariable("id") String id,
                                                         @RequestBody FoundationInfoRequest foundationInfoRequest,
                                                         @Parameter(hidden = true) @CurrentUser Account account) {
-        return ResponseEntity.ok().body(foundationInfoService.updateFoundationInfo(projectId, foundationInfoRequest, account)
+        return ResponseEntity.ok().body(foundationInfoService.updateFoundationInfo(id, foundationInfoRequest, account)
                 .map(c -> new SingleResponse(c))
         );
     }
