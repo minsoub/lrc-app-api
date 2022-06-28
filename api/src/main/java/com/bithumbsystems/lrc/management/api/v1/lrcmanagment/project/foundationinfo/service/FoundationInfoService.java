@@ -45,9 +45,7 @@ public class FoundationInfoService {
                     c.setProjectName(foundationInfoRequest.getProjectName());
                     c.setSymbol(foundationInfoRequest.getSymbol());
                     c.setContractCode(foundationInfoRequest.getContractCode());
-                    c.setContractName(foundationInfoRequest.getContractName());
                     c.setProgressCode(foundationInfoRequest.getProgressCode());
-                    c.setProgressName(foundationInfoRequest.getProgressName());
                     c.setAdminMemo(foundationInfoRequest.getAdminMemo());
                     c.setUpdateDate(LocalDateTime.now());
                     c.setUpdateAdminAccountId(account.getAccountId());
