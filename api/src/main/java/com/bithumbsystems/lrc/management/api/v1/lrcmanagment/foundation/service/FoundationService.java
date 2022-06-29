@@ -5,8 +5,9 @@ import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContent
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.Mapper.FoundationMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.model.request.FoundationRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.model.response.FoundationResponse;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.marketingquantity.mapper.MarketingQuantityMapper;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectlink.mapper.ProjectLinkMapper;
+료import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.model.response.IcoResponse;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.model.response.LinkResponse;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.model.response.MarketResponse;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.foundation.service.FoundationDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.foundationinfo.service.FoundationInfoDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.icoinfo.service.IcoInfoDomainService;
@@ -24,6 +25,7 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -35,13 +37,9 @@ public class FoundationService {
 
     private final FoundationInfoDomainService foundationInfoDomainService;
     private final ProjectInfoDomainService projectInfoDomainService;
-    private final MarketingQuantityDomainService marketingQuantityDomainService;
-
     private final IcoInfoDomainService icoInfoDomainService;
-
-
+    private final MarketingQuantityDomainService marketingQuantityDomainService;
     private final ProjectLinkDomainService projectLinkDomainService;
-
     private final LineMngDomainService lineMngDomainService;
     private final StatusCodeDomainService statusCodeDomainService;
 
@@ -51,55 +49,107 @@ public class FoundationService {
      */
     public Mono<List<FoundationResponse>> getFoundation1() {
         return foundationInfoDomainService.findByFoundationInfo()
-                .flatMap(foundationInfo -> {
-                    FoundationResponse foundationResponse = FoundationResponse.builder()
-                                    .projectId(foundationInfo.getId())
-                                    .projectName(foundationInfo.getProjectName())
-                                    .symbol(foundationInfo.getSymbol())
-                                    .contractCode(foundationInfo.getContractCode())
-                                    .progressCode(foundationInfo.getProgressCode())
-                                    .build();
-                    return Mono.just(foundationResponse);
-                })
-                .log()
+                .flatMap(foundationInfo ->
+                        Mono.just(FoundationResponse.builder()
+                        .projectId(foundationInfo.getId())
+                        .projectName(foundationInfo.getProjectName())
+                        .symbol(foundationInfo.getSymbol())
+                        .contractCode(foundationInfo.getContractCode())
+                        .progressCode(foundationInfo.getProgressCode())
+                        .createDate(foundationInfo.getCreateDate())
+                        .build()
+                        )
+                )
+                .flatMap(res -> projectInfoDomainService.findByProjectId(res.getProjectId())
+                        .map(projectInfo -> {
+                            res.setBusinessCode(projectInfo.getBusinessCode());
+                            res.setNetworkCode(projectInfo.getNetworkCode());
+                            return res;
+                        })
+                )
                 .flatMap(res -> {
-                    return projectInfoDomainService.findByProjectId(res.getProjectId())
-                            .map(projectInfo -> {
-                                res.setBusinessCode(projectInfo.getBusinessCode());
-                                res.setNetworkCode(projectInfo.getNetworkCode());
-                                return res;
-                            });
-                }).flatMap(res -> {
-                    return projectLinkDomainService.findByProjectLinkList(res.getProjectId())
-                            .map(ProjectLinkMapper.INSTANCE::projectLinkResponse).collectList()
-                            .map(v -> {
-                                res.setProjectLinks(v);
-                                return res;
-                            });
-                })
-                .flatMap(res -> {
-                    return marketingQuantityDomainService.findByProjectId(res.getProjectId())
-                            .map(MarketingQuantityMapper.INSTANCE::marketingQuantityResponse)
-                            .collectList()
-                            .map(market -> {
-                                res.setMarketingQuantities(market);
-                                return res;
-                            });
-                })
-                .flatMap(res -> {
-                    return lineMngDomainService.findById(res.getBusinessCode())
-                            .map(business -> {
-                                res.setBusinessName(business.getName());
-                                return res;
+                    Mono<FoundationResponse> res1 = Mono.just(res);
+
+                    return res1.zipWith(icoInfoDomainService.findByProjectId(res.getProjectId())
+                                    .map(icoInfo -> IcoResponse.builder()
+                                            .marketInfo(icoInfo.getMarketInfo())
+                                            .icoDate(icoInfo.getIcoDate())
+                                            .build()
+                                    ).collectList()
+                            )
+                            .map(tuple -> {
+                                tuple.getT1().setIcoDate(
+                                        tuple.getT2().stream().map(t ->
+                                                t.getIcoDate().toString() + " (" + t.getMarketInfo() + ")"
+                                        ).collect(Collectors.joining(", "))
+                                );
+                                return tuple.getT1();
                             });
                 })
                 .flatMap(res -> {
-                    return lineMngDomainService.findById(res.getNetworkCode())
-                            .map(business -> {
-                                res.setNetworkName(business.getName());
-                                return res;
+                    Mono<FoundationResponse> res1 = Mono.just(res);
+
+                    return res1.zipWith(marketingQuantityDomainService.findByProjectId(res.getProjectId())
+                                    .map(marketingQuantity ->
+                                            MarketResponse.builder()
+                                                    .MinimumQuantity(marketingQuantity.getMinimumQuantity())
+                                                    .actualQuantity(marketingQuantity.getActualQuantity())
+                                                    .symbol(marketingQuantity.getSymbol())
+                                                    .build()
+                                    )
+                                    .collectList()
+                            )
+                            .map(tuple -> {
+                                tuple.getT1().setMinimumQuantity(
+                                        tuple.getT2().stream().map(t ->
+                                                t.getMinimumQuantity() + " " + t.getSymbol()
+                                        ).collect(Collectors.joining(", "))
+                                );
+                                tuple.getT1().setActualQuantity(
+                                        tuple.getT2().stream().map(t ->
+                                                t.getActualQuantity() + " " + t.getSymbol()
+                                        ).collect(Collectors.joining(", "))
+                                );
+
+                                return tuple.getT1();
                             });
                 })
+                .flatMap(res -> {
+                    Mono<FoundationResponse> res1 = Mono.just(res);
+
+                    return res1.zipWith(projectLinkDomainService.findByProjectLinkList(res.getProjectId())
+                                    .flatMap(projectLink ->
+                                            foundationInfoDomainService.findById(projectLink.getProjectId())
+                                                    .map(projectInfo -> LinkResponse.builder()
+                                                            .projectId(res.getProjectId())
+                                                            .projectName(projectInfo.getProjectName())
+                                                            .symbol(projectLink.getSymbol())
+                                                            .build()
+                                                    )
+                                    )
+                                    .collectList()
+                            )
+                            .map(tuple -> {
+                                tuple.getT1().setProjectLink(
+                                        tuple.getT2().stream().map(t ->
+                                                t.getProjectName() + " (" + t.getSymbol() +")"
+                                        ).collect(Collectors.joining(", "))
+                                );
+                                return tuple.getT1();
+                            });
+                })
+                .flatMap(res -> lineMngDomainService.findById(res.getBusinessCode())
+                        .map(business -> {
+                            res.setBusinessName(business.getName());
+                            return res;
+                        })
+                )
+                .flatMap(res -> lineMngDomainService.findById(res.getNetworkCode())
+                        .map(business -> {
+                            res.setNetworkName(business.getName());
+                            return res;
+                        })
+                )
                 .flatMap(res -> {
                     if(!StringUtils.isEmpty(res.getProgressCode())) {
                         return statusCodeDomainService.findStatusValueById(res.getProgressCode())
@@ -123,7 +173,7 @@ public class FoundationService {
                         return Mono.just(res);
                     }
                 })
-                .collectSortedList(Comparator.comparing(FoundationResponse::getProjectId));
+                .collectSortedList(Comparator.comparing(FoundationResponse::getCreateDate));
 //                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
     }
 

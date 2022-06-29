@@ -1,10 +1,5 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.model.response;
 
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.foundationinfo.model.response.FoundationInfoResponse;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.icoinfo.model.response.IcoInfoResponse;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.marketingquantity.model.response.MarketingQuantityResponse;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.model.response.ProjectInfoResponse;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectlink.model.response.ProjectLinkResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -56,29 +50,17 @@ public class FoundationResponse {
     private String networkName;     //네트워크계열
 
     @Schema(description = "마케팅 수량 최소")
-    private Long minimumQuantity;    //마케팅 수량 최소
+    private String minimumQuantity;    //마케팅 수량 최소
 
     @Schema(description = "마케팅 수량 실제")
-    private Long actualQuantity;   //마케팅 수량 실제
+    private String actualQuantity;   //마케팅 수량 실제
 
     @Schema(description = "연결프로젝트")
     private String projectLink;     //연결프로젝트
 
     @Schema(description = "상장일")
-    private LocalDateTime ipoDate;         //상장일
+    private String icoDate;         //상장일
 
     @Schema(description = "생성날짜")
     private LocalDateTime createDate; //생성날짜
-
-    @Schema(description = "생성자 id")
-    private String createAdminAccountId;  //생성자 id
-
-    private List<FoundationInfoResponse> foundationInfoResponses;
-    private List<ProjectInfoResponse> projectInfos;
-    private List<IcoInfoResponse> icoInfos;
-    private List<MarketingQuantityResponse> marketingQuantities;
-    private List<ProjectLinkResponse> projectLinks;
-
-
-
 }
