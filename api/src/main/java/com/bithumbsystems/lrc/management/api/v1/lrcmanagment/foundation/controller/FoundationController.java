@@ -36,7 +36,19 @@ public class FoundationController {
     @GetMapping("/foundation")
     @Operation(summary = "재단 가져오기", description = "재단 목록 정보를 조회합니다.")
     public ResponseEntity<Mono<?>> getFoundation() {
-        return ResponseEntity.ok().body(foundationService.getFoundation1()
+        return ResponseEntity.ok().body(foundationService.getFoundation(null)
+                .map(c -> new MultiResponse(c))
+        );
+    }
+
+    /**
+     * 재단 계약 상태 가져오기
+     * @return FoundationResponse
+     */
+    @GetMapping("/foundation/{contreatCode}")
+    @Operation(summary = "재단 계약 상태 가져오기", description = "재단 계약 상태 목록 정보를 조회합니다.")
+    public ResponseEntity<Mono<?>> getFoundationContract(@PathVariable String contreatCode) {
+        return ResponseEntity.ok().body(foundationService.getFoundation(contreatCode)
                 .map(c -> new MultiResponse(c))
         );
     }
@@ -47,7 +59,7 @@ public class FoundationController {
      * @return FoundationResponse
      */
     @PostMapping("/foundation")
-    @Operation(summary = "재단 1개 저장", description = "재단 정보를 저장합니다.")
+    @Operation(hidden = true, summary = "재단 1개 저장", description = "재단 정보를 저장합니다.")
     public ResponseEntity<Mono<?>> createFoundation(@Parameter(name = "foundation Object", description = "재단의 Model", in = ParameterIn.PATH)
                                                         @RequestBody FoundationRequest foundationRequest) {
         return ResponseEntity.ok().body(foundationService.create(foundationRequest)
@@ -61,7 +73,7 @@ public class FoundationController {
      * @return FoundationResponse
      */
     @PostMapping("/foundation/{projectId}")
-    @Operation(summary = "재단 1개 저장", description = "재단 정보를 저장합니다.")
+    @Operation(hidden = true, summary = "재단 1개 저장", description = "재단 정보를 저장합니다.")
     public ResponseEntity<Mono<?>> createFoundation1(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
                                                          @PathVariable("projectId") String projectId,
                                                      @Parameter(name = "foundation Object", description = "재단의 Model", in = ParameterIn.PATH)
@@ -77,19 +89,19 @@ public class FoundationController {
      * @param toDate 다음
      * @param contractCode 계약상태
      * @param progressCode 진행상태
-     * @param businessList 사업계열
-     * @param networkList 네트워크계열
+     * @param businessCode 사업계열
+     * @param networkCode 네트워크계열
      * @param keyword 프로젝트명,심볼 조건 검색
      * @return Foundation Object
      */
     @GetMapping("foundation/search")
     @Operation(summary = "재단 검색 하기", description = "재단 정보를 저장합니다.")
-    public ResponseEntity<Mono<?>> findSearch(@Parameter(name = "fromDate", description = "fromDate 이전 날짜", in = ParameterIn.PATH) @RequestParam(required = false) String fromDate,
+    public ResponseEntity<Mono<?>> getFoundationSearch(@Parameter(name = "fromDate", description = "fromDate 이전 날짜", in = ParameterIn.PATH) @RequestParam(required = false) String fromDate,
                                               @Parameter(name = "toDate", description = "toDate 다음 날짜", in = ParameterIn.PATH) @RequestParam(required = false) String toDate,
                                               @Parameter(name = "contractCode", description = "계약상태", in = ParameterIn.PATH) @RequestParam(required = false) String contractCode,
                                               @Parameter(name = "progressCode", description = "진행상태", in = ParameterIn.PATH) @RequestParam(required = false) String progressCode,
-                                              @Parameter(name = "businessList", description = "사업계열", in = ParameterIn.PATH) @RequestParam(required = false) String businessList,
-                                              @Parameter(name = "networkList", description = "네트워크계열", in = ParameterIn.PATH) @RequestParam(required = false) String networkList,
+                                              @Parameter(name = "businessCode", description = "사업계열", in = ParameterIn.PATH) @RequestParam(required = false) String businessCode,
+                                              @Parameter(name = "networkCode", description = "네트워크계열", in = ParameterIn.PATH) @RequestParam(required = false) String networkCode,
                                               @Parameter(name = "keyword", description = "프로젝트명,심볼 조건 검색", in = ParameterIn.PATH) @RequestParam(required = false) String keyword)
             throws UnsupportedEncodingException {
 
@@ -97,17 +109,16 @@ public class FoundationController {
         LocalDateTime nToDate = LocalDateTime.parse(toDate);
 
         List<String> business = new ArrayList<String>();
-        if(StringUtils.isNotEmpty(businessList)) {
-            business = Arrays.asList(URLDecoder.decode(businessList, "UTF-8").split(";"));
+        if(StringUtils.isNotEmpty(businessCode)) {
+            business = Arrays.asList(URLDecoder.decode(businessCode, "UTF-8").split(";"));
         }
 
         List<String> network = new ArrayList<String>();
-        if(StringUtils.isNotEmpty(networkList)) {
-            network = Arrays.asList(URLDecoder.decode(networkList, "UTF-8").split(";"));
+        if(StringUtils.isNotEmpty(networkCode)) {
+            network = Arrays.asList(URLDecoder.decode(networkCode, "UTF-8").split(";"));
         }
 
-
-        return ResponseEntity.ok().body(foundationService.findSearch(nFromDate, nToDate, contractCode, progressCode, business, network, keyword)
+        return ResponseEntity.ok().body(foundationService.getFoundationSearch(nFromDate, nToDate, contractCode, progressCode, business, network, keyword)
                 .map(c -> new SingleResponse(c))
         );
     }
