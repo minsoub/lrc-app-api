@@ -5,7 +5,7 @@ import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContent
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.Mapper.FoundationMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.model.request.FoundationRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.model.response.FoundationResponse;
-료import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.model.response.IcoResponse;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.model.response.IcoResponse;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.model.response.LinkResponse;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.model.response.MarketResponse;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.foundation.service.FoundationDomainService;
