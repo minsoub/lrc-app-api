@@ -24,7 +24,7 @@ import software.amazon.awssdk.services.ssm.model.GetParameterResponse;
 @Data
 @Configuration
 @Profile("dev|prod|eks-dev")
-public class ParameterStoreConfig {
+public class      ParameterStoreConfig {
 
     private SsmClient ssmClient;
     private MongoProperties mongoProperties;

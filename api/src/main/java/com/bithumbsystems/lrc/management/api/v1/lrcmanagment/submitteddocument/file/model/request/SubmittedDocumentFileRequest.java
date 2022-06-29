@@ -1,6 +1,7 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.model.request;
 
 
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.model.enums.SubmittedDocumentEnums;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,7 +18,7 @@ public class SubmittedDocumentFileRequest {
     private String projectId;       //프로젝트 코드
 
     @Schema(description = "구분")
-    private String type;            //구분
+    private SubmittedDocumentEnums type;            //구분
 
     @Schema(description = "파일 키")
     private String fileKey;         //파일코드
@@ -26,5 +27,5 @@ public class SubmittedDocumentFileRequest {
     private String fileName;        //파일명
 
     @Schema(description = "파일 Object")
-    private FilePart filePart;      //첨부파일
+    private FilePart file;      //첨부파일
 }

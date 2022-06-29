@@ -8,15 +8,26 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document("lrc_project_user_account")
-public class UserAccount {
-
+@Document("lrc_user_account")
+public class UserInfo {
     @MongoId(value = FieldType.STRING, targetType = FieldType.STRING)
     private String id;
-    private String projectId;               //프로젝트 코드
-    private String userAccountId;           //회원 아이디
-    private String userType;                //마스터/담당자구분
+    private String email;
+    private String password;
+    private LocalDateTime lastLoginDate;
+    private String name;
+    private String phone;
+    private String snsId;
+    private String contactEmail;
+    private String status;
+    private String otpSecretKey;
+    private LocalDateTime createDate;
+    private String createAccountId;
+    private LocalDateTime updateDate;
+    private String updateAccountId;
 }

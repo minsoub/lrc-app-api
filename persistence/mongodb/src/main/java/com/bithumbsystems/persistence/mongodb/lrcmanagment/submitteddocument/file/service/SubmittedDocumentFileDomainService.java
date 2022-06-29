@@ -2,6 +2,7 @@ package com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.fi
 
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.file.model.entity.SubmittedDocumentFile;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.file.repository.SubmittedDocumentFileRepository;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.model.enums.SubmittedDocumentEnums;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -21,14 +22,21 @@ public class SubmittedDocumentFileDomainService {
     public Mono<SubmittedDocumentFile> findSubmittedDocumentFileById(String contentId) {
         return submittedDocumentFileRepository.findById(contentId);
     }
-
+    /**
+     * 제출 서류 관리 project id 으로 file 찾기
+     * @param projectId
+     * @return SubmittedDocumentFileResponse Object
+     */
+    public Flux<SubmittedDocumentFile> findByProjectId(String projectId) {
+        return submittedDocumentFileRepository.findByProjectId(projectId);
+    }
     /**
      * 제출 서류 관리 id, type 으로 file 찾기
      * @param projectId
      * @param type
      * @return SubmittedDocumentFileResponse Object
      */
-    public Flux<SubmittedDocumentFile> findByProjectIdAndType(String projectId, String type) {
+    public Flux<SubmittedDocumentFile> findByProjectIdAndType(String projectId, SubmittedDocumentEnums type) {
         return submittedDocumentFileRepository.findByProjectIdAndType(projectId, type);
     }
 

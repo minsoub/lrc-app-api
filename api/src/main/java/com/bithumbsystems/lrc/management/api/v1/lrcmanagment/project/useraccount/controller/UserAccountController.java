@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("lrc/lrcmanagment/projct")
+@RequestMapping("lrc/lrcmanagment/project")
 @Tag(name = "담당자 정보", description = "담당자 정보 API")
 public class UserAccountController {
 

@@ -36,17 +36,15 @@ public class SubmittedDocumentUrlController {
     }
 
     /**
-     * 제출 서류 관리 id, type 으로 url 찾기
+     * 제출 서류 관리 Project id 으로 url 찾기
      * @param projectId
      * @return SubmittedDocumentResponse Object
      */
     @GetMapping("/submitted-document/url")
-    @Operation(summary = "제출 서류 관리 id, type 으로 url 찾기", description = "projectId를 이용하여 제출 서류 관리 url 정보를 조회합니다.")
-    public ResponseEntity<Mono<?>> getSubmittedDocumentUrl(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
-                                                               @RequestParam() String projectId,
-                                                           @Parameter(name = "type", description = "project 의 type", in = ParameterIn.PATH)
-                                                           @RequestParam() String type) {
-        return ResponseEntity.ok().body(submittedDocumentUrlService.findByProjectIdAndType(projectId, type)
+    @Operation(summary = "제출 서류 관리 Project id 으로 url 찾기", description = "projectId를 이용하여 제출 서류 관리 url 정보를 조회합니다.")
+    public ResponseEntity<Mono<?>> getSubmittedDocumentUrl(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.QUERY)
+                                                               @RequestParam() String projectId) {
+        return ResponseEntity.ok().body(submittedDocumentUrlService.findByProjectId(projectId)
                 .map(c -> new SingleResponse(c))
         );
     }

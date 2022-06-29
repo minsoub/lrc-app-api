@@ -2,10 +2,12 @@ package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.foundation
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "재단 정보")
@@ -23,8 +25,14 @@ public class FoundationInfoResponse {
     @Schema(description = "계약상태 code")
     private String contractCode;    //계약상태 code
 
+    @Schema(description = "계약상태 명칭")
+    private String contractName;
+
     @Schema(description = "진행상태 code")
     private String progressCode;    //진행상태 code
+
+    @Schema(description = "진행상태명")
+    private String progressName;
 
     @Schema(description = "관리자 메모")
     private String adminMemo;       //관리자 메모

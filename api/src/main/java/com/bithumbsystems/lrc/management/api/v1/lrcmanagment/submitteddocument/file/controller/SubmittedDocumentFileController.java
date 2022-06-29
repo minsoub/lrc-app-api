@@ -39,18 +39,15 @@ public class SubmittedDocumentFileController {
     }
 
     /**
-     * 제출 서류 관리 id, type 으로 file 찾기
+     * 제출 서류 관리 Project id 으로 file 찾기
      * @param projectId
-     * @param type
      * @return SubmittedDocumentResponse Object
      */
     @GetMapping("/submitted-document/file")
-    @Operation(summary = "제출 서류 관리 id, type 으로 file 찾기", description = "projectId를 이용하여 제출 서류 관리 file 정보를 조회합니다.")
-    public ResponseEntity<Mono<?>> getSubmittedDocumentFile(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
-                                                                @RequestParam("projectId") String projectId,
-                                                            @Parameter(name = "type", description = "project 의 type", in = ParameterIn.PATH)
-                                                            @RequestParam("type") String type) {
-        return ResponseEntity.ok().body(submittedDocumentService.findByProjectIdAndType(projectId, type)
+    @Operation(summary = "제출 서류 관리 project id로 file 찾기", description = "projectId를 이용하여 제출 서류 관리 file 정보를 조회합니다.")
+    public ResponseEntity<Mono<?>> getSubmittedDocumentFile(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.QUERY)
+                                                                @RequestParam("projectId") String projectId) {
+        return ResponseEntity.ok().body(submittedDocumentService.findByProjectId(projectId)
                 .map(c -> new SingleResponse(c))
         );
     }
@@ -62,10 +59,9 @@ public class SubmittedDocumentFileController {
      */
     @PostMapping(value = "/submitted-document/file", consumes = MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "제출 서류 관리 file 저장", description = "제출 서류 관리 file 정보를 저장 합니다.")
-    public ResponseEntity<Mono<?>> createSubmittedDocumentFile(@Parameter(name = "document Object", description = "제출 서류 Model", in = ParameterIn.PATH)
-                                                                @ModelAttribute(value = "submittedDocumentRequest") SubmittedDocumentFileRequest submittedDocumentRequest,
+    public ResponseEntity<Mono<?>> createSubmittedDocumentFile(@ModelAttribute(value = "submittedDocumentRequest") SubmittedDocumentFileRequest submittedDocumentRequest,
                                                                @Parameter(hidden = true) @CurrentUser Account account) {
-        return ResponseEntity.ok().body(submittedDocumentService.saveAll(Flux.just(submittedDocumentRequest), account)
+        return ResponseEntity.ok().body(submittedDocumentService.saveAll(Mono.just(submittedDocumentRequest), account)
                 .map(c -> new SingleResponse(c)));
     }
 

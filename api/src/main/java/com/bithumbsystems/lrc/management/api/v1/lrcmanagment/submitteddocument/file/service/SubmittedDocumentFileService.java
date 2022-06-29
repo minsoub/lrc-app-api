@@ -3,6 +3,7 @@ package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.
 import com.bithumbsystems.lrc.management.api.core.config.property.AwsProperties;
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
+import com.bithumbsystems.lrc.management.api.core.util.AES256Util;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContentException;
 import com.bithumbsystems.lrc.management.api.v1.file.service.FileService;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.mapper.SubmittedDocumentFileMapper;
@@ -23,6 +24,7 @@ import reactor.core.scheduler.Schedulers;
 import java.nio.ByteBuffer;
 import java.text.Normalizer;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -39,70 +41,79 @@ public class SubmittedDocumentFileService {
     /**
      * 제출 서류 관리 id, type 으로 file 찾기
      * @param projectId
-     * @param type
      * @return ReviewEstimateResponse Object
      */
-    public Mono<List<SubmittedDocumentFileResponse>> findByProjectIdAndType(String projectId, String type) {
-        return submittedDocumentFileDomainService.findByProjectIdAndType(projectId, type)
-                .map(SubmittedDocumentFileMapper.INSTANCE::submittedDocumentFileResponse)
-                .collectList()
+    public Mono<List<SubmittedDocumentFileResponse>> findByProjectId(String projectId) {
+        return submittedDocumentFileDomainService.findByProjectId(projectId)
+                .flatMap(result -> {
+                    return Mono.just(SubmittedDocumentFileResponse.builder()
+                            .id(result.getId())
+                            .projectId(result.getProjectId())
+                            .type(result.getType())
+                            .fileKey(result.getFileKey())
+                            .fileName(result.getFileName())
+                            .email(AES256Util.decryptAES(awsProperties.getKmsKey(), result.getEmail()))
+                            .createDate(result.getCreateDate())
+                            .createAdminAccountId(result.getCreateAdminAccountId())
+                            .build());
+                })
+                //.map(SubmittedDocumentFileMapper.INSTANCE::submittedDocumentFileResponse)
+                .collectSortedList(Comparator.comparing(SubmittedDocumentFileResponse::getCreateDate))
                 .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
     }
 
     /**
      * 제출 서류 관리 file 저장
-     * @param submittedDocumentRequest
+     * @param fileRequest
      * @return SubmittedDocumentResponse Object
      */
     @Transactional
-    public Mono<List<SubmittedDocumentFileResponse>> saveAll(Flux<SubmittedDocumentFileRequest> submittedDocumentRequest, Account account) {
-        return submittedDocumentRequest
-                .flatMap(submittedDocument ->
-                        DataBufferUtils.join(submittedDocument.getFilePart().content())
-                                .flatMap(dataBuffer -> {
-                                    ByteBuffer buf = dataBuffer.asByteBuffer();
-                                    String fileKey = UUID.randomUUID().toString();
-                                    String fileName = submittedDocument.getFilePart().filename();
-                                    Long fileSize = (long) buf.array().length;
-                                    log.info("byte size ===>  {}   :   {}   :   {} : ", fileKey, fileName, fileSize);
+    public Mono<SubmittedDocumentFileResponse> saveAll(Mono<SubmittedDocumentFileRequest> fileRequest, Account account) {
+        return fileRequest
+                .flatMap(request -> {
+                            return DataBufferUtils.join(request.getFile().content())
+                                    .flatMap(dataBuffer -> {
+                                        ByteBuffer buf = dataBuffer.asByteBuffer();
+                                        String fileKey = UUID.randomUUID().toString();
+                                        String fileName = request.getFile().filename();
+                                        Long fileSize = (long) buf.array().length;
+                                        log.info("byte size ===>  {}   :   {}   :   {} : ", fileKey, fileName, fileSize);
 
-                                    return fileService.upload(fileKey, fileName, fileSize, awsProperties.getBucket(), buf)
+                                        return fileService.upload(fileKey, fileName, fileSize, awsProperties.getBucket(), buf)
+                                                .publishOn(Schedulers.boundedElastic())
+                                                .flatMap(res -> {
+                                                    log.info("service upload res   =>       {}", res);
+                                                    log.info("service upload fileName   =>       {}", fileName.toString());
+                                                    File info = File.builder()
+                                                            .fileKey(fileKey)
+                                                            .fileName(Normalizer.normalize(fileName, Normalizer.Form.NFC))
+                                                            .createdAt(new Date())
+                                                            .createdId("test")
+                                                            .delYn(false)
+                                                            .build();
 
-                                            .publishOn(Schedulers.boundedElastic())
-                                            .flatMap(res -> {
-                                                log.info("service upload res   =>       {}", res);
-                                                log.info("service upload fileName   =>       {}", fileName.toString());
-                                                File info = File.builder()
-                                                        .fileKey(fileKey)
-                                                        .fileName(Normalizer.normalize(fileName, Normalizer.Form.NFC))
-                                                        .createdAt(new Date())
-                                                        .createdId("test")
-                                                        .delYn(false)
-                                                        .build();
-
-                                                return fileService.save(info);
-                                            })
-                                            .publishOn(Schedulers.boundedElastic())
-                                            .flatMap(file -> {
-                                                submittedDocument.setFileKey(file.getFileKey());
-                                                submittedDocument.setFileName(file.getFileName());
-                                                return submittedDocumentFileDomainService.save(
-                                                        SubmittedDocumentFile.builder()
-                                                                .projectId(submittedDocument.getProjectId())
-                                                                .type(submittedDocument.getType())
-                                                                .fileKey(submittedDocument.getFileKey())
-                                                                .fileName(submittedDocument.getFileName())
-                                                                .createDate(LocalDateTime.now())
-                                                                .createAdminAccountId(account.getAccountId())
-                                                                .build()
-                                                );
-                                            });
-                                })
+                                                    return fileService.save(info);
+                                                })
+                                                .publishOn(Schedulers.boundedElastic())
+                                                .flatMap(file -> {
+                                                    request.setFileKey(file.getFileKey());
+                                                    request.setFileName(file.getFileName());
+                                                    return submittedDocumentFileDomainService.save(
+                                                            SubmittedDocumentFile.builder()
+                                                                    .projectId(request.getProjectId())
+                                                                    .type(request.getType())
+                                                                    .fileKey(request.getFileKey())
+                                                                    .fileName(request.getFileName())
+                                                                    .email(AES256Util.encryptAES(awsProperties.getKmsKey(), account.getEmail(), false))
+                                                                    .createDate(LocalDateTime.now())
+                                                                    .createAdminAccountId(account.getAccountId())
+                                                                    .build()
+                                                    );
+                                                });
+                                    });
+                        }
                 )
-                .flatMap(res ->
-                        submittedDocumentFileDomainService.findByProjectIdAndType(res.getProjectId(), res.getType())
-                                .map(SubmittedDocumentFileMapper.INSTANCE::submittedDocumentFileResponse)
-                ).collectList();
+                .map(SubmittedDocumentFileMapper.INSTANCE::submittedDocumentFileResponse);
     }
 
     /**

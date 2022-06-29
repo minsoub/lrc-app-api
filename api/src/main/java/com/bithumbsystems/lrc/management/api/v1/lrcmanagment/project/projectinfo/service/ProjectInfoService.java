@@ -5,7 +5,9 @@ import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContent
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.model.request.ProjectInfoRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.model.response.ProjectInfoResponse;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.mapper.ProejctInfoMapper;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectinfo.model.entity.ProjectInfo;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectinfo.service.ProjectInfoDomainService;
+import com.bithumbsystems.persistence.mongodb.statusmanagement.linemng.service.LineMngDomainService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -15,6 +17,7 @@ import reactor.core.publisher.Mono;
 public class ProjectInfoService {
 
     private final ProjectInfoDomainService projectInfoDomainService;
+    private final LineMngDomainService lineMngDomainService;
 
     /**
      * 프로젝트 정보 1개 id 찾기
@@ -23,9 +26,29 @@ public class ProjectInfoService {
      */
     public Mono<ProjectInfoResponse> findByProjectId(String projectId) {
         return projectInfoDomainService.findByProjectId(projectId)
-                .map(ProejctInfoMapper.INSTANCE::projectInfoResponse)
+                .flatMap(result -> {
+                    return lineMngDomainService.findById(result.getBusinessCode())
+                            .flatMap(r -> {
+                                return Mono.just(ProjectInfoResponse.builder()
+                                        .id(result.getId())
+                                        .projectId(result.getProjectId())
+                                        .whitepaperLink(result.getWhitepaperLink())
+                                        .businessCode(result.getBusinessCode())
+                                        .businessName(r.getName())
+                                        .networkCode(result.getNetworkCode())
+                                        .createDate(result.getCreateDate())
+                                        .contractAddress(result.getContractAddress())
+                                        .build());
+                            })
+                            .flatMap(res -> {
+                                return lineMngDomainService.findById(res.getNetworkCode())
+                                        .flatMap(c -> {
+                                            res.setNetworkName(c.getName());
+                                            return Mono.just(res);
+                                        });
+                            });
+                })
                 .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
-
     }
 
     /**

@@ -36,7 +36,7 @@ import reactor.core.publisher.Mono;
 
 @Slf4j
 @RestController
-@RequestMapping("/files")
+@RequestMapping("/lrc/files")
 @RequiredArgsConstructor
 @Tag(name = "File Test APIs", description = "File Test APIs for demo purpose")
 public class FileController {

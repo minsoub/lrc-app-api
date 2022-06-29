@@ -2,10 +2,12 @@ package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.useraccoun
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "사용자 정보")
@@ -19,6 +21,18 @@ public class UserAccountResponse {
     @Schema(description = "회원 아이디")
     private String userAccountId;           //회원 아이디
 
+    @Schema(description = "회원명")
+    private String userName;
+
     @Schema(description = "마스터/담당자구분")
     private String userType;                //마스터/담당자구분
+
+    @Schema(description = "SNS ID")
+    private String snsId;
+
+    @Schema(description = "Email")
+    private String email;
+
+    @Schema(description = "Phone")
+    private String phone;
 }

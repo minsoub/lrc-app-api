@@ -1,5 +1,6 @@
 package com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.service;
 
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.model.enums.SubmittedDocumentEnums;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.model.entity.SubmittedDocumentUrl;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.repository.SubmittedDocumentUrlRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,14 +22,21 @@ public class SubmittedDocumentUrlDomainService {
     public Mono<SubmittedDocumentUrl> findSubmittedDocumentUrlById(String contentId) {
         return submittedDocumentUrlRepository.findById(contentId);
     }
-
+    /**
+     * 제출 서류 관리 id, type 으로 url 찾기
+     * @param projectId
+     * @return SubmittedDocumentUrlResponse Object
+     */
+    public Flux<SubmittedDocumentUrl> findByProjectId(String projectId) {
+        return submittedDocumentUrlRepository.findByProjectId(projectId);
+    }
     /**
      * 제출 서류 관리 id, type 으로 url 찾기
      * @param projectId
      * @param type
      * @return SubmittedDocumentUrlResponse Object
      */
-    public Flux<SubmittedDocumentUrl> findByProjectIdAndType(String projectId, String type) {
+    public Flux<SubmittedDocumentUrl> findByProjectIdAndType(String projectId, SubmittedDocumentEnums type) {
         return submittedDocumentUrlRepository.findByProjectIdAndType(projectId, type);
     }
 

@@ -2,12 +2,14 @@ package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinf
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "프로젝트 정보")
@@ -21,8 +23,14 @@ public class ProjectInfoResponse {
     @Schema(description = "사업계열")
     private String businessCode;            //사업계열
 
+    @Schema(description = "사업계열명")
+    private String businessName;
+
     @Schema(description = "네트워크")
     private String networkCode;             //네트워크계열
+
+    @Schema(description = "네트워크명")
+    private String networkName;
 
     @Schema(description = "백서링크")
     private String whitepaperLink;          //백서링크

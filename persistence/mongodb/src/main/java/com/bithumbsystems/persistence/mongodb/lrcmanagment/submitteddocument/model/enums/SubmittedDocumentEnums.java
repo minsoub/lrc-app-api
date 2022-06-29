@@ -2,6 +2,7 @@ package com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.mo
 
 public enum SubmittedDocumentEnums {
     IPO_APPLICATION,                //상장 신청서
+    COLLECT_CONFIRM,                // 개인정보 동의서
     PROJECT_WHITEPAPER,             //프로젝트 백서
     TECH_REVIEW_REPORT,             //기술 검토 보고서
     TOKEN_DIVISION_PLAN,            //토큰 분배 계획서

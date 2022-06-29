@@ -7,6 +7,7 @@ import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.foundationi
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.foundationinfo.model.request.FoundationInfoRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.foundationinfo.model.response.FoundationInfoResponse;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.foundationinfo.service.FoundationInfoDomainService;
+import com.bithumbsystems.persistence.mongodb.statusmanagement.statusvalue.repository.StatusCodeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 public class FoundationInfoService {
 
     private final FoundationInfoDomainService foundationInfoDomainService;
+    private final StatusCodeRepository statusCodeRepository;
 
     /**
      * 재단 정보 1개 id 찾기
@@ -27,9 +29,29 @@ public class FoundationInfoService {
      */
     public Mono<FoundationInfoResponse> findById(String id) {
         return foundationInfoDomainService.findById(id)
-                .map(FoundationInfoMapper.INSTANCE::foundationInfoResponse)
+                .flatMap(result -> {
+                    return statusCodeRepository.findById(result.getContractCode())
+                            .flatMap(r1 -> {
+                                return Mono.just(FoundationInfoResponse.builder()
+                                        .id(result.getId())
+                                        .adminMemo(result.getMemo())
+                                        .symbol(result.getSymbol())
+                                        .projectName(result.getName())
+                                        .contractCode(result.getContractCode())
+                                        .contractName(r1.getName())
+                                        .progressCode(result.getProgressCode())
+                                        .build());
+                            })
+                            .flatMap(res -> {
+                                return statusCodeRepository.findById(res.getProgressCode())
+                                        .flatMap(r2 -> {
+                                            res.setProgressName(r2.getName());
+                                            return Mono.just(res);
+                                        });
+                            });
+                })
+                //.map(FoundationInfoMapper.INSTANCE::foundationInfoResponse)
                 .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
-
     }
 
     /**
@@ -41,11 +63,11 @@ public class FoundationInfoService {
     public Mono<FoundationInfoResponse> updateFoundationInfo(String id, FoundationInfoRequest foundationInfoRequest, Account account) {
         return foundationInfoDomainService.findById(id)
                 .flatMap(c -> {
-                    c.setProjectName(foundationInfoRequest.getProjectName());
+                    c.setName(foundationInfoRequest.getProjectName());
                     c.setSymbol(foundationInfoRequest.getSymbol());
                     c.setContractCode(foundationInfoRequest.getContractCode());
                     c.setProgressCode(foundationInfoRequest.getProgressCode());
-                    c.setAdminMemo(foundationInfoRequest.getAdminMemo());
+                    c.setMemo(foundationInfoRequest.getAdminMemo());
                     c.setUpdateDate(LocalDateTime.now());
                     c.setUpdateAdminAccountId(account.getAccountId());
 
