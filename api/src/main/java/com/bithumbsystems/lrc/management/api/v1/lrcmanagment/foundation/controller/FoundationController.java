@@ -36,7 +36,7 @@ public class FoundationController {
     @GetMapping("/foundation")
     @Operation(summary = "재단 가져오기", description = "재단 목록 정보를 조회합니다.")
     public ResponseEntity<Mono<?>> getFoundation() {
-        return ResponseEntity.ok().body(foundationService.getFoundation()
+        return ResponseEntity.ok().body(foundationService.getFoundation1()
                 .map(c -> new MultiResponse(c))
         );
     }

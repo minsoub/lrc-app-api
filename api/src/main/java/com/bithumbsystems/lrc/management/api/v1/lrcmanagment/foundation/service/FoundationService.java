@@ -5,19 +5,128 @@ import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContent
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.Mapper.FoundationMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.model.request.FoundationRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.model.response.FoundationResponse;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.marketingquantity.mapper.MarketingQuantityMapper;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectlink.mapper.ProjectLinkMapper;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.foundation.service.FoundationDomainService;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.foundationinfo.service.FoundationInfoDomainService;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.icoinfo.service.IcoInfoDomainService;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.marketingquantity.service.MarketingQuantityDomainService;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectinfo.service.ProjectInfoDomainService;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectlink.service.ProjectLinkDomainService;
+import com.bithumbsystems.persistence.mongodb.statusmanagement.linemng.service.LineMngDomainService;
+import com.bithumbsystems.persistence.mongodb.statusmanagement.statusvalue.service.StatusCodeDomainService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FoundationService {
 
     private final FoundationDomainService foundationDomainService;
+
+
+    private final FoundationInfoDomainService foundationInfoDomainService;
+    private final ProjectInfoDomainService projectInfoDomainService;
+    private final MarketingQuantityDomainService marketingQuantityDomainService;
+
+    private final IcoInfoDomainService icoInfoDomainService;
+
+
+    private final ProjectLinkDomainService projectLinkDomainService;
+
+    private final LineMngDomainService lineMngDomainService;
+    private final StatusCodeDomainService statusCodeDomainService;
+
+    /**
+     * 재단 모든 정보
+     * @return FoundationResponse
+     */
+    public Mono<List<FoundationResponse>> getFoundation1() {
+        return foundationInfoDomainService.findByFoundationInfo()
+                .flatMap(foundationInfo -> {
+                    FoundationResponse foundationResponse = FoundationResponse.builder()
+                                    .projectId(foundationInfo.getId())
+                                    .projectName(foundationInfo.getProjectName())
+                                    .symbol(foundationInfo.getSymbol())
+                                    .contractCode(foundationInfo.getContractCode())
+                                    .progressCode(foundationInfo.getProgressCode())
+                                    .build();
+                    return Mono.just(foundationResponse);
+                })
+                .log()
+                .flatMap(res -> {
+                    return projectInfoDomainService.findByProjectId(res.getProjectId())
+                            .map(projectInfo -> {
+                                res.setBusinessCode(projectInfo.getBusinessCode());
+                                res.setNetworkCode(projectInfo.getNetworkCode());
+                                return res;
+                            });
+                }).flatMap(res -> {
+                    return projectLinkDomainService.findByProjectLinkList(res.getProjectId())
+                            .map(ProjectLinkMapper.INSTANCE::projectLinkResponse).collectList()
+                            .map(v -> {
+                                res.setProjectLinks(v);
+                                return res;
+                            });
+                })
+                .flatMap(res -> {
+                    return marketingQuantityDomainService.findByProjectId(res.getProjectId())
+                            .map(MarketingQuantityMapper.INSTANCE::marketingQuantityResponse)
+                            .collectList()
+                            .map(market -> {
+                                res.setMarketingQuantities(market);
+                                return res;
+                            });
+                })
+                .flatMap(res -> {
+                    return lineMngDomainService.findById(res.getBusinessCode())
+                            .map(business -> {
+                                res.setBusinessName(business.getName());
+                                return res;
+                            });
+                })
+                .flatMap(res -> {
+                    return lineMngDomainService.findById(res.getNetworkCode())
+                            .map(business -> {
+                                res.setNetworkName(business.getName());
+                                return res;
+                            });
+                })
+                .flatMap(res -> {
+                    if(!StringUtils.isEmpty(res.getProgressCode())) {
+                        return statusCodeDomainService.findStatusValueById(res.getProgressCode())
+                                .map(progress -> {
+                                    res.setProgressName(progress.getName());
+                                    return res;
+                                });
+                    }
+                    else {
+                        return Mono.just(res);
+                    }
+                })
+                .flatMap(res -> {
+                    if(!StringUtils.isEmpty(res.getProgressCode())) {
+                        return statusCodeDomainService.findStatusValueById(res.getContractCode())
+                                .map(progress -> {
+                                    res.setContractName(progress.getName());
+                                    return res;
+                                });
+                    } else {
+                        return Mono.just(res);
+                    }
+                })
+                .collectSortedList(Comparator.comparing(FoundationResponse::getProjectId));
+//                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+    }
+
 
     /**
      * 재단 모든 정보
@@ -64,8 +173,8 @@ public class FoundationService {
                     c.setProjectId(foundationRequest.getProjectId());
                     c.setProjectName(foundationRequest.getProjectName());
                     c.setSymbol(foundationRequest.getSymbol());
-                    c.setContrectCode(foundationRequest.getContrectCode());
-                    c.setContrectName(foundationRequest.getContrectName());
+                    c.setContractCode(foundationRequest.getContractCode());
+                    c.setContractName(foundationRequest.getContractName());
                     c.setProgressCode(foundationRequest.getProgressCode());
                     c.setProgressName(foundationRequest.getProgressName());
                     c.setBusinessList(foundationRequest.getBusinessList());
@@ -97,5 +206,4 @@ public class FoundationService {
                 .map(FoundationMapper.INSTANCE::foundationResponse)
                 .collectList();
     }
-
 }

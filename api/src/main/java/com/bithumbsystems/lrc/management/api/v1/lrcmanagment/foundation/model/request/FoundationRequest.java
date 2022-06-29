@@ -19,16 +19,16 @@ public class FoundationRequest {
     private String projectId;      //프로젝트 id
 
     @Schema(description = "프로젝트 명")
-    private String ProjectName;     //프로젝트명
+    private String projectName;     //프로젝트명
 
     @Schema(description = "심볼")
     private String symbol;          //심볼
 
     @Schema(description = "계약상태 code")
-    private String contrectCode;    //계약상태 code
+    private String contractCode;    //계약상태 code
 
     @Schema(description = "계약상태")
-    private String contrectName;    //계약상태
+    private String contractName;    //계약상태
 
     @Schema(description = "진행상태 code")
     private String progressCode;    //진행상태 code

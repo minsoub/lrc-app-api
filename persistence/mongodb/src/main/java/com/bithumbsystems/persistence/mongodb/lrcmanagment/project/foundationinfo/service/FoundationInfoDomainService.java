@@ -4,6 +4,7 @@ import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.foundationinf
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.foundationinfo.repository.FoundationInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -11,6 +12,10 @@ import reactor.core.publisher.Mono;
 public class FoundationInfoDomainService {
 
     private final FoundationInfoRepository foundationInfoRepository;
+
+    public Flux<FoundationInfo> findByFoundationInfo() {
+        return foundationInfoRepository.findAll();
+    }
 
     /**
      * 재단정보 id로 찾기

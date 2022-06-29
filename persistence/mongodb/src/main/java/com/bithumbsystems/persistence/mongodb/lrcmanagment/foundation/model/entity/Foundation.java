@@ -17,10 +17,10 @@ public class Foundation {
     @Id
     private String id;
     private String projectId;       //프로젝트 id
-    private String ProjectName;     //프로젝트명
+    private String projectName;     //프로젝트명
     private String symbol;          //심볼
-    private String contrectCode;    //계약상태 code
-    private String contrectName;    //계약상태
+    private String contractCode;    //계약상태 code
+    private String contractName;    //계약상태
     private String progressCode;    //진행상태 code
     private String progressName;    //진행상태
     private String businessList;    //사업계열
