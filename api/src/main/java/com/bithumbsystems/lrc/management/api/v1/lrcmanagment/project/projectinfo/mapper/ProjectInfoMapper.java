@@ -7,9 +7,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 @Mapper
-public interface ProejctInfoMapper {
+public interface ProjectInfoMapper {
 
-    ProejctInfoMapper INSTANCE = Mappers.getMapper(ProejctInfoMapper.class);
+    ProjectInfoMapper INSTANCE = Mappers.getMapper(ProjectInfoMapper.class);
 
     ProjectInfoResponse projectInfoResponse(ProjectInfo projectInfo);
 

@@ -2,10 +2,9 @@ package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinf
 
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContentException;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.mapper.ProjectInfoMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.model.request.ProjectInfoRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.model.response.ProjectInfoResponse;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.mapper.ProejctInfoMapper;
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectinfo.model.entity.ProjectInfo;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectinfo.service.ProjectInfoDomainService;
 import com.bithumbsystems.persistence.mongodb.statusmanagement.linemng.service.LineMngDomainService;
 import lombok.RequiredArgsConstructor;
@@ -57,8 +56,8 @@ public class ProjectInfoService {
      * @return ProjectInfoResponse Object
      */
     public Mono<ProjectInfoResponse> create(ProjectInfoRequest projectInfoRequest) {
-        return projectInfoDomainService.save(ProejctInfoMapper.INSTANCE.projectInfoRequestToProjectInfo(projectInfoRequest))
-                .map(ProejctInfoMapper.INSTANCE::projectInfoResponse)
+        return projectInfoDomainService.save(ProjectInfoMapper.INSTANCE.projectInfoRequestToProjectInfo(projectInfoRequest))
+                .map(ProjectInfoMapper.INSTANCE::projectInfoResponse)
                 .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
     }
 
@@ -75,7 +74,7 @@ public class ProjectInfoService {
                     c.setWhitepaperLink(projectInfoRequest.getWhitepaperLink());
                     c.setContractAddress(projectInfoRequest.getContractAddress());
                     return projectInfoDomainService.updateProjectInfo(c)
-                            .map(ProejctInfoMapper.INSTANCE::projectInfoResponse);
+                            .map(ProjectInfoMapper.INSTANCE::projectInfoResponse);
                 })
         .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.FAIL_UPDATE_CONTENT)));
     }

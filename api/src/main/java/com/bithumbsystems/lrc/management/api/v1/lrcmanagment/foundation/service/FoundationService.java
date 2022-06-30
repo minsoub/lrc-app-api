@@ -8,6 +8,7 @@ import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.model.re
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.model.response.IcoResponse;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.model.response.LinkResponse;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.model.response.MarketResponse;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.mapper.ProjectInfoMapper;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.foundation.service.FoundationDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.foundationinfo.service.FoundationInfoDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.icoinfo.service.IcoInfoDomainService;
@@ -52,22 +53,49 @@ public class FoundationService {
         return foundationInfoDomainService.findByCustomSearchAll(contractCode)
                 .flatMap(foundationInfo ->
                         Mono.just(FoundationResponse.builder()
-                        .projectId(foundationInfo.getId())
-                        .projectName(foundationInfo.getName())
-                        .symbol(foundationInfo.getSymbol())
-                        .contractCode(foundationInfo.getContractCode())
-                        .progressCode(foundationInfo.getProgressCode())
-                        .createDate(foundationInfo.getCreateDate())
-                        .build()
+                                .projectId(foundationInfo.getId())
+                                .projectName(foundationInfo.getName())
+                                .symbol(foundationInfo.getSymbol())
+                                .contractCode(foundationInfo.getContractCode())
+                                .progressCode(foundationInfo.getProgressCode())
+                                .createDate(foundationInfo.getCreateDate())
+                                .build()
                         )
                 )
-                .flatMap(res -> projectInfoDomainService.findByProjectId(res.getProjectId())
-                        .map(projectInfo -> {
-                            res.setBusinessCode(projectInfo.getBusinessCode());
-                            res.setNetworkCode(projectInfo.getNetworkCode());
-                            return res;
-                        })
-                )
+                .flatMap(res -> {
+
+                    Mono<FoundationResponse> res1 = Mono.just(res);
+
+                    return res1.zipWith(projectInfoDomainService.findByProjectId(res.getProjectId())
+                                    .map(ProjectInfoMapper.INSTANCE::projectInfoResponse)
+                            )
+                            .map(tuple -> {
+                                tuple.getT1().setBusinessCode(tuple.getT2().getBusinessCode());
+                                tuple.getT1().setNetworkCode(tuple.getT2().getNetworkCode());
+                                return tuple.getT1();
+                            })
+                            .switchIfEmpty(
+                                    Mono.defer(() -> Mono.just(FoundationResponse.builder()
+                                            .projectId(res.getProjectId())
+                                            .projectName(res.getProjectName())
+                                            .symbol(res.getSymbol())
+                                            .contractCode(res.getContractCode())
+                                            .contractName(res.getContractName())
+                                            .progressCode(res.getProgressCode())
+                                            .progressName(res.getProgressName())
+                                            .businessCode(res.getBusinessCode())
+                                            .businessName(res.getBusinessName())
+                                            .networkCode(res.getNetworkCode())
+                                            .networkName(res.getNetworkName())
+                                            .minimumQuantity(res.getMinimumQuantity())
+                                            .actualQuantity(res.getActualQuantity())
+                                            .projectLink(res.getProjectLink())
+                                            .icoDate(res.getIcoDate())
+                                            .createDate(res.getCreateDate())
+                                            .build()))
+                            );
+
+                })
                 .flatMap(res -> {
                     Mono<FoundationResponse> res1 = Mono.just(res);
 
@@ -85,7 +113,27 @@ public class FoundationService {
                                         ).collect(Collectors.joining(", "))
                                 );
                                 return tuple.getT1();
-                            });
+                            })
+                            .switchIfEmpty(
+                                    Mono.defer(() -> Mono.just(FoundationResponse.builder()
+                                            .projectId(res.getProjectId())
+                                            .projectName(res.getProjectName())
+                                            .symbol(res.getSymbol())
+                                            .contractCode(res.getContractCode())
+                                            .contractName(res.getContractName())
+                                            .progressCode(res.getProgressCode())
+                                            .progressName(res.getProgressName())
+                                            .businessCode(res.getBusinessCode())
+                                            .businessName(res.getBusinessName())
+                                            .networkCode(res.getNetworkCode())
+                                            .networkName(res.getNetworkName())
+                                            .minimumQuantity(res.getMinimumQuantity())
+                                            .actualQuantity(res.getActualQuantity())
+                                            .projectLink(res.getProjectLink())
+                                            .icoDate(res.getIcoDate())
+                                            .createDate(res.getCreateDate())
+                                            .build()))
+                            );
                 })
                 .flatMap(res -> {
                     Mono<FoundationResponse> res1 = Mono.just(res);
@@ -113,7 +161,27 @@ public class FoundationService {
                                 );
 
                                 return tuple.getT1();
-                            });
+                            })
+                            .switchIfEmpty(
+                                    Mono.defer(() -> Mono.just(FoundationResponse.builder()
+                                            .projectId(res.getProjectId())
+                                            .projectName(res.getProjectName())
+                                            .symbol(res.getSymbol())
+                                            .contractCode(res.getContractCode())
+                                            .contractName(res.getContractName())
+                                            .progressCode(res.getProgressCode())
+                                            .progressName(res.getProgressName())
+                                            .businessCode(res.getBusinessCode())
+                                            .businessName(res.getBusinessName())
+                                            .networkCode(res.getNetworkCode())
+                                            .networkName(res.getNetworkName())
+                                            .minimumQuantity(res.getMinimumQuantity())
+                                            .actualQuantity(res.getActualQuantity())
+                                            .projectLink(res.getProjectLink())
+                                            .icoDate(res.getIcoDate())
+                                            .createDate(res.getCreateDate())
+                                            .build()))
+                            );
                 })
                 .flatMap(res -> {
                     Mono<FoundationResponse> res1 = Mono.just(res);
@@ -137,20 +205,51 @@ public class FoundationService {
                                         ).collect(Collectors.joining(", "))
                                 );
                                 return tuple.getT1();
-                            });
+                            })
+                            .switchIfEmpty(
+                                    Mono.defer(() -> Mono.just(FoundationResponse.builder()
+                                            .projectId(res.getProjectId())
+                                            .projectName(res.getProjectName())
+                                            .symbol(res.getSymbol())
+                                            .contractCode(res.getContractCode())
+                                            .contractName(res.getContractName())
+                                            .progressCode(res.getProgressCode())
+                                            .progressName(res.getProgressName())
+                                            .businessCode(res.getBusinessCode())
+                                            .businessName(res.getBusinessName())
+                                            .networkCode(res.getNetworkCode())
+                                            .networkName(res.getNetworkName())
+                                            .minimumQuantity(res.getMinimumQuantity())
+                                            .actualQuantity(res.getActualQuantity())
+                                            .projectLink(res.getProjectLink())
+                                            .icoDate(res.getIcoDate())
+                                            .createDate(res.getCreateDate())
+                                            .build()))
+                            );
                 })
-                .flatMap(res -> lineMngDomainService.findById(res.getBusinessCode())
-                        .map(business -> {
-                            res.setBusinessName(business.getName());
-                            return res;
-                        })
-                )
-                .flatMap(res -> lineMngDomainService.findById(res.getNetworkCode())
-                        .map(business -> {
-                            res.setNetworkName(business.getName());
-                            return res;
-                        })
-                )
+                .flatMap(res -> {
+                    if(!StringUtils.isEmpty(res.getBusinessCode())) {
+                        return lineMngDomainService.findById(res.getBusinessCode())
+                                .map(business -> {
+                                    res.setBusinessName(business.getName());
+                                    return res;
+                                });
+                    } else {
+                        return Mono.just(res);
+                    }
+
+                })
+                .flatMap(res -> {
+                    if(!StringUtils.isEmpty(res.getNetworkCode())) {
+                        return lineMngDomainService.findById(res.getNetworkCode())
+                                .map(business -> {
+                                    res.setNetworkName(business.getName());
+                                    return res;
+                                });
+                    } else {
+                        return Mono.just(res);
+                    }
+                })
                 .flatMap(res -> {
                     if(!StringUtils.isEmpty(res.getProgressCode())) {
                         return statusCodeDomainService.findStatusValueById(res.getProgressCode())
@@ -241,7 +340,7 @@ public class FoundationService {
      * @return Foundation Object
      */
     public Mono<List<FoundationResponse>> getFoundationSearch(LocalDateTime fromDate, LocalDateTime toDate, String contractCode, String progressCode,
-                                                     List<String> businessCode, List<String> networkCode, String keyword) {
+                                                              List<String> businessCode, List<String> networkCode, String keyword) {
 
         return foundationInfoDomainService.findByCustomSearch(fromDate, toDate, contractCode, progressCode, keyword)
                 .flatMap(foundationInfo ->
@@ -255,13 +354,43 @@ public class FoundationService {
                                 .build()
                         )
                 )
-                .flatMap(res -> projectInfoDomainService.findByProjectInfo(res.getProjectId(), businessCode, networkCode)
-                        .map(projectInfo -> {
-                            res.setBusinessCode(projectInfo.getBusinessCode());
-                            res.setNetworkCode(projectInfo.getNetworkCode());
-                            return res;
-                        })
-                )
+                .flatMap(res -> {
+                    Mono<FoundationResponse> res1 = Mono.just(res);
+
+                    return res1.zipWith(projectInfoDomainService.findByProjectInfo(res.getProjectId(), businessCode, networkCode)
+                                    .map(ProjectInfoMapper.INSTANCE::projectInfoResponse)
+                                    .collectList()
+                            )
+                            .map(tuple -> {
+                                tuple.getT1().setBusinessCode(
+                                        tuple.getT2().stream().map(t -> t.getBusinessCode()).collect(Collectors.joining())
+                                );
+                                tuple.getT1().setNetworkCode(
+                                        tuple.getT2().stream().map(t -> t.getNetworkCode()).collect(Collectors.joining())
+                                );
+                                return tuple.getT1();
+                            })
+                            .switchIfEmpty(
+                                    Mono.defer(() -> Mono.just(FoundationResponse.builder()
+                                            .projectId(res.getProjectId())
+                                            .projectName(res.getProjectName())
+                                            .symbol(res.getSymbol())
+                                            .contractCode(res.getContractCode())
+                                            .contractName(res.getContractName())
+                                            .progressCode(res.getProgressCode())
+                                            .progressName(res.getProgressName())
+                                            .businessCode(res.getBusinessCode())
+                                            .businessName(res.getBusinessName())
+                                            .networkCode(res.getNetworkCode())
+                                            .networkName(res.getNetworkName())
+                                            .minimumQuantity(res.getMinimumQuantity())
+                                            .actualQuantity(res.getActualQuantity())
+                                            .projectLink(res.getProjectLink())
+                                            .icoDate(res.getIcoDate())
+                                            .createDate(res.getCreateDate())
+                                            .build()))
+                            );
+                })
                 .flatMap(res -> {
                     Mono<FoundationResponse> res1 = Mono.just(res);
 
@@ -279,7 +408,27 @@ public class FoundationService {
                                         ).collect(Collectors.joining(", "))
                                 );
                                 return tuple.getT1();
-                            });
+                            })
+                            .switchIfEmpty(
+                                    Mono.defer(() -> Mono.just(FoundationResponse.builder()
+                                            .projectId(res.getProjectId())
+                                            .projectName(res.getProjectName())
+                                            .symbol(res.getSymbol())
+                                            .contractCode(res.getContractCode())
+                                            .contractName(res.getContractName())
+                                            .progressCode(res.getProgressCode())
+                                            .progressName(res.getProgressName())
+                                            .businessCode(res.getBusinessCode())
+                                            .businessName(res.getBusinessName())
+                                            .networkCode(res.getNetworkCode())
+                                            .networkName(res.getNetworkName())
+                                            .minimumQuantity(res.getMinimumQuantity())
+                                            .actualQuantity(res.getActualQuantity())
+                                            .projectLink(res.getProjectLink())
+                                            .icoDate(res.getIcoDate())
+                                            .createDate(res.getCreateDate())
+                                            .build()))
+                            );
                 })
                 .flatMap(res -> {
                     Mono<FoundationResponse> res1 = Mono.just(res);
@@ -307,7 +456,27 @@ public class FoundationService {
                                 );
 
                                 return tuple.getT1();
-                            });
+                            })
+                            .switchIfEmpty(
+                                    Mono.defer(() -> Mono.just(FoundationResponse.builder()
+                                            .projectId(res.getProjectId())
+                                            .projectName(res.getProjectName())
+                                            .symbol(res.getSymbol())
+                                            .contractCode(res.getContractCode())
+                                            .contractName(res.getContractName())
+                                            .progressCode(res.getProgressCode())
+                                            .progressName(res.getProgressName())
+                                            .businessCode(res.getBusinessCode())
+                                            .businessName(res.getBusinessName())
+                                            .networkCode(res.getNetworkCode())
+                                            .networkName(res.getNetworkName())
+                                            .minimumQuantity(res.getMinimumQuantity())
+                                            .actualQuantity(res.getActualQuantity())
+                                            .projectLink(res.getProjectLink())
+                                            .icoDate(res.getIcoDate())
+                                            .createDate(res.getCreateDate())
+                                            .build()))
+                            );
                 })
                 .flatMap(res -> {
                     Mono<FoundationResponse> res1 = Mono.just(res);
@@ -331,20 +500,50 @@ public class FoundationService {
                                         ).collect(Collectors.joining(", "))
                                 );
                                 return tuple.getT1();
-                            });
+                            })
+                            .switchIfEmpty(
+                                    Mono.defer(() -> Mono.just(FoundationResponse.builder()
+                                            .projectId(res.getProjectId())
+                                            .projectName(res.getProjectName())
+                                            .symbol(res.getSymbol())
+                                            .contractCode(res.getContractCode())
+                                            .contractName(res.getContractName())
+                                            .progressCode(res.getProgressCode())
+                                            .progressName(res.getProgressName())
+                                            .businessCode(res.getBusinessCode())
+                                            .businessName(res.getBusinessName())
+                                            .networkCode(res.getNetworkCode())
+                                            .networkName(res.getNetworkName())
+                                            .minimumQuantity(res.getMinimumQuantity())
+                                            .actualQuantity(res.getActualQuantity())
+                                            .projectLink(res.getProjectLink())
+                                            .icoDate(res.getIcoDate())
+                                            .createDate(res.getCreateDate())
+                                            .build()))
+                            );
                 })
-                .flatMap(res -> lineMngDomainService.findById(res.getBusinessCode())
-                        .map(business -> {
-                            res.setBusinessName(business.getName());
-                            return res;
-                        })
-                )
-                .flatMap(res -> lineMngDomainService.findById(res.getNetworkCode())
-                        .map(business -> {
-                            res.setNetworkName(business.getName());
-                            return res;
-                        })
-                )
+                .flatMap(res -> {
+                    if(!StringUtils.isEmpty(res.getBusinessCode())) {
+                        return lineMngDomainService.findById(res.getBusinessCode())
+                                .map(business -> {
+                                    res.setBusinessName(business.getName());
+                                    return res;
+                                });
+                    } else {
+                        return Mono.just(res);
+                    }
+                })
+                .flatMap(res -> {
+                    if(!StringUtils.isEmpty(res.getNetworkCode())) {
+                        return lineMngDomainService.findById(res.getNetworkCode())
+                                .map(business -> {
+                                    res.setNetworkName(business.getName());
+                                    return res;
+                                });
+                    } else {
+                        return Mono.just(res);
+                    }
+                })
                 .flatMap(res -> {
                     if(!StringUtils.isEmpty(res.getProgressCode())) {
                         return statusCodeDomainService.findStatusValueById(res.getProgressCode())
@@ -352,8 +551,7 @@ public class FoundationService {
                                     res.setProgressName(progress.getName());
                                     return res;
                                 });
-                    }
-                    else {
+                    } else {
                         return Mono.just(res);
                     }
                 })
@@ -370,6 +568,6 @@ public class FoundationService {
                 })
                 .collectSortedList(Comparator.comparing(FoundationResponse::getCreateDate))
                 ;
-                //.switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+        //.switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
     }
 }
