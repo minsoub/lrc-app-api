@@ -2,6 +2,7 @@ package com.bithumbsystems.lrc.management.api.core.exception;
 
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.core.model.response.ErrorResponse;
+import com.bithumbsystems.lrc.management.api.v1.audit.exception.AuditLogException;
 import com.bithumbsystems.lrc.management.api.v1.file.exception.FileException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -14,17 +15,24 @@ import reactor.core.publisher.Mono;
 @RestControllerAdvice
 public class ExceptionHandlers {
 
-  @ExceptionHandler(Exception.class)
-  public ResponseEntity<Mono<?>> serverExceptionHandler(Exception ex) {
-    log.error(ex.getMessage(), ex);
-    ErrorData errorData = new ErrorData(ErrorCode.UNKNOWN_ERROR);
-    return ResponseEntity.internalServerError().body(Mono.just(new ErrorResponse(errorData)));
-  }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Mono<?>> serverExceptionHandler(Exception ex) {
+      log.error(ex.getMessage(), ex);
+      ErrorData errorData = new ErrorData(ErrorCode.UNKNOWN_ERROR);
+      return ResponseEntity.internalServerError().body(Mono.just(new ErrorResponse(errorData)));
+    }
 
-  @ExceptionHandler(FileException.class)
-  public ResponseEntity<Mono<?>> fileExceptionHandler(FileException ex) {
-    log.error(ex.getMessage(), ex);
-    ErrorResponse errorResponse = new ErrorResponse(new ErrorData(ex.getErrorCode()));
-    return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(Mono.just(errorResponse));
-  }
+    @ExceptionHandler(FileException.class)
+    public ResponseEntity<Mono<?>> fileExceptionHandler(FileException ex) {
+      log.error(ex.getMessage(), ex);
+      ErrorResponse errorResponse = new ErrorResponse(new ErrorData(ex.getErrorCode()));
+      return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(Mono.just(errorResponse));
+    }
+
+    @ExceptionHandler(AuditLogException.class)
+    public ResponseEntity<Mono<?>> auditLogExceptionHandler(AuditLogException ex) {
+      log.error(ex.getMessage(), ex);
+      ErrorResponse errorResponse = new ErrorResponse(new ErrorData(ex.getErrorCode()));
+      return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(Mono.just(errorResponse));
+    }
 }

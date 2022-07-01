@@ -13,7 +13,10 @@ public enum ErrorCode {
 
   NOT_FOUND_CONTENT("F004","not found content"),
   FAIL_UPDATE_CONTENT("F005","cannot update content"),
-  FAIL_CREATE_CONTENT("F006","cannot create content");
+  FAIL_CREATE_CONTENT("F006","cannot create content"),
+  INVALID_DATE_AFTER("F007", "It's up to 3 months.");
+
+
   private final String code;
 
   private final String message;

@@ -3,8 +3,6 @@ package com.bithumbsystems.lrc.management.api.core.config.resolver;
 import com.bithumbsystems.lrc.management.api.core.exception.InvalidTokenException;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.nimbusds.jose.shaded.json.JSONArray;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -14,6 +12,9 @@ import org.springframework.web.reactive.BindingContext;
 import org.springframework.web.reactive.result.method.HandlerMethodArgumentResolver;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -49,7 +50,8 @@ public class CustomArgumentResolver implements HandlerMethodArgumentResolver {
           final var accountId = jwt.getClaimAsString("account_id");
           final var roles = (JSONArray)jwt.getClaim("ROLE");
           final var email = jwt.getClaimAsString("user_id");
-          return Mono.just(new Account(accountId, roles.stream().map(Object::toString).collect(Collectors.toSet()), email));
+          final var mySiteId = jwt.getSubject();
+          return Mono.just(new Account(accountId, roles.stream().map(Object::toString).collect(Collectors.toSet()), email, mySiteId));
         });
   }
 }
