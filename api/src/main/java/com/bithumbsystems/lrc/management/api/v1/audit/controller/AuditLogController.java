@@ -8,7 +8,6 @@ import com.bithumbsystems.lrc.management.api.v1.audit.exception.AuditLogExceptio
 import com.bithumbsystems.lrc.management.api.v1.audit.service.AuditLogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,9 +29,9 @@ public class AuditLogController {
 
     @GetMapping("/logs")
     @Operation(summary = "서비스 로그 조회" , description = "서비스 로그 관리 목록 정보를 조회합니다.")
-    public ResponseEntity<Mono<?>> getAuditLog(@Parameter(name = "fromDate", description = "fromDate 이전 날짜(* 날짜 입력 형식 2022-02-22)", in = ParameterIn.PATH) @RequestParam(required = false) String fromDate,
-                                               @Parameter(name = "toDate", description = "toDate 다음 날짜(* 날짜 입력 형식 2022-02-22)", in = ParameterIn.PATH) @RequestParam(required = false) String toDate,
-                                               @Parameter(name = "keyword", description = "로그 관련 키워드 조건 검색", in = ParameterIn.PATH) @RequestParam(required = false) String keyword,
+    public ResponseEntity<Mono<?>> getAuditLog(@Parameter(name = "fromDate", description = "fromDate 이전 날짜(* 날짜 입력 형식 2022-02-22)", required = true) @RequestParam(required = false) String fromDate,
+                                               @Parameter(name = "toDate", description = "toDate 다음 날짜(* 날짜 입력 형식 2022-02-22)", required = true) @RequestParam(required = false) String toDate,
+                                               @Parameter(name = "keyword", description = "로그 관련 키워드 조건 검색") @RequestParam(required = false) String keyword,
                                                @Parameter(hidden = true) @CurrentUser Account account) {
 
         LocalDateTime nFromDate = LocalDateTime.parse(fromDate+"T00:00:00");
