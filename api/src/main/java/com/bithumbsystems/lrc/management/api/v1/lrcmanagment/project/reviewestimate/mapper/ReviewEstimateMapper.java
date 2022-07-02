@@ -15,6 +15,6 @@ public interface ReviewEstimateMapper {
 
     ReviewEstimate reviewEstimateResponseToRequest(ReviewEstimate reviewEstimate);
 
-    ReviewEstimate requestToReviewEstimate(ReviewEstimateRequest reviewEstimate);
+    //ReviewEstimate requestToReviewEstimate(ReviewEstimateRequest reviewEstimate);
 
 }

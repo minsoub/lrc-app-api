@@ -26,4 +26,7 @@ public class ReviewEstimateResponse {
 
     @Schema(description = "평가 자료 파일")
     private String fileKey;   //평가 자료 파일
+
+    @Schema(description = "파일명")
+    private String fileName;
 }

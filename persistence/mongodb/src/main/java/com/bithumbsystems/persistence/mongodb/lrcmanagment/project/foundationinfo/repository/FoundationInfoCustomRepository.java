@@ -4,6 +4,7 @@ import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.foundationinf
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Repository
@@ -17,6 +18,14 @@ public interface FoundationInfoCustomRepository {
     public Flux<FoundationInfo> findByCustomSearchAll(String contractCode);
 
     /**
+     * 재단정보를 symbol로 like 검색한다.
+     *
+     * @param symbol
+     * @return
+     */
+    public Flux<FoundationInfo> findBySymbolSearch(String symbol);
+
+    /**
      * 재단정보 검색 하기
      * @param fromDate 이전
      * @param toDate 다음
@@ -25,6 +34,6 @@ public interface FoundationInfoCustomRepository {
      * @param keyword 프로젝트명,심볼 조건 검색
      * @return FoundationInfoResponse Object
      */
-    public Flux<FoundationInfo> findByCustomSearch(LocalDateTime fromDate, LocalDateTime toDate, String contractCode, String progressCode, String keyword);
+    public Flux<FoundationInfo> findByCustomSearch(LocalDate fromDate, LocalDate toDate, String contractCode, String progressCode, String keyword);
 
 }

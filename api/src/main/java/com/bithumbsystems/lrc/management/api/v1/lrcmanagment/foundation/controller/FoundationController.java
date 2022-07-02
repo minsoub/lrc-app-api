@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,8 +36,8 @@ public class FoundationController {
      */
     @GetMapping("/foundation")
     @Operation(summary = "재단 가져오기", description = "재단 목록 정보를 조회합니다.")
-    public ResponseEntity<Mono<?>> getFoundation() {
-        return ResponseEntity.ok().body(foundationService.getFoundation(null)
+    public ResponseEntity<Mono<?>> getFoundation(@Parameter(name = "keyWord", description = "심볼 검색", in = ParameterIn.QUERY) @RequestParam(required = true) String keyWord) {
+        return ResponseEntity.ok().body(foundationService.getFoundationKeyWordSearch(keyWord)
                 .map(c -> new MultiResponse(c))
         );
     }
@@ -96,17 +97,17 @@ public class FoundationController {
      */
     @GetMapping("foundation/search")
     @Operation(summary = "재단 검색 하기", description = "재단 정보를 저장합니다.")
-    public ResponseEntity<Mono<?>> getFoundationSearch(@Parameter(name = "fromDate", description = "fromDate 이전 날짜", in = ParameterIn.PATH) @RequestParam(required = false) String fromDate,
-                                              @Parameter(name = "toDate", description = "toDate 다음 날짜", in = ParameterIn.PATH) @RequestParam(required = false) String toDate,
-                                              @Parameter(name = "contractCode", description = "계약상태", in = ParameterIn.PATH) @RequestParam(required = false) String contractCode,
-                                              @Parameter(name = "progressCode", description = "진행상태", in = ParameterIn.PATH) @RequestParam(required = false) String progressCode,
-                                              @Parameter(name = "businessCode", description = "사업계열", in = ParameterIn.PATH) @RequestParam(required = false) String businessCode,
-                                              @Parameter(name = "networkCode", description = "네트워크계열", in = ParameterIn.PATH) @RequestParam(required = false) String networkCode,
-                                              @Parameter(name = "keyword", description = "프로젝트명,심볼 조건 검색", in = ParameterIn.PATH) @RequestParam(required = false) String keyword)
+    public ResponseEntity<Mono<?>> getFoundationSearch(@Parameter(name = "fromDate", description = "fromDate 이전 날짜", in = ParameterIn.QUERY) @RequestParam(required = false) String fromDate,
+                                              @Parameter(name = "toDate", description = "toDate 다음 날짜", in = ParameterIn.QUERY) @RequestParam(required = false) String toDate,
+                                              @Parameter(name = "contractCode", description = "계약상태", in = ParameterIn.QUERY) @RequestParam(required = false) String contractCode,
+                                              @Parameter(name = "progressCode", description = "진행상태", in = ParameterIn.QUERY) @RequestParam(required = false) String progressCode,
+                                              @Parameter(name = "businessCode", description = "사업계열", in = ParameterIn.QUERY) @RequestParam(required = false) String businessCode,
+                                              @Parameter(name = "networkCode", description = "네트워크계열", in = ParameterIn.QUERY) @RequestParam(required = false) String networkCode,
+                                              @Parameter(name = "keyword", description = "프로젝트명,심볼 조건 검색", in = ParameterIn.QUERY) @RequestParam(required = false) String keyword)
             throws UnsupportedEncodingException {
 
-        LocalDateTime nFromDate = LocalDateTime.parse(fromDate);
-        LocalDateTime nToDate = LocalDateTime.parse(toDate);
+        LocalDate nFromDate = LocalDate.parse(fromDate);
+        LocalDate nToDate = LocalDate.parse(toDate);
 
         List<String> business = new ArrayList<String>();
         if(StringUtils.isNotEmpty(businessCode)) {

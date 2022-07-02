@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -39,5 +40,5 @@ public class ProjectInfoResponse {
     private String contractAddress;         //컨트렉트 주소
 
     @Schema(description = "최초발행일")
-    private LocalDateTime createDate;       //최초 발행일
+    private LocalDate createDate;       //최초 발행일
 }

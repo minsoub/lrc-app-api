@@ -18,6 +18,9 @@ public class FoundationLinkResponse {
     @Schema(description = "프로젝트 id")
     private String projectId;           //프로젝트 id
 
+    @Schema(description = "프로젝트명")
+    private String projectName;
+
     @Schema(description = "심볼")
     private String symbol;
 }

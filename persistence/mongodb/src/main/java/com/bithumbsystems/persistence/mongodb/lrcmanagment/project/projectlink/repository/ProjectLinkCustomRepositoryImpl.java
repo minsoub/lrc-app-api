@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @Repository
@@ -37,14 +38,15 @@ public class ProjectLinkCustomRepositoryImpl implements ProjectLinkCustomReposit
      * @param linkProjectId
      * @return FoundationResponse
      */
-    public Flux<ProjectLink> findByLinkProject(String projectId, String linkProjectId)
+    public Mono<ProjectLink> findByLinkProject(String projectId, String linkProjectId)
     {
         Query query = new Query();
 
         query.addCriteria(Criteria.where("project_id").is(projectId))
                 .addCriteria(Criteria.where("link_project_id").is(linkProjectId))
                 .addCriteria(Criteria.where("use_yn").is(true));
-        return reactiveMongoTemplate.find(query, ProjectLink.class);
+        return reactiveMongoTemplate.find(query, ProjectLink.class)
+                .take(1).single();
     }
 
 }
