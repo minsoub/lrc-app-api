@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class ProjectLinkDomainService {
@@ -16,6 +18,15 @@ public class ProjectLinkDomainService {
 
     private final ProjectLinkCustomRepository projectLinkCustomRepository;
 
+    /**
+     * link key를 통해서 데이터를 찾는다.
+     *
+     * @param id
+     * @return
+     */
+    public Mono<ProjectLink> findById(String id) {
+        return projectLinkRepository.findById(id);
+    }
 
     /**
      * 프로젝트 링크 true 인것 가져오기
@@ -32,7 +43,7 @@ public class ProjectLinkDomainService {
      * @param linkProjectId
      * @return FoundationResponse
      */
-    public Flux<ProjectLink> findByLinkProject(String projectId, String linkProjectId) {
+    public Mono<ProjectLink> findByLinkProject(String projectId, String linkProjectId) {
         return projectLinkCustomRepository.findByLinkProject(projectId, linkProjectId);
     }
 
@@ -42,6 +53,7 @@ public class ProjectLinkDomainService {
      * @return FoundationResponse
      */
     public Mono<ProjectLink> save(ProjectLink projectLink) {
+        projectLink.setId(UUID.randomUUID().toString());
         projectLink.setUseYn(true); //true 인것만
         return projectLinkRepository.insert(projectLink);
     }

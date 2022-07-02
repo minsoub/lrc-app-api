@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class FoundationResponse {
-
+    @Schema(description = "id")
     private String id;
 
     @Schema(description = "프로젝트 id")

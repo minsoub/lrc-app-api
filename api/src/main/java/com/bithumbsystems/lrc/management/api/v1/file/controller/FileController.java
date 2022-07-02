@@ -97,7 +97,7 @@ public class FileController {
     }
 
     @GetMapping(value = "/download/s3/{fileKey}", produces = APPLICATION_OCTET_STREAM_VALUE)
-    public Mono<ResponseEntity<?>> s3upload(@PathVariable String fileKey) {
+    public Mono<ResponseEntity<?>> s3download(@PathVariable String fileKey) {
 
         AtomicReference<String> fileName = new AtomicReference<>();
 
@@ -111,6 +111,28 @@ public class FileController {
                 .log()
                 .map(inputStream -> {
                     log.debug("finaly result...here");
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.setContentDispositionFormData(fileName.toString(), fileName.toString());
+                    ResponseEntity<?> entity = ResponseEntity.ok().cacheControl(CacheControl.noCache())
+                            .headers(headers)
+                            .body(new InputStreamResource(inputStream));
+                    return entity;
+                });
+    }
+
+    /**
+     * 공통 파일 다운로드
+     *
+     * @param fileKey
+     * @return
+     */
+    @GetMapping(value = "/download/s3/common/{fileKey}", produces = APPLICATION_OCTET_STREAM_VALUE)
+    public Mono<ResponseEntity<?>> s3commonaddownload(@PathVariable String fileKey) {
+        return fileService.download(fileKey, awsProperties.getBucket())
+                .log()
+                .map(inputStream -> {
+                    log.debug("finaly result...here");
+                    String fileName = "common-file-name-user-define.txt";
                     HttpHeaders headers = new HttpHeaders();
                     headers.setContentDispositionFormData(fileName.toString(), fileName.toString());
                     ResponseEntity<?> entity = ResponseEntity.ok().cacheControl(CacheControl.noCache())

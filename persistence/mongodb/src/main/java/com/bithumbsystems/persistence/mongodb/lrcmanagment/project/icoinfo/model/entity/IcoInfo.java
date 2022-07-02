@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -19,5 +20,5 @@ public class IcoInfo {
     private String projectId;          //프로젝트 코드
     private String marketInfo;          //마켓 정보
     private Long price;                 //상장가(원)
-    private LocalDateTime icoDate;      //상장일
+    private LocalDate icoDate;      //상장일
 }

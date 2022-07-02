@@ -2,10 +2,12 @@ package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectlin
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "프로젝트 링크")
@@ -21,6 +23,9 @@ public class ProjectLinkResponse {
 
     @Schema(description = "링크 프로젝트 id")
     private String linkProjectId;       //링크 프로젝트 id
+
+    @Schema(description = "링크 프로젝트 명")
+    private String linkProjectName;
 
     @Schema(description = "링크 프로젝트 심볼")
     private String linkProjectSymbol;   //링크 프로젝트 심볼

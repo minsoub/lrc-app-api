@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
@@ -25,6 +26,16 @@ public class FoundationInfoDomainService {
      */
     public Flux<FoundationInfo> findByCustomSearchAll(String contractCode) {
         return foundationInfoCustomRepository.findByCustomSearchAll(contractCode);
+    }
+
+    /**
+     * 재단정보를 symbol로 like 검색한다.
+     *
+     * @param symbol
+     * @return
+     */
+    public Flux<FoundationInfo> findBySymbolSearch(String symbol) {
+        return foundationInfoCustomRepository.findBySymbolSearch(symbol);
     }
 
     public Flux<FoundationInfo> findByFoundationInfo() {
@@ -58,7 +69,7 @@ public class FoundationInfoDomainService {
      * @param keyword 프로젝트명,심볼 조건 검색
      * @return FoundationInfoResponse Object
      */
-    public Flux<FoundationInfo> findByCustomSearch(LocalDateTime fromDate, LocalDateTime toDate, String contractCode, String progressCode, String keyword) {
+    public Flux<FoundationInfo> findByCustomSearch(LocalDate fromDate, LocalDate toDate, String contractCode, String progressCode, String keyword) {
         return foundationInfoCustomRepository.findByCustomSearch(fromDate, toDate, contractCode, progressCode, keyword);
     }
 }

@@ -24,7 +24,7 @@ public class FoundationInfoRequest {
     private String contractCode;    //계약상태 code
 
     @Schema(description = "진행상태 code")
-    private String progressCode;    //진행상태 code
+    private String processCode;    //진행상태 code
 
     @Schema(description = "관리자 메모")
     private String adminMemo;       //관리자 메모

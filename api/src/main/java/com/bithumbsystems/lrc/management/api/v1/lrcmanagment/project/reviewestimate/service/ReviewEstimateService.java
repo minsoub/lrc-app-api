@@ -8,21 +8,22 @@ import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestim
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.model.request.ReviewEstimateRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.model.response.ReviewEstimateResponse;
 import com.bithumbsystems.persistence.mongodb.file.model.entity.File;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.reviewestimate.model.entity.ReviewEstimate;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.reviewestimate.service.ReviewEstimateDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.nio.ByteBuffer;
 import java.text.Normalizer;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -62,42 +63,113 @@ public class ReviewEstimateService {
     }*/
 
     @Transactional
-    public Mono<List<ReviewEstimateResponse>> saveAll(Flux<ReviewEstimateRequest> reviewEstimateRequest) {
-        return reviewEstimateRequest
-                .flatMap(reviewEstimate -> {
-                    if(reviewEstimate.getFilePart() != null) {  //첨부파일 확인
-                        return DataBufferUtils.join(reviewEstimate.getFilePart().content())
-                                .flatMap(dataBuffer -> {
-                                    ByteBuffer buf = dataBuffer.asByteBuffer();
-                                    String fileKey = UUID.randomUUID().toString();
-                                    String fileName = reviewEstimate.getFilePart().filename();
-                                    Long fileSize = (long) buf.array().length;
-                                    log.info("byte size ===>  {}   :   {}   :   {} : ", fileKey, fileName, fileSize);
+    public Mono<List<ReviewEstimateResponse>> saveAll(ReviewEstimateRequest reviewEstimateRequest) {
+        //List<ReviewEstimateRequest> array = new ArrayList<>();
+        //array.addAll(Arrays.asList(reviewEstimateRequest));
 
-                                    return fileService.upload(fileKey, fileName, fileSize, awsProperties.getBucket(), buf)
-                                            .flatMap(res -> {
-                                                log.info("service upload res   =>       {}", res);
-                                                log.info("service upload fileName   =>       {}", fileName.toString());
-                                                File info = File.builder()
-                                                        .fileKey(fileKey)
-                                                        .fileName(Normalizer.normalize(fileName, Normalizer.Form.NFC))
-                                                        .createdAt(new Date())
-                                                        .createdId("test")
-                                                        .delYn(false)
-                                                        .build();
+        Queue<FilePart> fileList = new LinkedList<FilePart>();
+        if (reviewEstimateRequest.getFile() != null)
+            fileList.addAll(reviewEstimateRequest.getFile());
 
-                                                return fileService.save(info);
-                                            })
-                                            .publishOn(Schedulers.boundedElastic())
-                                            .flatMap(file -> {
-                                                reviewEstimate.setFileKey(file.getFileKey());
-                                                reviewEstimate.setReference(file.getFileName());
-                                                return reviewEstimateDomainService.save(ReviewEstimateMapper.INSTANCE.requestToReviewEstimate(reviewEstimate));
-                                            });
-                                });
-                    } else {
-                        return reviewEstimateDomainService.save(ReviewEstimateMapper.INSTANCE.requestToReviewEstimate(reviewEstimate));
+        return  Flux.fromIterable(reviewEstimateRequest.getNo())
+                .flatMap(index -> {
+
+                    String id = reviewEstimateRequest.getId().get(index);
+                    String projectId = reviewEstimateRequest.getProjectId().get(index);
+                    String organization = reviewEstimateRequest.getOrganization().get(index);
+                    String result  = reviewEstimateRequest.getResult().get(index);
+                    String reference = reviewEstimateRequest.getReference().get(index);
+                    String fileKey = reviewEstimateRequest.getFileKey().get(index);
+                    Boolean isFile = reviewEstimateRequest.getIsFile().get(index);
+                    String fileName = reviewEstimateRequest.getFileName().get(index);
+
+                    // file part
+
+                    if (StringUtils.hasLength(id)) {   // 수정 모드
+                        if(isFile) {  //첨부파일 확인
+                            return DataBufferUtils.join(fileList.poll().content())
+                                    .flatMap(dataBuffer -> {
+                                        ByteBuffer buf = dataBuffer.asByteBuffer();
+                                        String file_key = UUID.randomUUID().toString();
+                                        String file_name = fileName;
+                                        Long fileSize = (long) buf.array().length;
+                                        log.info("byte size ===>  {}   :   {}   :   {} : ", file_key, file_name, fileSize);
+
+                                        return fileService.upload(file_key, file_name, fileSize, awsProperties.getBucket(), buf)
+                                                .flatMap(res -> {
+                                                    log.info("service upload res   =>       {}", res);
+                                                    log.info("service upload fileName   =>       {}", fileName.toString());
+
+                                                    return reviewEstimateDomainService.save(
+                                                            ReviewEstimate.builder()
+                                                                    .id(id)
+                                                                    .projectId(projectId)
+                                                                    .organization(organization)
+                                                                    .result(result)
+                                                                    .reference(reference)
+                                                                    .fileKey(file_key)
+                                                                    .fileName(Normalizer.normalize(file_name, Normalizer.Form.NFC))
+                                                                    .build()
+                                                    );
+                                                });
+                                    });
+                        } else {
+                            return reviewEstimateDomainService.save(
+                                    ReviewEstimate.builder()
+                                            .id(id)
+                                            .projectId(projectId)
+                                            .organization(organization)
+                                            .result(result)
+                                            .reference(reference)
+                                            .fileKey(fileKey)
+                                            .fileName(fileName)
+                                            .build()
+                            );
+                        }
+                    }else {     // 신규 등록
+                        if(isFile != null) {  //첨부파일 확인
+                            return DataBufferUtils.join(fileList.poll().content())
+                                    .flatMap(dataBuffer -> {
+                                        ByteBuffer buf = dataBuffer.asByteBuffer();
+                                        String file_key = UUID.randomUUID().toString();
+                                        String file_name = fileName;
+                                        Long fileSize = (long) buf.array().length;
+                                        log.info("byte size ===>  {}   :   {}   :   {} : ", file_key, file_name, fileSize);
+
+                                        return fileService.upload(file_key, file_name, fileSize, awsProperties.getBucket(), buf)
+                                                .flatMap(res -> {
+                                                    log.info("service upload res   =>       {}", res);
+                                                    log.info("service upload fileName   =>       {}", fileName.toString());
+
+                                                    return reviewEstimateDomainService.save(
+                                                            ReviewEstimate.builder()
+                                                                    .id(UUID.randomUUID().toString())
+                                                                    .projectId(projectId)
+                                                                    .organization(organization)
+                                                                    .result(result)
+                                                                    .reference(reference)
+                                                                    .fileKey(file_key)
+                                                                    .fileName(Normalizer.normalize(file_name, Normalizer.Form.NFC))
+                                                                    .build()
+                                                    );
+                                                });
+                                    });
+                        } else {
+                            return reviewEstimateDomainService.save(
+                                    ReviewEstimate.builder()
+                                            .id(UUID.randomUUID().toString())
+                                            .projectId(projectId)
+                                            .organization(organization)
+                                            .result(result)
+                                            .reference(reference)
+                                            .fileKey(fileKey)
+                                            .fileName(fileName)
+                                            .build()
+                            );
+                        }
                     }
+
+
                 }).collectList()
                 .then(this.findByProjectId("PRJ001"));  //프로젝트 명은 바꾸어야 함
     }

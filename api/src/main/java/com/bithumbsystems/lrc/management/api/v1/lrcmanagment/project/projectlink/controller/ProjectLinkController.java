@@ -33,14 +33,14 @@ public class ProjectLinkController {
     }
 
     /**
-     * 프로젝트 연결 재단 조회
+     * 프로젝트 연결을 위한 재단 조회
      * @param symbol
      * @return FoundationResponse
      */
-    @GetMapping("/project-link/foundation/{symbol}")
-    @Operation(summary = "프로젝트 연결 재단 검색", description = "프로젝트 연결 재단을 조회 합니다.")
-    public ResponseEntity<Mono<?>> getFoundationList(@PathVariable String symbol) {
-        return ResponseEntity.ok().body(projectLinkService.findBySymbolLike(symbol)
+    @GetMapping("/project-link/foundation")
+    @Operation(summary = "프로젝트 연결을 위한 재단 검색", description = "프로젝트 연결을 위한 재단을 조회 합니다.")
+    public ResponseEntity<Mono<?>> getFoundationList(@RequestParam String symbol, @RequestParam String projectId) {
+        return ResponseEntity.ok().body(projectLinkService.findBySymbolLike(symbol, projectId)
                 .map(c -> new SingleResponse(c))
         );
     }
@@ -73,13 +73,13 @@ public class ProjectLinkController {
 
     /**
      * 프로젝트 링크 삭제(링크해제)
-     * @param projectLinkRequest
+     * @param linkId
      * @return FoundationResponse
      */
-    @DeleteMapping("/project-link")
+    @DeleteMapping("/project-link/{linkId}")
     @Operation(summary = "프로젝트 링크 삭제(링크해제)", description = "프로젝크 링크 정보를 삭제 합니다.")
-    public ResponseEntity<Flux<?>> getProjectLink(@RequestBody ProjectLinkRequest projectLinkRequest) {
-        return ResponseEntity.ok().body(projectLinkService.deleteLinkProject(projectLinkRequest)
+    public ResponseEntity<Mono<?>> disconnectLink(@PathVariable String linkId) {
+        return ResponseEntity.ok().body(projectLinkService.deleteLinkProject(linkId)
                 .map(c -> new SingleResponse(c))
         );
     }

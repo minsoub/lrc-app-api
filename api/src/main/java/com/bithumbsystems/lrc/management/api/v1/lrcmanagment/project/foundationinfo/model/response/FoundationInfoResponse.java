@@ -29,10 +29,10 @@ public class FoundationInfoResponse {
     private String contractName;
 
     @Schema(description = "진행상태 code")
-    private String progressCode;    //진행상태 code
+    private String processCode;    //진행상태 code
 
     @Schema(description = "진행상태명")
-    private String progressName;
+    private String processName;
 
     @Schema(description = "관리자 메모")
     private String adminMemo;       //관리자 메모

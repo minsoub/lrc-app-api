@@ -2,6 +2,7 @@ package com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectlink.
 
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectlink.model.entity.ProjectLink;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public interface ProjectLinkCustomRepository {
 
@@ -18,5 +19,5 @@ public interface ProjectLinkCustomRepository {
      * @param linkProjectId
      * @return FoundationResponse
      */
-    public Flux<ProjectLink> findByLinkProject(String projectId, String linkProjectId);
+    public Mono<ProjectLink> findByLinkProject(String projectId, String linkProjectId);
 }

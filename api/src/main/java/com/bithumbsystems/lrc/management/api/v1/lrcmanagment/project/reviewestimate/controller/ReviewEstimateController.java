@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @RequiredArgsConstructor
@@ -43,13 +45,13 @@ public class ReviewEstimateController {
      * @param reviewEstimateRequest
      * @return ReviewEstimateResponse Object
      */
-/*    @PostMapping("/review-estimate/{projectId}")
-    public ResponseEntity<Mono<?>> createReviewEstimate(@PathVariable("projectId") String projectId,
-                                                        @RequestBody ReviewEstimateRequest reviewEstimateRequest) {
-        return ResponseEntity.ok().body(reviewEstimateService.create(projectId, reviewEstimateRequest)
-                .map(c -> new SingleResponse(c))
-        );
-    }*/
+//    @PostMapping("/review-estimate/{projectId}")
+//    public ResponseEntity<Mono<?>> createReviewEstimate(@PathVariable("projectId") String projectId,
+//                                                        @RequestBody ReviewEstimateRequest reviewEstimateRequest) {
+//        return ResponseEntity.ok().body(reviewEstimateService.create(projectId, reviewEstimateRequest)
+//                .map(c -> new SingleResponse(c))
+//        );
+//    }
 
     /**
      * 검토 평가 여러개 저장 및 업데이트
@@ -74,14 +76,13 @@ public class ReviewEstimateController {
      * 검토 평가 여러개 저장 및 업데이트 ( 이거로 사용함 )
      * 리스트로 받아서 파일 여부 확인 하여 저장 해야 함
      *
-     * @param reviewEstimateRequest
+     * @param reviewEstimateList
      * @return ReviewEstimateResponse Object
      */
     @PostMapping(value = "/review-estimate/upload/s3", consumes = MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "검토 평가 여러개 저장 및 업데이트", description = "projectId를 이용하여 검토 평가 정보를 여러개 저장합니다.")
-    public ResponseEntity<Mono<SingleResponse>> createReviewEstimateFile(@Parameter(name = "reviewModelView", description = "검토평가 의 model", in = ParameterIn.PATH)
-                                                                             @ModelAttribute(value = "reviewEstimateRequest") ReviewEstimateRequest reviewEstimateRequest) {
-        return ResponseEntity.ok().body(reviewEstimateService.saveAll(Flux.just(reviewEstimateRequest))
+    public ResponseEntity<Mono<SingleResponse>> createReviewEstimateFile(@ModelAttribute(value = "reviewEstimateList") ReviewEstimateRequest reviewEstimateList) {
+        return ResponseEntity.ok().body(reviewEstimateService.saveAll(reviewEstimateList)
                 .map(c -> new SingleResponse(c)));
     }
 }

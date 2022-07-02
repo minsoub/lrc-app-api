@@ -73,6 +73,7 @@ public class ProjectInfoService {
                     c.setNetworkCode(projectInfoRequest.getNetworkCode());
                     c.setWhitepaperLink(projectInfoRequest.getWhitepaperLink());
                     c.setContractAddress(projectInfoRequest.getContractAddress());
+                    c.setCreateDate(projectInfoRequest.getCreateDate());
                     return projectInfoDomainService.updateProjectInfo(c)
                             .map(ProjectInfoMapper.INSTANCE::projectInfoResponse);
                 })

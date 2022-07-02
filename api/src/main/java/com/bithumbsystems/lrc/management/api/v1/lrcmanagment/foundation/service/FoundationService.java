@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -57,7 +58,7 @@ public class FoundationService {
                                 .projectName(foundationInfo.getName())
                                 .symbol(foundationInfo.getSymbol())
                                 .contractCode(foundationInfo.getContractCode())
-                                .progressCode(foundationInfo.getProgressCode())
+                                .progressCode(foundationInfo.getProcessCode())
                                 .createDate(foundationInfo.getCreateDate())
                                 .build()
                         )
@@ -278,6 +279,27 @@ public class FoundationService {
     }
 
     /**
+     * 프로젝트 검색 시 심볼에 의해서 Like 검색을 수행해서 리턴한다.
+     *
+     * @param keyWord
+     * @return
+     */
+    public Mono<List<FoundationResponse>> getFoundationKeyWordSearch(String keyWord) {
+        return foundationInfoDomainService.findBySymbolSearch(keyWord)
+                .flatMap(foundationInfo ->
+                        Mono.just(FoundationResponse.builder()
+                                .projectId(foundationInfo.getId())
+                                .projectName(foundationInfo.getName())
+                                .symbol(foundationInfo.getSymbol())
+                                .contractCode(foundationInfo.getContractCode())
+                                .progressCode(foundationInfo.getProcessCode())
+                                .createDate(foundationInfo.getCreateDate())
+                                .build()
+                        )
+                )
+                .collectSortedList(Comparator.comparing(FoundationResponse::getCreateDate));
+    }
+    /**
      * 재단 1개 id 찾기
      *
      * @param projectId
@@ -339,17 +361,18 @@ public class FoundationService {
      * @param keyword 프로젝트명,심볼 조건 검색
      * @return Foundation Object
      */
-    public Mono<List<FoundationResponse>> getFoundationSearch(LocalDateTime fromDate, LocalDateTime toDate, String contractCode, String progressCode,
+    public Mono<List<FoundationResponse>> getFoundationSearch(LocalDate fromDate, LocalDate toDate, String contractCode, String progressCode,
                                                               List<String> businessCode, List<String> networkCode, String keyword) {
 
         return foundationInfoDomainService.findByCustomSearch(fromDate, toDate, contractCode, progressCode, keyword)
                 .flatMap(foundationInfo ->
                         Mono.just(FoundationResponse.builder()
+                                .id(foundationInfo.getId())
                                 .projectId(foundationInfo.getId())
                                 .projectName(foundationInfo.getName())
                                 .symbol(foundationInfo.getSymbol())
                                 .contractCode(foundationInfo.getContractCode())
-                                .progressCode(foundationInfo.getProgressCode())
+                                .progressCode(foundationInfo.getProcessCode())
                                 .createDate(foundationInfo.getCreateDate())
                                 .build()
                         )
@@ -372,6 +395,7 @@ public class FoundationService {
                             })
                             .switchIfEmpty(
                                     Mono.defer(() -> Mono.just(FoundationResponse.builder()
+                                            .id(res.getProjectId())
                                             .projectId(res.getProjectId())
                                             .projectName(res.getProjectName())
                                             .symbol(res.getSymbol())
@@ -411,6 +435,7 @@ public class FoundationService {
                             })
                             .switchIfEmpty(
                                     Mono.defer(() -> Mono.just(FoundationResponse.builder()
+                                            .id(res.getProjectId())
                                             .projectId(res.getProjectId())
                                             .projectName(res.getProjectName())
                                             .symbol(res.getSymbol())
@@ -459,6 +484,7 @@ public class FoundationService {
                             })
                             .switchIfEmpty(
                                     Mono.defer(() -> Mono.just(FoundationResponse.builder()
+                                            .id(res.getProjectId())
                                             .projectId(res.getProjectId())
                                             .projectName(res.getProjectName())
                                             .symbol(res.getSymbol())
@@ -503,6 +529,7 @@ public class FoundationService {
                             })
                             .switchIfEmpty(
                                     Mono.defer(() -> Mono.just(FoundationResponse.builder()
+                                            .id(res.getProjectId())
                                             .projectId(res.getProjectId())
                                             .projectName(res.getProjectName())
                                             .symbol(res.getSymbol())

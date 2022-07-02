@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -19,6 +20,20 @@ public class FoundationInfoCustomRepositoryImpl implements FoundationInfoCustomR
 
     private final ReactiveMongoTemplate reactiveMongoTemplate;
 
+    /**
+     * Symbol에 의해서 like 검색한다.
+     * @param symbol
+     * @return
+     */
+    public Flux<FoundationInfo> findBySymbolSearch(String symbol) {
+        Query query = new Query();
+
+        if(StringUtils.isNotEmpty(symbol)) {
+            query.addCriteria(Criteria.where("symbol").regex(symbol));    //symbol
+        }
+
+        return reactiveMongoTemplate.find(query, FoundationInfo.class);
+    }
 
     /**
      * 재단정보 및 계약 상태 검색
@@ -44,7 +59,7 @@ public class FoundationInfoCustomRepositoryImpl implements FoundationInfoCustomR
      * @param keyword 프로젝트명,심볼 조건 검색
      * @return FoundationInfoResponse Object
      */
-    public Flux<FoundationInfo> findByCustomSearch(LocalDateTime fromDate, LocalDateTime toDate, String contractCode, String progressCode, String keyword) {
+    public Flux<FoundationInfo> findByCustomSearch(LocalDate fromDate, LocalDate toDate, String contractCode, String progressCode, String keyword) {
 
         Query query = new Query();
 

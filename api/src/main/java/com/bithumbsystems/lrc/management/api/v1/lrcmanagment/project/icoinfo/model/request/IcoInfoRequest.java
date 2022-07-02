@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class IcoInfoRequest {
         private Long price;                 //상장가(원)
 
         @Schema(description = "상장일")
-        private LocalDateTime icoDate;      //상장일
+        private LocalDate icoDate;      //상장일
     }
 }
 

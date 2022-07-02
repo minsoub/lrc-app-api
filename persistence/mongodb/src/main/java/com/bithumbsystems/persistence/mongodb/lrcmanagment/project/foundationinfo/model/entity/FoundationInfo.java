@@ -20,7 +20,7 @@ public class FoundationInfo {
     private String name;     //프로젝트 명
     private String symbol;          //심볼
     private String contractCode;    //계약상태 code
-    private String progressCode;    //진행상태 code
+    private String processCode;    //진행상태 code
     private String memo;       //관리자 메모
 
     private LocalDateTime createDate; //생성날짜

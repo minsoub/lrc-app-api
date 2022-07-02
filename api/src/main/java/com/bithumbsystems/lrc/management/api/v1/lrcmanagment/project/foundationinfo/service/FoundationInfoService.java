@@ -39,13 +39,13 @@ public class FoundationInfoService {
                                         .projectName(result.getName())
                                         .contractCode(result.getContractCode())
                                         .contractName(r1.getName())
-                                        .progressCode(result.getProgressCode())
+                                        .processCode(result.getProcessCode())
                                         .build());
                             })
                             .flatMap(res -> {
-                                return statusCodeRepository.findById(res.getProgressCode())
+                                return statusCodeRepository.findById(res.getProcessCode())
                                         .flatMap(r2 -> {
-                                            res.setProgressName(r2.getName());
+                                            res.setProcessName(r2.getName());
                                             return Mono.just(res);
                                         });
                             });
@@ -66,7 +66,7 @@ public class FoundationInfoService {
                     c.setName(foundationInfoRequest.getProjectName());
                     c.setSymbol(foundationInfoRequest.getSymbol());
                     c.setContractCode(foundationInfoRequest.getContractCode());
-                    c.setProgressCode(foundationInfoRequest.getProgressCode());
+                    c.setProcessCode(foundationInfoRequest.getProcessCode());
                     c.setMemo(foundationInfoRequest.getAdminMemo());
                     c.setUpdateDate(LocalDateTime.now());
                     c.setUpdateAdminAccountId(account.getAccountId());
