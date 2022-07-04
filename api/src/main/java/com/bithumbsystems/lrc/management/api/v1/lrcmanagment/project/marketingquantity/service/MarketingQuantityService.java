@@ -2,8 +2,8 @@ package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.marketingq
 
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
-import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContentException;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.listener.HistoryDto;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.marketingquantity.exception.MarketingQuantityException;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.marketingquantity.mapper.MarketingQuantityMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.marketingquantity.model.request.MarketingQuantityRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.marketingquantity.model.response.MarketingQuantityResponse;
@@ -39,7 +39,7 @@ public class MarketingQuantityService {
         return marketingQuantityDomainService.findByProjectId(projectId)
                 .map(MarketingQuantityMapper.INSTANCE::marketingQuantityResponse)
                 .collectList()
-                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+                .switchIfEmpty(Mono.error(new MarketingQuantityException(ErrorCode.NOT_FOUND_CONTENT)));
 
     }
 

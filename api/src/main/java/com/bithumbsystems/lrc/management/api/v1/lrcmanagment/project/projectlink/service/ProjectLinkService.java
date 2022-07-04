@@ -1,23 +1,18 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectlink.service;
 
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
-import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContentException;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectlink.exception.ProjectLinkException;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectlink.mapper.ProjectLinkMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectlink.model.request.ProjectLinkRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectlink.model.response.FoundationLinkResponse;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectlink.model.response.ProjectLinkResponse;
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.foundation.service.FoundationDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.foundationinfo.service.FoundationInfoDomainService;
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectlink.model.entity.ProjectLink;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectlink.service.ProjectLinkDomainService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -48,8 +43,8 @@ public class ProjectLinkService {
                             });
                     //ProjectLinkMapper.INSTANCE::projectLinkResponse
                 })
-                .collectList()
-                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+                .switchIfEmpty(Mono.error(new ProjectLinkException(ErrorCode.NOT_FOUND_CONTENT)))
+                .collectList();
     }
 
     /**
@@ -69,8 +64,8 @@ public class ProjectLinkService {
                             .build();
                     return foundationLinkResponse;
                 })
-                .collectList()
-                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+                .switchIfEmpty(Mono.error(new ProjectLinkException(ErrorCode.NOT_FOUND_CONTENT)))
+                .collectList();
     }
 
     /**
@@ -83,7 +78,7 @@ public class ProjectLinkService {
         return projectLinkDomainService.findByLinkProject(projectId, linkProjectId)
                 .map(ProjectLinkMapper.INSTANCE::projectLinkResponse)
                 //.collectList()
-                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+                .switchIfEmpty(Mono.error(new ProjectLinkException(ErrorCode.NOT_FOUND_CONTENT)));
     }
 
     /**
@@ -102,8 +97,7 @@ public class ProjectLinkService {
 
                     return projectLinkDomainService.save(ProjectLinkMapper.INSTANCE.projectLinkRequestToProjectLink(projectLinkRequest1));
                 })
-                .then(this.findByProjectLinkList(projectLinkRequest.getProjectId()))
-                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+                .then(this.findByProjectLinkList(projectLinkRequest.getProjectId()));
     }
 
     /**

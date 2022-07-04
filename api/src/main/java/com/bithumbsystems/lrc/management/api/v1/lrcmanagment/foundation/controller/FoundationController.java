@@ -1,7 +1,9 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.controller;
 
+import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.core.model.response.MultiResponse;
 import com.bithumbsystems.lrc.management.api.core.model.response.SingleResponse;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.exception.FoundationException;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.model.request.FoundationRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.service.FoundationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,7 +19,6 @@ import reactor.core.publisher.Mono;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -108,6 +109,9 @@ public class FoundationController {
 
         LocalDate nFromDate = LocalDate.parse(fromDate);
         LocalDate nToDate = LocalDate.parse(toDate);
+
+        if(!nToDate.isBefore(LocalDate.parse(fromDate).plusDays(91)))   //최대 3개월
+            throw new FoundationException(ErrorCode.INVALID_DATE_AFTER);
 
         List<String> business = new ArrayList<String>();
         if(StringUtils.isNotEmpty(businessCode)) {

@@ -119,7 +119,7 @@ public class FaqContentService {
                                 .createAdminAccountId(account.getAccountId())
                                 .build())
                 .map(FaqContentMapper.INSTANCE::faqContentResponse)
-            .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.FAIL_CREATE_CONTENT)));
+                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.FAIL_CREATE_CONTENT)));
     }
 
     /**
@@ -136,7 +136,8 @@ public class FaqContentService {
             c.setUpdateDate(LocalDateTime.now());
             c.setUpdateAdminAccountId(account.getAccountId());
             return faqDomainService.updateContent(c).map(FaqContentMapper.INSTANCE::faqContentResponse);
-        }).switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.FAIL_UPDATE_CONTENT)));
+        })
+                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.FAIL_UPDATE_CONTENT)));
     }
 
     /**
@@ -154,7 +155,9 @@ public class FaqContentService {
                             result.setUpdateAdminAccountId(account.getAccountId());
                             return faqDomainService.updateContent(result)
                                     .map(FaqContentMapper.INSTANCE::faqContentResponse);
-                        })).collectList();
+                        }))
+                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.FAIL_UPDATE_CONTENT)))
+                .collectList();
     }
 
     /**
@@ -197,6 +200,7 @@ public class FaqContentService {
      * @return FaqContentResponse
      */
     public Flux<FaqContentResponse> search(String keyword) {
-        return faqDomainService.search(keyword).map(FaqContentMapper.INSTANCE::faqContentResponse);
+        return faqDomainService.search(keyword).map(FaqContentMapper.INSTANCE::faqContentResponse)
+                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
     }
 }

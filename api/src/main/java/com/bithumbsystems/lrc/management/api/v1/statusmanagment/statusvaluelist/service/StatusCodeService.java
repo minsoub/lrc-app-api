@@ -2,10 +2,10 @@ package com.bithumbsystems.lrc.management.api.v1.statusmanagment.statusvaluelist
 
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
-import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContentException;
+import com.bithumbsystems.lrc.management.api.v1.statusmanagment.statusvaluelist.exception.StatusValueListException;
 import com.bithumbsystems.lrc.management.api.v1.statusmanagment.statusvaluelist.mapper.StatusValueListMapper;
-import com.bithumbsystems.lrc.management.api.v1.statusmanagment.statusvaluelist.model.request.StatusModifyRequest;
 import com.bithumbsystems.lrc.management.api.v1.statusmanagment.statusvaluelist.model.request.StatusCodeRequest;
+import com.bithumbsystems.lrc.management.api.v1.statusmanagment.statusvaluelist.model.request.StatusModifyRequest;
 import com.bithumbsystems.lrc.management.api.v1.statusmanagment.statusvaluelist.model.response.StatusCodeResponse;
 import com.bithumbsystems.persistence.mongodb.statusmanagement.statusvalue.model.entity.StatusCode;
 import com.bithumbsystems.persistence.mongodb.statusmanagement.statusvalue.service.StatusCodeDomainService;
@@ -36,7 +36,7 @@ public class StatusCodeService {
     public Flux<StatusCodeResponse> getStatusValue() {
         return statusValueDomainService.findAllStatus()
                 .map(StatusValueListMapper.INSTANCE::statusValueListResponse)
-                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+                .switchIfEmpty(Mono.error(new StatusValueListException(ErrorCode.NOT_FOUND_CONTENT)));
     }
 
     /**
@@ -62,6 +62,7 @@ public class StatusCodeService {
                                 return Mono.just(res);
                             });
                 })
+                .switchIfEmpty(Mono.error(new StatusValueListException(ErrorCode.NOT_FOUND_CONTENT)))
                 .collectSortedList(Comparator.comparing(StatusCodeResponse::getOrderNo));
     }
 
@@ -83,7 +84,7 @@ public class StatusCodeService {
                         .createAdminAccountId(account.getAccountId())
                         .build()
         ).map(StatusValueListMapper.INSTANCE::statusValueListResponse)
-        .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+        .switchIfEmpty(Mono.error(new StatusValueListException(ErrorCode.FAIL_CREATE_CONTENT)));
     }
 
     /**
@@ -105,7 +106,7 @@ public class StatusCodeService {
                     return statusValueDomainService.update(result)
                             .map(StatusValueListMapper.INSTANCE::statusValueListResponse);
                 })
-                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+                .switchIfEmpty(Mono.error(new StatusValueListException(ErrorCode.FAIL_UPDATE_CONTENT)));
     }
 
     /**

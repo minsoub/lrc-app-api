@@ -2,7 +2,7 @@ package com.bithumbsystems.lrc.management.api.v1.statusmanagment.linemng.service
 
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
-import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContentException;
+import com.bithumbsystems.lrc.management.api.v1.statusmanagment.linemng.exception.LineMngException;
 import com.bithumbsystems.lrc.management.api.v1.statusmanagment.linemng.mapper.LineMngMapper;
 import com.bithumbsystems.lrc.management.api.v1.statusmanagment.linemng.model.request.LineMngRequest;
 import com.bithumbsystems.lrc.management.api.v1.statusmanagment.linemng.model.response.LineMngResponse;
@@ -31,8 +31,8 @@ public class LineMngService {
         return businessListDomainService.findAll()
                 .filter(f -> type == null || "".equals(type) || f.getType().equals(type))
                 .filter(f -> f.isUseYn() == true)
-                .map(LineMngMapper.INSTANCE::businessListResponse);
-                //.switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+                .map(LineMngMapper.INSTANCE::businessListResponse)
+                .switchIfEmpty(Mono.error(new LineMngException(ErrorCode.NOT_FOUND_CONTENT)));
     }
 
     /**
@@ -49,7 +49,7 @@ public class LineMngService {
                         .createDate(LocalDateTime.now())
                         .createAdminAccountId(account.getAccountId()).build())
                 .map(LineMngMapper.INSTANCE::businessListResponse)
-                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+                .switchIfEmpty(Mono.error(new LineMngException(ErrorCode.FAIL_CREATE_CONTENT)));
     }
 
     /**
@@ -66,7 +66,7 @@ public class LineMngService {
             return businessListDomainService.updateLine(c)
                     .map(LineMngMapper.INSTANCE::businessListResponse);
         })
-                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.FAIL_UPDATE_CONTENT)));
+                .switchIfEmpty(Mono.error(new LineMngException(ErrorCode.FAIL_UPDATE_CONTENT)));
     }
 
     /**
@@ -82,6 +82,6 @@ public class LineMngService {
                     return businessListDomainService.updateLine(c)
                             .map(LineMngMapper.INSTANCE::businessListResponse);
                 })
-                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.FAIL_UPDATE_CONTENT)));
+                .switchIfEmpty(Mono.error(new LineMngException(ErrorCode.FAIL_UPDATE_CONTENT)));
     }
 }

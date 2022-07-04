@@ -2,7 +2,7 @@ package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.foundation
 
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
-import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContentException;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.foundationinfo.exception.FoundationInfoException;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.foundationinfo.mapper.FoundationInfoMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.foundationinfo.model.request.FoundationInfoRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.foundationinfo.model.response.FoundationInfoResponse;
@@ -62,7 +62,7 @@ public class FoundationInfoService {
                             });
                 })
                 //.map(FoundationInfoMapper.INSTANCE::foundationInfoResponse)
-                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+                .switchIfEmpty(Mono.error(new FoundationInfoException(ErrorCode.NOT_FOUND_CONTENT)));
     }
 
     /**
@@ -104,7 +104,7 @@ public class FoundationInfoService {
                 .switchIfEmpty(
                         foundationInfoDomainService.updateFoundationInfo(FoundationInfoMapper.INSTANCE.foundationInfoRequestToFoundationInfo(foundationInfoRequest))
                                 .map(FoundationInfoMapper.INSTANCE::foundationInfoResponse)
-                                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.FAIL_UPDATE_CONTENT)))
+                                .switchIfEmpty(Mono.error(new FoundationInfoException(ErrorCode.FAIL_UPDATE_CONTENT)))
                         //
                 );
     }

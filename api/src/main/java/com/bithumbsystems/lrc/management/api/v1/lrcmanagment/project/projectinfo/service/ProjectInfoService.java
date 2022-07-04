@@ -2,8 +2,12 @@ package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinf
 
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
+<<<<<<< HEAD
 import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContentException;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.listener.HistoryDto;
+=======
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.exception.ProjectInfoException;
+>>>>>>> e9f49e4e4f3c990b843c34a51966534586594904
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.mapper.ProjectInfoMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.model.request.ProjectInfoRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.model.response.ProjectInfoResponse;
@@ -55,7 +59,7 @@ public class ProjectInfoService {
                                         });
                             });
                 })
-                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+                .switchIfEmpty(Mono.error(new ProjectInfoException(ErrorCode.NOT_FOUND_CONTENT)));
     }
 
     /**
@@ -66,7 +70,7 @@ public class ProjectInfoService {
     public Mono<ProjectInfoResponse> create(ProjectInfoRequest projectInfoRequest) {
         return projectInfoDomainService.save(ProjectInfoMapper.INSTANCE.projectInfoRequestToProjectInfo(projectInfoRequest))
                 .map(ProjectInfoMapper.INSTANCE::projectInfoResponse)
-                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+                .switchIfEmpty(Mono.error(new ProjectInfoException(ErrorCode.FAIL_CREATE_CONTENT)));
     }
 
     /**
@@ -101,7 +105,7 @@ public class ProjectInfoService {
                     return projectInfoDomainService.updateProjectInfo(c)
                             .map(ProjectInfoMapper.INSTANCE::projectInfoResponse);
                 })
-        .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.FAIL_UPDATE_CONTENT)));
+                .switchIfEmpty(Mono.error(new ProjectInfoException(ErrorCode.FAIL_UPDATE_CONTENT)));
     }
 
     /**

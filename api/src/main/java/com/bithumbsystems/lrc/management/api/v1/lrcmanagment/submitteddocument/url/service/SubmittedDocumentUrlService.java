@@ -4,6 +4,7 @@ import com.bithumbsystems.lrc.management.api.core.config.property.AwsProperties;
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.core.util.AES256Util;
+<<<<<<< HEAD
 import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContentException;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.listener.HistoryDto;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.model.response.SubmittedDocumentFileResponse;
@@ -13,6 +14,12 @@ import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.u
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.history.model.entity.History;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.history.service.HistoryDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.model.enums.SubmittedDocumentEnums;
+=======
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.exception.SubmittedDocumentUrlException;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.mapper.SubmittedDocumentUrlMapper;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.model.request.SubmittedDocumentUrlRequest;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.model.response.SubmittedDocumentUrlResponse;
+>>>>>>> e9f49e4e4f3c990b843c34a51966534586594904
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.model.entity.SubmittedDocumentUrl;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.service.SubmittedDocumentUrlDomainService;
 import lombok.RequiredArgsConstructor;
@@ -54,8 +61,8 @@ public class SubmittedDocumentUrlService {
                             .build());
                 })
                 //.map(SubmittedDocumentUrlMapper.INSTANCE::submittedDocumentUrlResponse)
-                .collectList()
-                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+                .switchIfEmpty(Mono.error(new SubmittedDocumentUrlException(ErrorCode.NOT_FOUND_CONTENT)))
+                .collectList();
     }
 
     /**
@@ -78,12 +85,12 @@ public class SubmittedDocumentUrlService {
                                 .email(AES256Util.encryptAES(awsProperties.getKmsKey(),account.getEmail(), false))
                                 .build()
                 )
+                .switchIfEmpty(Mono.error(new SubmittedDocumentUrlException(ErrorCode.FAIL_CREATE_CONTENT)))
                 .flatMap(res ->
                         submittedDocumentUrlDomainService.findByProjectIdAndType(res.getProjectId(), res.getType())
                                 .map(SubmittedDocumentUrlMapper.INSTANCE::submittedDocumentUrlResponse)
                                 .collectList()
-                )
-                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+                );
     }
 
     /**
@@ -93,7 +100,8 @@ public class SubmittedDocumentUrlService {
      */
     public Mono<Void> deleteSubmittedDocumentUrl(String id) {
         return submittedDocumentUrlDomainService.findSubmittedDocumentUrlById(id)
-                .flatMap(submittedDocumentUrlDomainService::deleteSubmittedDocumentUrl);
+                .flatMap(submittedDocumentUrlDomainService::deleteSubmittedDocumentUrl)
+                .switchIfEmpty(Mono.error(new SubmittedDocumentUrlException(ErrorCode.FAIL_CREATE_CONTENT)));
     }
 
     /**
