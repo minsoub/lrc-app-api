@@ -5,17 +5,12 @@ import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.core.util.AES256Util;
 import com.bithumbsystems.lrc.management.api.v1.file.service.FileService;
-<<<<<<< HEAD
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.listener.HistoryDto;
-=======
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.exception.SubmittedDocumentFileException;
->>>>>>> e9f49e4e4f3c990b843c34a51966534586594904
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.mapper.SubmittedDocumentFileMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.model.request.SubmittedDocumentFileRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.model.response.SubmittedDocumentFileResponse;
 import com.bithumbsystems.persistence.mongodb.file.model.entity.File;
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.history.model.entity.History;
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.history.service.HistoryDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.file.model.entity.SubmittedDocumentFile;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.file.service.SubmittedDocumentFileDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.model.enums.SubmittedDocumentEnums;
