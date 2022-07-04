@@ -3,6 +3,7 @@ package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.service
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContentException;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.Mapper.FoundationMapper;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.exception.FoundationException;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.model.request.FoundationRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.model.response.FoundationResponse;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.model.response.IcoResponse;
@@ -24,7 +25,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -274,8 +274,8 @@ public class FoundationService {
                         return Mono.just(res);
                     }
                 })
+                .switchIfEmpty(Mono.error(new FoundationException(ErrorCode.NOT_FOUND_CONTENT)))
                 .collectSortedList(Comparator.comparing(FoundationResponse::getCreateDate));
-//                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
     }
 
     /**
@@ -297,6 +297,7 @@ public class FoundationService {
                                 .build()
                         )
                 )
+                .switchIfEmpty(Mono.error(new FoundationException(ErrorCode.NOT_FOUND_CONTENT)))
                 .collectSortedList(Comparator.comparing(FoundationResponse::getCreateDate));
     }
     /**
@@ -308,7 +309,7 @@ public class FoundationService {
     public Mono<FoundationResponse> findByProjectId(String projectId) {
         return foundationDomainService.findByProjectId(projectId)
                 .map(FoundationMapper.INSTANCE::foundationResponse)
-                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+                .switchIfEmpty(Mono.error(new FoundationException(ErrorCode.NOT_FOUND_CONTENT)));
 
     }
 
@@ -320,7 +321,7 @@ public class FoundationService {
     public Mono<FoundationResponse> create(FoundationRequest foundationRequest) {
         return foundationDomainService.save(FoundationMapper.INSTANCE.foundationRequestToFoundation(foundationRequest))
                 .map(FoundationMapper.INSTANCE::foundationResponse)
-                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.FAIL_CREATE_CONTENT)));
     }
 
     /**
@@ -347,7 +348,7 @@ public class FoundationService {
                     return foundationDomainService.save(c)
                             .map(FoundationMapper.INSTANCE::foundationResponse);
                 })
-                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.FAIL_UPDATE_CONTENT)));
+                .switchIfEmpty(Mono.error(new FoundationException(ErrorCode.FAIL_UPDATE_CONTENT)));
     }
 
     /**
@@ -593,8 +594,8 @@ public class FoundationService {
                         return Mono.just(res);
                     }
                 })
-                .collectSortedList(Comparator.comparing(FoundationResponse::getCreateDate))
-                ;
-        //.switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+                .switchIfEmpty(Mono.error(new FoundationException(ErrorCode.NOT_FOUND_CONTENT)))
+                .collectSortedList(Comparator.comparing(FoundationResponse::getCreateDate));
+
     }
 }

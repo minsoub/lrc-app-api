@@ -2,10 +2,10 @@ package com.bithumbsystems.lrc.management.api.v1.faq.category.service;
 
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
+import com.bithumbsystems.lrc.management.api.v1.faq.category.exception.FaqCategoryException;
 import com.bithumbsystems.lrc.management.api.v1.faq.category.mapper.FaqCategoryMapper;
 import com.bithumbsystems.lrc.management.api.v1.faq.category.model.request.FaqCategoryRequest;
 import com.bithumbsystems.lrc.management.api.v1.faq.category.model.response.FaqCategoryResponse;
-import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContentException;
 import com.bithumbsystems.persistence.mongodb.faq.category.model.entity.FaqCategory;
 import com.bithumbsystems.persistence.mongodb.faq.category.model.enums.LanguageType;
 import com.bithumbsystems.persistence.mongodb.faq.category.service.FaqCategoryDomainService;
@@ -36,7 +36,8 @@ public class FaqCategoryService {
         return faqCategoryDomainService.findAll()
                 .filter(f -> f.getLanguage().equals(languageType))
                 .filter(f -> f.getUseYn().equals(true))
-                .map(FaqCategoryMapper.INSTANCE::faqCategoryResponse);
+                .map(FaqCategoryMapper.INSTANCE::faqCategoryResponse)
+                .switchIfEmpty(Mono.error(new FaqCategoryException(ErrorCode.NOT_FOUND_CONTENT)));
     }
 
     /**
@@ -47,7 +48,7 @@ public class FaqCategoryService {
     public Mono<FaqCategoryResponse> findCategoryById(String id) {
         return faqCategoryDomainService.findCategoryById(id)
                 .map(FaqCategoryMapper.INSTANCE::faqCategoryResponse)
-                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+                .switchIfEmpty(Mono.error(new FaqCategoryException(ErrorCode.NOT_FOUND_CONTENT)));
     }
 
     /**
@@ -66,7 +67,7 @@ public class FaqCategoryService {
                         .createAdminAccountId(account.getAccountId())
                         .build())
                 .map(FaqCategoryMapper.INSTANCE::faqCategoryResponse)
-                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+                .switchIfEmpty(Mono.error(new FaqCategoryException(ErrorCode.FAIL_CREATE_CONTENT)));
     }
 
     /**
@@ -85,8 +86,8 @@ public class FaqCategoryService {
                     c.setCreateAdminAccountId(account.getAccountId());
                     return faqCategoryDomainService.updateCategory(c)
                             .map(FaqCategoryMapper.INSTANCE::faqCategoryResponse);
-        })
-                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.FAIL_UPDATE_CONTENT)));
+                })
+                .switchIfEmpty(Mono.error(new FaqCategoryException(ErrorCode.FAIL_UPDATE_CONTENT)));
     }
 
     /**
@@ -103,7 +104,7 @@ public class FaqCategoryService {
                     return faqCategoryDomainService.updateCategory(c)
                             .map(FaqCategoryMapper.INSTANCE::faqCategoryResponse);
                 })
-                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.FAIL_UPDATE_CONTENT)));
+                .switchIfEmpty(Mono.error(new FaqCategoryException(ErrorCode.FAIL_UPDATE_CONTENT)));
     }
 
     /**

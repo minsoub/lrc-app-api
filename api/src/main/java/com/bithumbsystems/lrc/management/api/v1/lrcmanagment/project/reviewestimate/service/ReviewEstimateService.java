@@ -2,12 +2,11 @@ package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewesti
 
 import com.bithumbsystems.lrc.management.api.core.config.property.AwsProperties;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
-import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContentException;
 import com.bithumbsystems.lrc.management.api.v1.file.service.FileService;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.exception.ReviewEstimateException;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.mapper.ReviewEstimateMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.model.request.ReviewEstimateRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.model.response.ReviewEstimateResponse;
-import com.bithumbsystems.persistence.mongodb.file.model.entity.File;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.reviewestimate.model.entity.ReviewEstimate;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.reviewestimate.service.ReviewEstimateDomainService;
 import lombok.RequiredArgsConstructor;
@@ -19,11 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.nio.ByteBuffer;
 import java.text.Normalizer;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -44,8 +45,8 @@ public class ReviewEstimateService {
     public Mono<List<ReviewEstimateResponse>> findByProjectId(String projectId) {
         return reviewEstimateDomainService.findByProjectId(projectId)
                 .map(ReviewEstimateMapper.INSTANCE::reviewEstimateResponse)
-                .collectList()
-                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+                .switchIfEmpty(Mono.error(new ReviewEstimateException(ErrorCode.NOT_FOUND_CONTENT)))
+                .collectList();
     }
 
     /**
@@ -171,6 +172,6 @@ public class ReviewEstimateService {
 
 
                 }).collectList()
-                .then(this.findByProjectId("PRJ001"));  //프로젝트 명은 바꾸어야 함
+                .then(this.findByProjectId(reviewEstimateRequest.getProjectId().get(0)));  //프로젝트 명은 바꾸어야 함
     }
 }

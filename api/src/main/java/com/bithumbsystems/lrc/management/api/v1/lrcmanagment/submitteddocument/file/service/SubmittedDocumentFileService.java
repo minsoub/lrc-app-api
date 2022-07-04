@@ -4,8 +4,8 @@ import com.bithumbsystems.lrc.management.api.core.config.property.AwsProperties;
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.core.util.AES256Util;
-import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContentException;
 import com.bithumbsystems.lrc.management.api.v1.file.service.FileService;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.exception.SubmittedDocumentFileException;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.mapper.SubmittedDocumentFileMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.model.request.SubmittedDocumentFileRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.model.response.SubmittedDocumentFileResponse;
@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -58,8 +57,9 @@ public class SubmittedDocumentFileService {
                             .build());
                 })
                 //.map(SubmittedDocumentFileMapper.INSTANCE::submittedDocumentFileResponse)
-                .collectSortedList(Comparator.comparing(SubmittedDocumentFileResponse::getCreateDate))
-                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+                .switchIfEmpty(Mono.error(new SubmittedDocumentFileException(ErrorCode.NOT_FOUND_CONTENT)))
+                .collectSortedList(Comparator.comparing(SubmittedDocumentFileResponse::getCreateDate));
+
     }
 
     /**
@@ -123,6 +123,7 @@ public class SubmittedDocumentFileService {
      */
     public Mono<Void> deleteSubmittedDocumentFile(String id) {
         return submittedDocumentFileDomainService.findSubmittedDocumentFileById(id)
-                .flatMap(submittedDocumentFileDomainService::deleteSubmittedDocumentFile);
+                .flatMap(submittedDocumentFileDomainService::deleteSubmittedDocumentFile)
+                .switchIfEmpty(Mono.error(new SubmittedDocumentFileException(ErrorCode.FAIL_UPDATE_CONTENT)));
     }
 }
