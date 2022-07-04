@@ -1,5 +1,7 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.controller;
 
+import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
+import com.bithumbsystems.lrc.management.api.core.config.resolver.CurrentUser;
 import com.bithumbsystems.lrc.management.api.core.model.response.SingleResponse;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.model.request.ProjectInfoRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.service.ProjectInfoService;
@@ -58,8 +60,9 @@ public class ProjectInfoController {
     @Operation(summary = "프로젝트 정보 업데이트", description = "프로젝트 정보를 수정하여 저장합니다.")
     public ResponseEntity<Mono<?>> updateProjectInfo(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
                                                          @PathVariable("projectId") String projectId,
-                                                     @RequestBody ProjectInfoRequest projectInfoRequest) {
-        return ResponseEntity.ok().body(projectInfoService.updateProjectInfo(projectId, projectInfoRequest)
+                                                     @RequestBody ProjectInfoRequest projectInfoRequest,
+                                                     @Parameter(hidden = true) @CurrentUser Account account) {
+        return ResponseEntity.ok().body(projectInfoService.updateProjectInfo(projectId, projectInfoRequest, account)
                 .map(c -> new SingleResponse(c))
         );
     }

@@ -1,5 +1,7 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.icoinfo.controller;
 
+import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
+import com.bithumbsystems.lrc.management.api.core.config.resolver.CurrentUser;
 import com.bithumbsystems.lrc.management.api.core.model.response.SingleResponse;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.icoinfo.model.request.IcoInfoRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.icoinfo.service.IcoInfoService;
@@ -44,8 +46,9 @@ public class IcoInfoController {
     @Operation(summary = "상장 정보 여러개 저장 및 업데이트", description = "projectId를 이용하여 상정 정보를 저장합니다.")
     public ResponseEntity<Mono<?>> createIcoInfo(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
                                                      @PathVariable("projectId") String projectId,
-                                                 @RequestBody IcoInfoRequest icoInfoRequest) {
-        return ResponseEntity.ok().body(icoInfoService.create(projectId, icoInfoRequest)
+                                                 @RequestBody IcoInfoRequest icoInfoRequest,
+                                                 @Parameter(hidden = true) @CurrentUser Account account) {
+        return ResponseEntity.ok().body(icoInfoService.create(projectId, icoInfoRequest, account)
                 .map(c -> new SingleResponse(c))
         );
     }

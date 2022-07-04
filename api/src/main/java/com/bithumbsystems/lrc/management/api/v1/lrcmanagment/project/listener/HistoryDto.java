@@ -1,4 +1,5 @@
-package com.bithumbsystems.persistence.mongodb.lrcmanagment.history.model.entity;
+package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.listener;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,15 +10,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Document("lrc_project_history")
-public class History {
-
-    @Id
+public class HistoryDto {
     private String id;
     private String projectId;
     private String menu;            //메뉴
@@ -27,4 +24,6 @@ public class History {
 
     private LocalDateTime updateDate; //수정날짜
     private String updateAdminAccountId; //수정자 id
+    private String email;
+    private String accountId;
 }

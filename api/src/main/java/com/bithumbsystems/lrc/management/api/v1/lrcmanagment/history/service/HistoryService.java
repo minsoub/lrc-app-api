@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
@@ -24,10 +25,10 @@ public class HistoryService {
      * 히스토리 모두 가져오기
      * @return HistoryResponse
      */
-    public Mono<List<HistoryResponse>> getHistory() {
-        return historyDomainService.findAll()
+    public Mono<List<HistoryResponse>> getHistory(String projectId, String keyword) {
+        return historyDomainService.findBySearch(projectId, keyword)
                 .map(HistoryMapper.INSTANCE::historyResponse)
-                .collectList()
+                .collectSortedList(Comparator.comparing(HistoryResponse::getUpdateDate))
                 .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
     }
 

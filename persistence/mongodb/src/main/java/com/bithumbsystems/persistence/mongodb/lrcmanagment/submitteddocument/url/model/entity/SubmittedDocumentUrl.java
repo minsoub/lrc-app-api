@@ -28,4 +28,5 @@ public class SubmittedDocumentUrl {
 
     private LocalDateTime createDate; //생성날짜
     private String createAdminAccountId;  //생성자 id
+    private String createAccountId; // 사용자 id
 }

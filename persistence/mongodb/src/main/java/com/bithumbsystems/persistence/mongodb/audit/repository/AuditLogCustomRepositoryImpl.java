@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Repository
@@ -18,7 +19,7 @@ public class AuditLogCustomRepositoryImpl implements AuditLogCustomRepository {
     private final ReactiveMongoTemplate reactiveMongoTemplate;
 
     @Override
-    public Flux<AuditLog> findPageBySearchText(LocalDateTime fromDate, LocalDateTime toDate, String keyword, String mySiteId) {
+    public Flux<AuditLog> findPageBySearchText(LocalDate fromDate, LocalDate toDate, String keyword, String mySiteId) {
 
         Query query = new Query();
 

@@ -14,6 +14,14 @@ public class IcoInfoDomainService {
     private final IcoInfoRepository icoInfoRepository;
 
     /**
+     * 상장정보 리턴.
+     * @param id
+     * @return
+     */
+    public Mono<IcoInfo> findById(String id) {
+        return icoInfoRepository.findById(id);
+    }
+    /**
      * 상장 정보 1개 id 찾기
      * @param projectId
      * @return IcoInfoResponse Object

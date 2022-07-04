@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
@@ -14,7 +15,7 @@ public class AuditLogDomainService {
 
     private final AuditLogRepository auditLogRepository;
 
-    public Flux<AuditLog> findPageBySearchText(LocalDateTime fromDate, LocalDateTime toDate, String keyword, String mySiteId) {
+    public Flux<AuditLog> findPageBySearchText(LocalDate fromDate, LocalDate toDate, String keyword, String mySiteId) {
       return auditLogRepository.findPageBySearchText(fromDate, toDate, keyword, mySiteId);
     }
 }

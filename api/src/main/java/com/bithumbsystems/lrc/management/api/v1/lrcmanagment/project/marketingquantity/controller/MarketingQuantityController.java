@@ -1,5 +1,7 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.marketingquantity.controller;
 
+import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
+import com.bithumbsystems.lrc.management.api.core.config.resolver.CurrentUser;
 import com.bithumbsystems.lrc.management.api.core.model.response.SingleResponse;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.marketingquantity.model.request.MarketingQuantityRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.marketingquantity.service.MarketingQuantityService;
@@ -43,8 +45,9 @@ public class MarketingQuantityController {
     @Operation(summary = "마케팅 수량 여러개 저장 및 업데이트", description = "projectId를 이용하여 마케징 수량 정보를 저장/삭제 합니다.")
     public ResponseEntity<Mono<?>> createMarketingQuantity(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
                                                                @PathVariable("projectId") String projectId,
-                                                           @RequestBody MarketingQuantityRequest marketingQuantityRequest) {
-        return ResponseEntity.ok().body(marketingQuantityService.create(projectId, marketingQuantityRequest)
+                                                           @RequestBody MarketingQuantityRequest marketingQuantityRequest,
+                                                           @Parameter(hidden = true) @CurrentUser Account account) {
+        return ResponseEntity.ok().body(marketingQuantityService.create(projectId, marketingQuantityRequest, account)
                 .map(c -> new SingleResponse(c))
         );
     }

@@ -14,6 +14,15 @@ public class ReviewEstimateDomainService {
     private final ReviewEstimateRepository reviewEstimateRepository;
 
     /**
+     * 검토평가 데이터 리턴.
+     *
+     * @param id
+     * @return
+     */
+    public Mono<ReviewEstimate> findById(String id) {
+        return reviewEstimateRepository.findById((id));
+    }
+    /**
      * 검토평가 id로 찾기
      * @param projectId
      * @return MarketingQuantityResponse Object

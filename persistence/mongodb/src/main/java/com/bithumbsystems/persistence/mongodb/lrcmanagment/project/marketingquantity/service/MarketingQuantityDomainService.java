@@ -23,6 +23,15 @@ public class MarketingQuantityDomainService {
     }
 
     /**
+     * 마케팅 수량 리턴.
+     * @param id
+     * @return
+     */
+    public Mono<MarketingQuantity> findById(String id) {
+        return marketingQuantityRepository.findById((id));
+    }
+
+    /**
      * 마케팅 수량 여러개 저장 및 업데이트
      * @param marketingQuantity
      * @return MarketingQuantityResponse Object

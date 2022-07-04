@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
@@ -34,10 +35,10 @@ public class AuditLogController {
                                                @Parameter(name = "keyword", description = "로그 관련 키워드 조건 검색") @RequestParam(required = false) String keyword,
                                                @Parameter(hidden = true) @CurrentUser Account account) {
 
-        LocalDateTime nFromDate = LocalDateTime.parse(fromDate+"T00:00:00");
-        LocalDateTime nToDate = LocalDateTime.parse(toDate+"T23:59:59");
+        LocalDate nFromDate = LocalDate.parse(fromDate);
+        LocalDate nToDate = LocalDate.parse(toDate);
 
-        if(!nToDate.isBefore(LocalDateTime.parse(fromDate+"T00:00:00").plusDays(91)))   //최대 3개월
+        if(!nToDate.isBefore(LocalDate.parse(fromDate).plusDays(91)))   //최대 3개월
             throw new AuditLogException(ErrorCode.INVALID_DATE_AFTER);
 
 

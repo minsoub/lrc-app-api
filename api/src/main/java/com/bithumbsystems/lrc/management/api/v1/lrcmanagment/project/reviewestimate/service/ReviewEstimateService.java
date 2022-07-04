@@ -1,17 +1,22 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.service;
 
 import com.bithumbsystems.lrc.management.api.core.config.property.AwsProperties;
+import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContentException;
 import com.bithumbsystems.lrc.management.api.v1.file.service.FileService;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.listener.HistoryDto;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.mapper.ReviewEstimateMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.model.request.ReviewEstimateRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.model.response.ReviewEstimateResponse;
 import com.bithumbsystems.persistence.mongodb.file.model.entity.File;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.history.model.entity.History;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.history.service.HistoryDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.reviewestimate.model.entity.ReviewEstimate;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.reviewestimate.service.ReviewEstimateDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
@@ -23,6 +28,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.nio.ByteBuffer;
 import java.text.Normalizer;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
@@ -31,7 +37,7 @@ import java.util.*;
 public class ReviewEstimateService {
 
     private final ReviewEstimateDomainService reviewEstimateDomainService;
-
+    private final ApplicationEventPublisher applicationEventPublisher;
     private final AwsProperties awsProperties;
     private final FileService fileService;
 
@@ -63,7 +69,7 @@ public class ReviewEstimateService {
     }*/
 
     @Transactional
-    public Mono<List<ReviewEstimateResponse>> saveAll(ReviewEstimateRequest reviewEstimateRequest) {
+    public Mono<List<ReviewEstimateResponse>> saveAll(ReviewEstimateRequest reviewEstimateRequest, Account account) {
         //List<ReviewEstimateRequest> array = new ArrayList<>();
         //array.addAll(Arrays.asList(reviewEstimateRequest));
 
@@ -84,7 +90,6 @@ public class ReviewEstimateService {
                     String fileName = reviewEstimateRequest.getFileName().get(index);
 
                     // file part
-
                     if (StringUtils.hasLength(id)) {   // 수정 모드
                         if(isFile) {  //첨부파일 확인
                             return DataBufferUtils.join(fileList.poll().content())
@@ -100,31 +105,64 @@ public class ReviewEstimateService {
                                                     log.info("service upload res   =>       {}", res);
                                                     log.info("service upload fileName   =>       {}", fileName.toString());
 
-                                                    return reviewEstimateDomainService.save(
-                                                            ReviewEstimate.builder()
-                                                                    .id(id)
-                                                                    .projectId(projectId)
-                                                                    .organization(organization)
-                                                                    .result(result)
-                                                                    .reference(reference)
-                                                                    .fileKey(file_key)
-                                                                    .fileName(Normalizer.normalize(file_name, Normalizer.Form.NFC))
-                                                                    .build()
-                                                    );
+                                                    return reviewEstimateDomainService.findById(id)
+                                                            .flatMap(mode -> {
+                                                                if (!mode.getOrganization().equals(organization)) {
+                                                                    historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 기관", "수정", account);
+                                                                }
+                                                                if (!mode.getResult().equals(result)) {
+                                                                    historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 결과", "수정", account);
+                                                                }
+                                                                if (StringUtils.hasLength(reference)) {
+                                                                    if (!mode.getReference().equals(reference)) {
+                                                                        historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 자료", "수정", account);
+                                                                    }
+                                                                }
+                                                                // 파일은 수정이다.
+                                                                historyLogSend(projectId, "프로젝트 관리>검토 평가", "검토 평가", "수정", account);
+
+                                                                return reviewEstimateDomainService.save(
+                                                                        ReviewEstimate.builder()
+                                                                                .id(id)
+                                                                                .projectId(projectId)
+                                                                                .organization(organization)
+                                                                                .result(result)
+                                                                                .reference(reference)
+                                                                                .fileKey(file_key)
+                                                                                .fileName(Normalizer.normalize(file_name, Normalizer.Form.NFC))
+                                                                                .build());
+                                                            });
+
                                                 });
                                     });
                         } else {
-                            return reviewEstimateDomainService.save(
-                                    ReviewEstimate.builder()
-                                            .id(id)
-                                            .projectId(projectId)
-                                            .organization(organization)
-                                            .result(result)
-                                            .reference(reference)
-                                            .fileKey(fileKey)
-                                            .fileName(fileName)
-                                            .build()
-                            );
+                            return reviewEstimateDomainService.findById(id)
+                                            .flatMap(mode -> {
+                                                if (!mode.getOrganization().equals(organization)) {
+                                                    historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 기관", "수정", account);
+                                                }
+                                                if (!mode.getResult().equals(result)) {
+                                                    historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 결과", "수정", account);
+                                                }
+                                                if (StringUtils.hasLength(reference)) {
+                                                    if (!mode.getReference().equals(reference)) {
+                                                        historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 자료", "수정", account);
+                                                    }
+                                                }
+                                                // 파일은 수정이다.
+                                                //historyLogSend(projectId, "프로젝트 관리>검토 평가", "검토 평가", "수정", account);
+
+                                                return reviewEstimateDomainService.save(
+                                                        ReviewEstimate.builder()
+                                                                .id(id)
+                                                                .projectId(projectId)
+                                                                .organization(organization)
+                                                                .result(result)
+                                                                .reference(reference)
+                                                                .fileKey(fileKey)
+                                                                .fileName(fileName)
+                                                                .build());
+                                            });
                         }
                     }else {     // 신규 등록
                         if(isFile != null) {  //첨부파일 확인
@@ -141,6 +179,12 @@ public class ReviewEstimateService {
                                                     log.info("service upload res   =>       {}", res);
                                                     log.info("service upload fileName   =>       {}", fileName.toString());
 
+                                                    historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 기관", "신규등록", account);
+                                                    historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 결과", "신규등록", account);
+                                                    if (StringUtils.hasLength(reference))
+                                                        historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 자료", "신규등록", account);
+                                                    historyLogSend(projectId, "프로젝트 관리>검토 평가", "검토 평가", "신규등록", account);
+
                                                     return reviewEstimateDomainService.save(
                                                             ReviewEstimate.builder()
                                                                     .id(UUID.randomUUID().toString())
@@ -155,6 +199,11 @@ public class ReviewEstimateService {
                                                 });
                                     });
                         } else {
+                            historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 기관", "신규등록", account);
+                            historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 결과", "신규등록", account);
+                            if (StringUtils.hasLength(reference))
+                                historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 자료", "신규등록", account);
+
                             return reviewEstimateDomainService.save(
                                     ReviewEstimate.builder()
                                             .id(UUID.randomUUID().toString())
@@ -172,5 +221,28 @@ public class ReviewEstimateService {
 
                 }).collectList()
                 .then(this.findByProjectId("PRJ001"));  //프로젝트 명은 바꾸어야 함
+    }
+
+    /**
+     * 변경 히스토리 저장.
+     *
+     * @param projectId
+     * @param menu
+     * @param subject
+     * @param taskHistory
+     * @param account
+     * @return
+     */
+    private void historyLogSend(String projectId, String menu, String subject, String taskHistory, Account account) {
+        applicationEventPublisher.publishEvent(
+                HistoryDto.builder()
+                        .projectId(projectId)
+                        .menu(menu)
+                        .subject(subject)
+                        .taskHistory(taskHistory)
+                        .email(account.getEmail())
+                        .accountId(account.getAccountId())
+                        .build()
+        );
     }
 }

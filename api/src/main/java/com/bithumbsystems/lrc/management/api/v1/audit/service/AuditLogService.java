@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -19,7 +20,7 @@ public class AuditLogService {
 
     private final AuditLogDomainService auditLogDomainService;
 
-    public Mono<List<AuditLogResponse>> findAuditServiceLog(LocalDateTime fromDate, LocalDateTime toDate, String keyword, String mySiteId) {
+    public Mono<List<AuditLogResponse>> findAuditServiceLog(LocalDate fromDate, LocalDate toDate, String keyword, String mySiteId) {
 
         return auditLogDomainService.findPageBySearchText(
                         fromDate,

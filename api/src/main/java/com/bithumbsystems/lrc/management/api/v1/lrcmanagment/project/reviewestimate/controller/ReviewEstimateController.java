@@ -1,6 +1,8 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.controller;
 
 
+import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
+import com.bithumbsystems.lrc.management.api.core.config.resolver.CurrentUser;
 import com.bithumbsystems.lrc.management.api.core.model.response.SingleResponse;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.model.request.ReviewEstimateRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.service.ReviewEstimateService;
@@ -81,8 +83,9 @@ public class ReviewEstimateController {
      */
     @PostMapping(value = "/review-estimate/upload/s3", consumes = MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "검토 평가 여러개 저장 및 업데이트", description = "projectId를 이용하여 검토 평가 정보를 여러개 저장합니다.")
-    public ResponseEntity<Mono<SingleResponse>> createReviewEstimateFile(@ModelAttribute(value = "reviewEstimateList") ReviewEstimateRequest reviewEstimateList) {
-        return ResponseEntity.ok().body(reviewEstimateService.saveAll(reviewEstimateList)
+    public ResponseEntity<Mono<SingleResponse>> createReviewEstimateFile(@ModelAttribute(value = "reviewEstimateList") ReviewEstimateRequest reviewEstimateList,
+                                                                         @Parameter(hidden = true) @CurrentUser Account account) {
+        return ResponseEntity.ok().body(reviewEstimateService.saveAll(reviewEstimateList, account)
                 .map(c -> new SingleResponse(c)));
     }
 }

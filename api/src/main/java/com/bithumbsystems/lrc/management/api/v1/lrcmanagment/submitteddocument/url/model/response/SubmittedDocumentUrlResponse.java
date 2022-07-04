@@ -36,4 +36,7 @@ public class SubmittedDocumentUrlResponse {
 
     @Schema(description = "생성자 id")
     private String createAdminAccountId;  //생성자 id
+
+    @Schema(description = "사용자 id")
+    private String createAccountId;
 }
