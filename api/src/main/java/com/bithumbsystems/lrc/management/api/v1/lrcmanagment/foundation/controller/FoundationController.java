@@ -97,8 +97,8 @@ public class FoundationController {
      */
     @GetMapping("foundation/search")
     @Operation(summary = "재단 검색 하기", description = "재단 정보를 저장합니다.")
-    public ResponseEntity<Mono<?>> getFoundationSearch(@Parameter(name = "fromDate", description = "fromDate 이전 날짜", in = ParameterIn.QUERY) @RequestParam(required = false) String fromDate,
-                                              @Parameter(name = "toDate", description = "toDate 다음 날짜", in = ParameterIn.QUERY) @RequestParam(required = false) String toDate,
+    public ResponseEntity<Mono<?>> getFoundationSearch(@Parameter(name = "fromDate", description = "fromDate 이전 날짜", required = true) @RequestParam(required = false) String fromDate,
+                                              @Parameter(name = "toDate", description = "toDate 다음 날짜", required = true) @RequestParam(required = false) String toDate,
                                               @Parameter(name = "contractCode", description = "계약상태", in = ParameterIn.QUERY) @RequestParam(required = false) String contractCode,
                                               @Parameter(name = "progressCode", description = "진행상태", in = ParameterIn.QUERY) @RequestParam(required = false) String progressCode,
                                               @Parameter(name = "businessCode", description = "사업계열", in = ParameterIn.QUERY) @RequestParam(required = false) String businessCode,
