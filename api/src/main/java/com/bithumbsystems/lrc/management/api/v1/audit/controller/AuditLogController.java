@@ -4,6 +4,7 @@ import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.config.resolver.CurrentUser;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.core.model.response.SingleResponse;
+import com.bithumbsystems.lrc.management.api.core.util.DateUtil;
 import com.bithumbsystems.lrc.management.api.v1.audit.exception.AuditLogException;
 import com.bithumbsystems.lrc.management.api.v1.audit.service.AuditLogService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 
@@ -41,8 +41,11 @@ public class AuditLogController {
         LocalDate nFromDate = LocalDate.parse(fromDate);
         LocalDate nToDate = LocalDate.parse(toDate);
 
-        if(!nToDate.isBefore(LocalDate.parse(fromDate).plusDays(91)))   //최대 3개월
-            throw new AuditLogException(ErrorCode.INVALID_DATE_AFTER);
+        if(DateUtil.isAfter(nFromDate, nToDate))
+            throw new AuditLogException(ErrorCode.INVALID_DATE_DAY_PRIVIOUS);
+
+        if(DateUtil.isBetterThenPrevious(nFromDate, nToDate, 3))    //최대 3개월
+            throw new AuditLogException(ErrorCode.INVALID_DATE_MONTH_AFTER);
 
 
         return ResponseEntity.ok().body(auditLogService.findAuditServiceLog(nFromDate, nToDate, keyword, account.getMySiteId())
@@ -51,7 +54,6 @@ public class AuditLogController {
 
     /**
      * 서비스 로그 상세 정보를 조회한다.
-     *
      * @param id
      * @param account
      * @return

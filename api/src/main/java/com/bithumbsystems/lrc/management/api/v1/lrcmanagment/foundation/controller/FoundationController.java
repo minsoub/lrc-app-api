@@ -3,7 +3,8 @@ package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.control
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.core.model.response.MultiResponse;
 import com.bithumbsystems.lrc.management.api.core.model.response.SingleResponse;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.exception.FoundationException;
+import com.bithumbsystems.lrc.management.api.core.util.DateUtil;
+import com.bithumbsystems.lrc.management.api.v1.audit.exception.AuditLogException;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.model.request.FoundationRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.service.FoundationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,10 +48,10 @@ public class FoundationController {
      * 재단 계약 상태 가져오기
      * @return FoundationResponse
      */
-    @GetMapping("/foundation/{contreatCode}")
+    @GetMapping("/foundation/{contractCode}")
     @Operation(summary = "재단 계약 상태 가져오기", description = "재단 계약 상태 목록 정보를 조회합니다.")
-    public ResponseEntity<Mono<?>> getFoundationContract(@PathVariable String contreatCode) {
-        return ResponseEntity.ok().body(foundationService.getFoundation(contreatCode)
+    public ResponseEntity<Mono<?>> getFoundationContract(@PathVariable String contractCode) {
+        return ResponseEntity.ok().body(foundationService.getFoundation(contractCode)
                 .map(c -> new MultiResponse(c))
         );
     }
@@ -62,7 +63,7 @@ public class FoundationController {
      */
     @PostMapping("/foundation")
     @Operation(hidden = true, summary = "재단 1개 저장", description = "재단 정보를 저장합니다.")
-    public ResponseEntity<Mono<?>> createFoundation(@Parameter(name = "foundation Object", description = "재단의 Model", in = ParameterIn.PATH)
+    public ResponseEntity<Mono<?>> createFoundation(@Parameter(name = "foundation Object", description = "재단의 Model", in = ParameterIn.QUERY)
                                                         @RequestBody FoundationRequest foundationRequest) {
         return ResponseEntity.ok().body(foundationService.create(foundationRequest)
                 .map(c -> new SingleResponse(c))
@@ -76,9 +77,9 @@ public class FoundationController {
      */
     @PostMapping("/foundation/{projectId}")
     @Operation(hidden = true, summary = "재단 1개 저장", description = "재단 정보를 저장합니다.")
-    public ResponseEntity<Mono<?>> createFoundation1(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
+    public ResponseEntity<Mono<?>> createFoundation1(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.QUERY)
                                                          @PathVariable("projectId") String projectId,
-                                                     @Parameter(name = "foundation Object", description = "재단의 Model", in = ParameterIn.PATH)
+                                                     @Parameter(name = "foundation Object", description = "재단의 Model", in = ParameterIn.QUERY)
                                                      @RequestBody FoundationRequest foundationRequest) {
         return ResponseEntity.ok().body(foundationService.updateFoundationInfo(projectId, foundationRequest)
                 .map(c -> new SingleResponse(c))
@@ -110,8 +111,11 @@ public class FoundationController {
         LocalDate nFromDate = LocalDate.parse(fromDate);
         LocalDate nToDate = LocalDate.parse(toDate);
 
-        if(!nToDate.isBefore(LocalDate.parse(fromDate).plusDays(91)))   //최대 3개월
-            throw new FoundationException(ErrorCode.INVALID_DATE_AFTER);
+        if(DateUtil.isAfter(nFromDate, nToDate))
+            throw new AuditLogException(ErrorCode.INVALID_DATE_DAY_PRIVIOUS);
+
+        if(DateUtil.isBetterThenPrevious(nFromDate, nToDate, 3))    //최대 3개월
+            throw new AuditLogException(ErrorCode.INVALID_DATE_MONTH_AFTER);
 
         List<String> business = new ArrayList<String>();
         if(StringUtils.isNotEmpty(businessCode)) {
