@@ -23,8 +23,9 @@ public class AuditLogCustomRepositoryImpl implements AuditLogCustomRepository {
 
         Query query = new Query();
 
-        query.addCriteria(Criteria.where("create_date").gte(fromDate).lte(toDate))
-                .addCriteria(Criteria.where("my_site_id").is(mySiteId));
+        // TODO: my_site_id 고려
+        query.addCriteria(Criteria.where("create_date").gte(fromDate.atTime(0, 0, 0)).lte(toDate.atTime(23, 59, 59)));
+                //.addCriteria(Criteria.where("my_site_id").is(mySiteId));
 
         if (StringUtils.isNotEmpty(keyword)) {   //서비스 로그 관리 목록
             query.addCriteria(new Criteria().orOperator(

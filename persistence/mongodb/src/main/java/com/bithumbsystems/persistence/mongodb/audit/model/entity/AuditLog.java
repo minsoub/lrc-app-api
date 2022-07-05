@@ -18,12 +18,8 @@ import java.util.Set;
 @Builder
 public class AuditLog {
 
-  @Transient
-  public static final String SEQUENCE_NAME = "audit_log_sequence";
-
-  @MongoId(targetType = FieldType.STRING)
-  private Long seq;
-
+  @MongoId
+  private String id;
   private String email;
   private String ip;
   private String menuId;
