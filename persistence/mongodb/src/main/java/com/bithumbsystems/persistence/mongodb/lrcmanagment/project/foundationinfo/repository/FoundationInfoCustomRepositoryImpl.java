@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Slf4j
 @Repository
@@ -19,6 +18,39 @@ import java.time.LocalDateTime;
 public class FoundationInfoCustomRepositoryImpl implements FoundationInfoCustomRepository {
 
     private final ReactiveMongoTemplate reactiveMongoTemplate;
+
+    /**
+     * 재단정보 계약 상태 검색
+     * @param contractCode
+     * @return FoundationInfoResponse
+     */
+    public Flux<FoundationInfo> findByCustomContract(String contractCode) {
+        Query query = new Query();
+
+        if(StringUtils.isNotEmpty(contractCode)) {
+            query.addCriteria(Criteria.where("contract_code").is(contractCode));    //계약상태
+        }
+
+        return reactiveMongoTemplate.find(query, FoundationInfo.class);
+    }
+
+    /**
+     * 재단정보 계약 상태, 진행 상태 검색
+     * @param keyword
+     * @return FoundationInfoResponse
+     */
+    public Flux<FoundationInfo> findByCustomContractProcess(String keyword) {
+        Query query = new Query();
+
+        if(StringUtils.isNotEmpty(keyword)) {
+            query.addCriteria(new Criteria().orOperator(
+                    Criteria.where("contract_code").is(keyword),  //계약상태
+                    Criteria.where("process_code").is(keyword)    //진행상태
+            ));
+        }
+
+        return reactiveMongoTemplate.find(query, FoundationInfo.class);
+    }
 
     /**
      * Symbol에 의해서 like 검색한다.
@@ -29,22 +61,7 @@ public class FoundationInfoCustomRepositoryImpl implements FoundationInfoCustomR
         Query query = new Query();
 
         if(StringUtils.isNotEmpty(symbol)) {
-            query.addCriteria(Criteria.where("symbol").regex(symbol));    //symbol
-        }
-
-        return reactiveMongoTemplate.find(query, FoundationInfo.class);
-    }
-
-    /**
-     * 재단정보 및 계약 상태 검색
-     * @param contractCode
-     * @return FoundationInfoResponse
-     */
-    public Flux<FoundationInfo> findByCustomSearchAll(String contractCode) {
-        Query query = new Query();
-
-        if(StringUtils.isNotEmpty(contractCode)) {
-            query.addCriteria(Criteria.where("contract_code").is(contractCode));    //계약상태
+            query.addCriteria(Criteria.where("symbol").is(symbol));    //symbol
         }
 
         return reactiveMongoTemplate.find(query, FoundationInfo.class);

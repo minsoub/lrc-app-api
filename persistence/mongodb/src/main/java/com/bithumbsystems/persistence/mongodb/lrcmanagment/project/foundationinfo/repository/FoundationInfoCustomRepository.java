@@ -5,17 +5,23 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Repository
 public interface FoundationInfoCustomRepository {
 
     /**
-     * 재단정보 및 계약 상태 검색
+     * 재단정보 계약 상태 검색
      * @param contractCode
      * @return FoundationInfoResponse
      */
-    public Flux<FoundationInfo> findByCustomSearchAll(String contractCode);
+    public Flux<FoundationInfo> findByCustomContract(String contractCode);
+
+    /**
+     * 재단정보 계약 상태, 진행 상태 검색
+     * @param keyword
+     * @return FoundationInfoResponse
+     */
+    public Flux<FoundationInfo> findByCustomContractProcess(String keyword);
 
     /**
      * 재단정보를 symbol로 like 검색한다.

@@ -9,7 +9,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -20,12 +19,21 @@ public class FoundationInfoDomainService {
 
 
     /**
-     * 재단정보 및 계약 상태 검색
+     * 재단정보 계약 상태 검색
      * @param contractCode
      * @return FoundationInfoResponse
      */
     public Flux<FoundationInfo> findByCustomSearchAll(String contractCode) {
-        return foundationInfoCustomRepository.findByCustomSearchAll(contractCode);
+        return foundationInfoCustomRepository.findByCustomContract(contractCode);
+    }
+
+    /**
+     * 재단정보 계약 상태, 진행 상태 검색
+     * @param keyword
+     * @return FoundationInfoResponse
+     */
+    public Flux<FoundationInfo> findByCustomContractProcess(String keyword) {
+        return foundationInfoCustomRepository.findByCustomContractProcess(keyword);
     }
 
     /**

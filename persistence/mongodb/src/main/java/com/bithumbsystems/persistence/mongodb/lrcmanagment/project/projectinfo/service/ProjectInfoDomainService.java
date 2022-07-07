@@ -47,12 +47,21 @@ public class ProjectInfoDomainService {
 
     /**
      * 프로젝트 정보 검색
+     * @param keyword
+     * @return ProjectInfoResponse Object
+     */
+    public Flux<ProjectInfo> findByCustomBusinessNetwork(String keyword) {
+        return projectInfoCustomRepository.findByCustomBusinessNetwork(keyword);
+    }
+
+    /**
+     * 프로젝트 정보 검색
      * @param projectId
      * @param businessCode
      * @param networkCode
      * @return ProjectInfoResponse Object
      */
     public Flux<ProjectInfo> findByProjectInfo(String projectId, List<String> businessCode, List<String> networkCode) {
-        return projectInfoCustomRepository.findByProjectInfo(projectId, businessCode, networkCode);
+        return projectInfoCustomRepository.findByCustomProjectInfo(projectId, businessCode, networkCode);
     }
 }
