@@ -3,6 +3,7 @@ package com.bithumbsystems.lrc.management.api.core.exception;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.core.model.response.ErrorResponse;
 import com.bithumbsystems.lrc.management.api.v1.audit.exception.AuditLogException;
+import com.bithumbsystems.lrc.management.api.v1.dashboard.exception.DashBoardException;
 import com.bithumbsystems.lrc.management.api.v1.exception.LrcException;
 import com.bithumbsystems.lrc.management.api.v1.faq.category.exception.FaqCategoryException;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContentException;
@@ -51,6 +52,14 @@ public class ExceptionHandlers {
     @ExceptionHandler(AuditLogException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<Mono<?>> auditLogExceptionHandler(AuditLogException ex) {
+        log.error(ex.getMessage(), ex);
+        ErrorResponse errorResponse = new ErrorResponse(new ErrorData(ex.getErrorCode()));
+        return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(Mono.just(errorResponse));
+    }
+
+    @ExceptionHandler(DashBoardException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<Mono<?>> dashBoardExceptionHandler(DashBoardException ex) {
         log.error(ex.getMessage(), ex);
         ErrorResponse errorResponse = new ErrorResponse(new ErrorData(ex.getErrorCode()));
         return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(Mono.just(errorResponse));

@@ -6,13 +6,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class DashBoardStatusCodeResponse {
+public class DashBoardStatus {
 
     @Schema(description = "상태코드")
     private String id;
@@ -31,6 +29,4 @@ public class DashBoardStatusCodeResponse {
 
     @Schema(description = "상태 갯수")
     private Long count;
-
-    private List<DashBoardStatus> children;
 }

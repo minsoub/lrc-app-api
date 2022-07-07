@@ -1,7 +1,10 @@
 package com.bithumbsystems.lrc.management.api.v1.dashboard.service;
 
 
+import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
+import com.bithumbsystems.lrc.management.api.v1.dashboard.exception.DashBoardException;
 import com.bithumbsystems.lrc.management.api.v1.dashboard.model.response.DashBoardLineMngResponse;
+import com.bithumbsystems.lrc.management.api.v1.dashboard.model.response.DashBoardStatus;
 import com.bithumbsystems.lrc.management.api.v1.dashboard.model.response.DashBoardStatusCodeResponse;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.foundationinfo.service.FoundationInfoDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectinfo.service.ProjectInfoDomainService;
@@ -14,6 +17,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -32,7 +36,7 @@ public class DashBoardService {
     public Mono<List<DashBoardStatusCodeResponse>> getStatusCode() {
         return statusCodeDomainService.findAllStatus()
                 .map(statusCode ->
-                    DashBoardStatusCodeResponse.builder()
+                        DashBoardStatus.builder()
                             .id(statusCode.getId())
                             .name(statusCode.getName())
                             .parentCode(statusCode.getParentCode())
@@ -40,6 +44,7 @@ public class DashBoardService {
                             .useYn(statusCode.getUseYn())
                             .build()
                 )
+                .switchIfEmpty(Mono.error(new DashBoardException(ErrorCode.NOT_FOUND_CONTENT)))
                 .filter( f -> f.getUseYn())
                 .flatMap(c ->
                         Mono.just(c)
@@ -49,7 +54,27 @@ public class DashBoardService {
                                     return t.getT1();
                                 })
                 )
-                .collectSortedList(Comparator.comparing(DashBoardStatusCodeResponse::getOrderNo));
+                .collectSortedList(Comparator.comparing(DashBoardStatus::getOrderNo))
+                .map(c -> {
+
+                    List<DashBoardStatus> d = c.stream().filter(f -> f.getParentCode() == null || "".equals(f.getParentCode())).collect(Collectors.toList());
+
+                    return d.stream().map(s ->
+                            DashBoardStatusCodeResponse.builder()
+                                    .id(s.getId())
+                                    .name(s.getName())
+                                    .parentCode(s.getParentCode())
+                                    .orderNo(s.getOrderNo())
+                                    .useYn(s.getUseYn())
+                                    .count(s.getCount())
+                                    .children(
+                                            c.stream().filter(f -> f.getParentCode().equals(s.getId()))
+                                                    .sorted(Comparator.comparing(DashBoardStatus::getOrderNo))
+                                                    .collect(Collectors.toList())
+                                    )
+                                    .build()
+                    ).collect(Collectors.toList());
+                });
     }
 
     /**
@@ -66,6 +91,7 @@ public class DashBoardService {
                                 .useYn(lineMng.isUseYn())
                                 .build()
                 )
+                .switchIfEmpty(Mono.error(new DashBoardException(ErrorCode.NOT_FOUND_CONTENT)))
                 .filter( f -> f.getUseYn())
                 .flatMap(c ->
                         Mono.just(c)
