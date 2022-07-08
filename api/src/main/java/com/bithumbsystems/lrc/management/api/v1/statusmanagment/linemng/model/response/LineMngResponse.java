@@ -13,17 +13,17 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class LineMngResponse {
 
-    @Schema(description = "사업 계열 명")
-    private String name;    //사업 계열 명
+    @Schema(description = "계열관리 명")
+    private String name;    //계열관리 명
 
-    @Schema(description = "사업 계열 코드")
-    private String id;    //사업 계열 코드
+    @Schema(description = "계열관리 코드")
+    private String id;    //계열관리 코드
 
     @Schema(description = "계열타입")
     private LineType type;
 
     @Schema(description = "사용여부")
-    private boolean useYn;
+    private Boolean useYn;
 
     @Schema(description = "생성날짜")
     private LocalDateTime createDate; //생성날짜

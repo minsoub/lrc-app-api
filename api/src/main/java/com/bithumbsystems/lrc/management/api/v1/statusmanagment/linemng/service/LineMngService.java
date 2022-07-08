@@ -30,7 +30,7 @@ public class LineMngService {
     public Flux<LineMngResponse> findAll(LineType type) {
         return businessListDomainService.findAll()
                 .filter(f -> type == null || "".equals(type) || f.getType().equals(type))
-                .filter(f -> f.isUseYn() == true)
+                .filter(LineMng::getUseYn)
                 .map(LineMngMapper.INSTANCE::businessListResponse)
                 .switchIfEmpty(Mono.error(new LineMngException(ErrorCode.NOT_FOUND_CONTENT)));
     }

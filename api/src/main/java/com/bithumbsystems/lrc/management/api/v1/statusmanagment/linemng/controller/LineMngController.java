@@ -39,13 +39,13 @@ public class LineMngController {
 
 
     /**
-     * 사업계열 1개 저장
+     * 계열관리 1개 저장
      * @param lineMngRequest
      * @return BusinessListResponse
      */
     @PostMapping("/line-code")
-    @Operation(summary = "사업계열 1개 저장", description = "사업계열 정보를 저장합니다.")
-    public ResponseEntity<Mono<?>> createLine(@Parameter(name = "business Object", description = "사업 계열 Model", in = ParameterIn.PATH)
+    @Operation(summary = "계열관리 1개 저장", description = "계열관리 정보를 저장합니다.")
+    public ResponseEntity<Mono<?>> createLine(@Parameter(name = "business Object", description = "계열관리 Model", in = ParameterIn.PATH)
                                                       @RequestBody LineMngRequest lineMngRequest,
                                                   @Parameter(hidden = true) @CurrentUser Account account) {
         return ResponseEntity.ok().body(lineMngService.create(lineMngRequest, account)
@@ -54,16 +54,16 @@ public class LineMngController {
     }
 
     /**
-     * 사업계열 업데이트
+     * 계열관리 업데이트
      * @param id
      * @param lineMngRequest
      * @return BusinessListResponse
      */
     @PutMapping("/line-code/{id}")
-    @Operation(summary = "사업계열 업데이트", description = "사업계열 정보를 수정합니다.")
-    public ResponseEntity<Mono<?>> updateLines(@Parameter(name = "id", description = "사업 계열 id", in = ParameterIn.PATH)
+    @Operation(summary = "계열관리 업데이트", description = "계열관리 정보를 수정합니다.")
+    public ResponseEntity<Mono<?>> updateLines(@Parameter(name = "id", description = "계열관리 id", in = ParameterIn.PATH)
                                                       @PathVariable("id") String id,
-                                                  @Parameter(name = "serviceLog", description = "사업 계열 Model", in = ParameterIn.PATH)
+                                                  @Parameter(name = "serviceLog", description = "계열관리 Model", in = ParameterIn.PATH)
                                                   @RequestBody LineMngRequest lineMngRequest,
                                                @Parameter(hidden = true) @CurrentUser Account account) {
         return ResponseEntity.ok().body(lineMngService.updateLine(id, lineMngRequest, account)
@@ -72,13 +72,13 @@ public class LineMngController {
     }
 
     /**
-     * 사업계열 삭제
+     * 계열관리 삭제
      * @param id
      * @return null
      */
     @DeleteMapping("/line-code/{id}")
-    @Operation(summary = "사업계열 삭제", description = "사업계열 정보를 삭제합니다.")
-    public ResponseEntity<Mono<?>> deleteBusiness(@Parameter(name = "id", description = "사업계열 id", in = ParameterIn.PATH)
+    @Operation(summary = "계열관리 삭제", description = "계열관리 정보를 삭제합니다.")
+    public ResponseEntity<Mono<?>> deleteBusiness(@Parameter(name = "id", description = "계열관리 id", in = ParameterIn.PATH)
                                                       @PathVariable("id") String id,
                                                   @Parameter(hidden = true) @CurrentUser Account account) {
         return ResponseEntity.ok().body(lineMngService.deleteLine(id, account)

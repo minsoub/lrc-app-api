@@ -16,7 +16,7 @@ public class LineMngDomainService {
     private final LineMngRepository lineMngRepository;
 
     /**
-     * 비즈니스 모두 가져오기
+     * 계열관리 모두 가져오기
      * @return BusinessList
      */
     public Flux<LineMng> findAll() {
@@ -24,7 +24,7 @@ public class LineMngDomainService {
     }
 
     /**
-     * 비즈니스 1개 저장
+     * 계여롼리 1개 저장
      * @param lineData
      * @return BusinessList
      */
@@ -33,7 +33,7 @@ public class LineMngDomainService {
     }
 
     /**
-     * 비즈니스 업데이트
+     * 계열관리 업데이트
      * @param lineData
      * @return BusinessList
      */
@@ -43,7 +43,7 @@ public class LineMngDomainService {
     }
 
     /**
-     * 비즈니스 id 찾기
+     * 계열관리 id 찾기
      * @param id
      * @return BusinessList
      */
@@ -52,7 +52,7 @@ public class LineMngDomainService {
     }
 
     /**
-     * 비즈니스 1개 삭제
+     * 계열관리 1개 삭제
      * @param businessList
      * @return null
      */

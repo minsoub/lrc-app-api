@@ -45,7 +45,7 @@ public class DashBoardService {
                             .build()
                 )
                 .switchIfEmpty(Mono.error(new DashBoardException(ErrorCode.NOT_FOUND_CONTENT)))
-                .filter( f -> f.getUseYn())
+                .filter(DashBoardStatus::getUseYn)
                 .flatMap(c ->
                         Mono.just(c)
                                 .zipWith(foundationInfoDomainService.findByCustomContractProcess(c.getId()).count())
@@ -88,11 +88,11 @@ public class DashBoardService {
                                 .id(lineMng.getId())
                                 .name(lineMng.getName())
                                 .type(lineMng.getType())
-                                .useYn(lineMng.isUseYn())
+                                .useYn(lineMng.getUseYn())
                                 .build()
                 )
                 .switchIfEmpty(Mono.error(new DashBoardException(ErrorCode.NOT_FOUND_CONTENT)))
-                .filter( f -> f.getUseYn())
+                .filter(DashBoardLineMngResponse::getUseYn)
                 .flatMap(c ->
                         Mono.just(c)
                                 .zipWith(projectInfoDomainService.findByCustomBusinessNetwork(c.getId()).count())

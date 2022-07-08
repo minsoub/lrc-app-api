@@ -16,11 +16,11 @@ public class LineMngRequest {
     private String id;
 
     @Schema(description = "계열관리 명")
-    private String name;    //사업 계열 명
+    private String name;    //계열관리 명
 
     @Schema(description = "계열관리 타입")
     private LineType type;    //계열관리 타입
 
     @Schema(description = "사용여부")
-    private boolean useYn;
+    private Boolean useYn;
 }
