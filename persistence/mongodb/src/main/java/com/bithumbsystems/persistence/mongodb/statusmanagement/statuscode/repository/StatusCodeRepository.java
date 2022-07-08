@@ -1,6 +1,6 @@
-package com.bithumbsystems.persistence.mongodb.statusmanagement.statusvalue.repository;
+package com.bithumbsystems.persistence.mongodb.statusmanagement.statuscode.repository;
 
-import com.bithumbsystems.persistence.mongodb.statusmanagement.statusvalue.model.entity.StatusCode;
+import com.bithumbsystems.persistence.mongodb.statusmanagement.statuscode.model.entity.StatusCode;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;

@@ -19,7 +19,7 @@ import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestim
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.exception.SubmittedDocumentFileException;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.exception.SubmittedDocumentUrlException;
 import com.bithumbsystems.lrc.management.api.v1.statusmanagment.linemng.exception.LineMngException;
-import com.bithumbsystems.lrc.management.api.v1.statusmanagment.statusvaluelist.exception.StatusValueListException;
+import com.bithumbsystems.lrc.management.api.v1.statusmanagment.statuscode.exception.StatusCodeException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -169,9 +169,9 @@ public class ExceptionHandlers {
         return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(Mono.just(errorResponse));
     }
 
-    @ExceptionHandler(StatusValueListException.class)
+    @ExceptionHandler(StatusCodeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<Mono<?>> statusValueListExceptionHandler(StatusValueListException ex) {
+    public ResponseEntity<Mono<?>> statusValueListExceptionHandler(StatusCodeException ex) {
         log.error(ex.getMessage(), ex);
         ErrorResponse errorResponse = new ErrorResponse(new ErrorData(ex.getErrorCode()));
         return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(Mono.just(errorResponse));

@@ -7,21 +7,14 @@ import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.foundationi
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.foundationinfo.model.request.FoundationInfoRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.foundationinfo.model.response.FoundationInfoResponse;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.listener.HistoryDto;
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.history.model.entity.History;
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.history.service.HistoryDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.foundationinfo.service.FoundationInfoDomainService;
-import com.bithumbsystems.persistence.mongodb.statusmanagement.statusvalue.repository.StatusCodeRepository;
+import com.bithumbsystems.persistence.mongodb.statusmanagement.statuscode.repository.StatusCodeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor

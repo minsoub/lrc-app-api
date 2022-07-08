@@ -1,7 +1,7 @@
-package com.bithumbsystems.persistence.mongodb.statusmanagement.statusvalue.service;
+package com.bithumbsystems.persistence.mongodb.statusmanagement.statuscode.service;
 
-import com.bithumbsystems.persistence.mongodb.statusmanagement.statusvalue.model.entity.StatusCode;
-import com.bithumbsystems.persistence.mongodb.statusmanagement.statusvalue.repository.StatusCodeRepository;
+import com.bithumbsystems.persistence.mongodb.statusmanagement.statuscode.model.entity.StatusCode;
+import com.bithumbsystems.persistence.mongodb.statusmanagement.statuscode.repository.StatusCodeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;

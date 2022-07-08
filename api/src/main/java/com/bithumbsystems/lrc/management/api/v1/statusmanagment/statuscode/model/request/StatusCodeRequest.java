@@ -1,4 +1,4 @@
-package com.bithumbsystems.lrc.management.api.v1.statusmanagment.statusvaluelist.model.request;
+package com.bithumbsystems.lrc.management.api.v1.statusmanagment.statuscode.model.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -8,9 +8,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class StatusModifyRequest {
-    @Schema(description = "상태코드")
-    private String id;        //상태코드
+public class StatusCodeRequest {
+
+//    @Schema(description = "상태코드")
+//    private String id;        //상태코드
 
     @Schema(description = "상태명")
     private String name;        //상태명

@@ -1,4 +1,4 @@
-package com.bithumbsystems.persistence.mongodb.statusmanagement.statusvalue.model.entity;
+package com.bithumbsystems.persistence.mongodb.statusmanagement.statuscode.model.entity;
 
 import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
