@@ -54,7 +54,9 @@ spring:
       host: localhost
       port: 27017
       database: test
-
+application:
+  role-type: ADMIN
+  site-id: 62a15f4ae4129b518b133127
 logging:
   config: classpath:logback-spring-${spring.profiles.active}.xml
 ---
@@ -70,6 +72,9 @@ spring:
       database: test
 logging:
   config: classpath:logback-spring-local.xml
+application:
+  role-type: ADMIN
+  site-id: 62a15f4ae4129b518b133127
 ---
 spring:
   config:
@@ -78,6 +83,9 @@ spring:
       on-profile: dev
 logging:
   config: classpath:logback-spring-${spring.profiles.active}.xml
+application:
+  role-type: ADMIN
+  site-id: 62a15f4ae4129b518b133127
 ---
 spring:
   config:
@@ -86,6 +94,9 @@ spring:
       on-profile: eks-dev
 logging:
   config: classpath:logback-spring-dev.xml
+application:
+  role-type: ADMIN
+  site-id: 62a15f4ae4129b518b133127
 ---
 spring:
   config:
@@ -97,3 +108,6 @@ springdoc:
     enabled: false
 logging:
   config: classpath:logback-spring-${spring.profiles.active}.xml
+application:
+  role-type: ADMIN
+  site-id: 62a15f4ae4129b518b133127
