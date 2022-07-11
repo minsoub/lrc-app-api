@@ -28,7 +28,7 @@ public class ProjectInfoController {
      * @return ProjectInfoResponse Object
      */
     @GetMapping("/project-info/{projectId}")
-    @Operation(summary = "프로젝트 정보 1개 id 찾기", description = "projectId를 이용하여 프로젝트 정보를 조회합니다.")
+    @Operation(summary = "프로젝트 정보 1개 id 찾기", description = "projectId를 이용하여 프로젝트 정보를 조회합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 프로젝트 정보 > 1개 찾기")
     public ResponseEntity<Mono<?>> getProjectInfo(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
                                                       @PathVariable("projectId") String projectId) {
         return ResponseEntity.ok().body(projectInfoService.findByProjectId(projectId)
@@ -42,7 +42,7 @@ public class ProjectInfoController {
      * @return ProjectInfoResponse Object
      */
     @PostMapping("/project-info")
-    @Operation(summary = "프로젝트 정보 1개 저장", description = "프로젝트 정보를 저장합니다.")
+    @Operation(summary = "프로젝트 정보 1개 저장", description = "프로젝트 정보를 저장합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 프로젝트 정보 > 1개 저장")
     public ResponseEntity<Mono<?>> createProjectInfo(@Parameter(name = "project Object", description = "프로젝트 의 모든 정보", in = ParameterIn.PATH)
                                                          @RequestBody ProjectInfoRequest projectInfoRequest) {
         return ResponseEntity.ok().body(projectInfoService.create(projectInfoRequest)
@@ -57,7 +57,7 @@ public class ProjectInfoController {
      * @return ProjectInfoResponse Object
      */
     @PutMapping("/project-info/{projectId}")
-    @Operation(summary = "프로젝트 정보 업데이트", description = "프로젝트 정보를 수정하여 저장합니다.")
+    @Operation(summary = "프로젝트 정보 업데이트", description = "프로젝트 정보를 수정하여 저장합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 프로젝트 정보 > 1개 수정")
     public ResponseEntity<Mono<?>> updateProjectInfo(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
                                                          @PathVariable("projectId") String projectId,
                                                      @RequestBody ProjectInfoRequest projectInfoRequest,

@@ -26,7 +26,7 @@ public class UserAccountController {
      * @return ReviewEstimateResponse Object
      */
     @GetMapping("/user-account/{projectId}")
-    @Operation(summary = "담당자 정보 id로 찾기", description = "projectId를 이용하여 담장자 정보를 조회합니다.")
+    @Operation(summary = "담당자 정보 id로 찾기", description = "projectId를 이용하여 담장자 정보를 조회합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 담당자 정보 > 검색")
     public ResponseEntity<Mono<?>> getUserAccount(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
                                                       @PathVariable("projectId") String projectId) {
         return ResponseEntity.ok().body(userAccountService.findByProjectId(projectId)
@@ -40,7 +40,7 @@ public class UserAccountController {
      * @return ReviewEstimateResponse Object
      */
     @PostMapping("/user-account/{projectId}")
-    @Operation(summary = "담당자 정보 여러개 저장 및 업데이트", description = "projectId를 이용하여 담장자 정보를 저장/수정합니다.")
+    @Operation(summary = "담당자 정보 여러개 저장 및 업데이트", description = "projectId를 이용하여 담장자 정보를 저장/수정합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 담당자 정보 > 저장 및 삭제")
     public ResponseEntity<Mono<?>> createUserAccount(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
                                                          @PathVariable("projectId") String projectId,
                                                      @Parameter(name = "user Object", description = "사용자 정보", in = ParameterIn.PATH)

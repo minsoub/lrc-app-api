@@ -28,7 +28,7 @@ public class SubmittedDocumentUrlController {
      * @return SubmittedDocumentResponse Object
      */
     @GetMapping("/submitted-document/url/type")
-    @Operation(summary = "제출 서류 목록", description = "제출 서류 목록 정보를 조회합니다.")
+    @Operation(summary = "제출 서류 목록", description = "제출 서류 목록 정보를 조회합니다.", tags = "사이트 운영 > 거래지원 관리 > 제출 서류 관리 > url type 검색")
     public ResponseEntity<Mono<?>> getSubmittedDocumentType() {
         return ResponseEntity.ok().body(Mono.just(SubmittedDocumentEnums.values())
                 .map(c -> new SingleResponse(c))
@@ -41,7 +41,7 @@ public class SubmittedDocumentUrlController {
      * @return SubmittedDocumentResponse Object
      */
     @GetMapping("/submitted-document/url")
-    @Operation(summary = "제출 서류 관리 Project id 으로 url 찾기", description = "projectId를 이용하여 제출 서류 관리 url 정보를 조회합니다.")
+    @Operation(summary = "제출 서류 관리 Project id 으로 url 찾기", description = "projectId를 이용하여 제출 서류 관리 url 정보를 조회합니다.", tags = "사이트 운영 > 거래지원 관리 > 제출 서류 관리 > url 검색")
     public ResponseEntity<Mono<?>> getSubmittedDocumentUrl(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.QUERY)
                                                                @RequestParam() String projectId) {
         return ResponseEntity.ok().body(submittedDocumentUrlService.findByProjectId(projectId)
@@ -55,7 +55,7 @@ public class SubmittedDocumentUrlController {
      * @return SubmittedDocumentResponse Object
      */
     @PostMapping(value = "/submitted-document/url")
-    @Operation(summary = "제출 서류 관리 url 저장", description = "제출 서류 관리 url 정보를 저장 합니다.")
+    @Operation(summary = "제출 서류 관리 url 저장", description = "제출 서류 관리 url 정보를 저장 합니다.", tags = "사이트 운영 > 거래지원 관리 > 제출 서류 관리 > url 저장")
     public ResponseEntity<Mono<?>> createSubmittedDocumentUrl(@Parameter(name = "document Object", description = "제출 서류 Model", in = ParameterIn.PATH)
                                                                 @RequestBody SubmittedDocumentUrlRequest submittedDocumentUrlRequest,
                                                               @Parameter(hidden = true) @CurrentUser Account account) {
@@ -68,10 +68,9 @@ public class SubmittedDocumentUrlController {
      * @return SubmittedDocumentResponse Object
      */
     @DeleteMapping("/submitted-document/url/{id}")
-    @Operation(summary = "제출 서류 관리 url 삭제", description = "제출 서류 관리 url 정보를 삭제 합니다.")
+    @Operation(summary = "제출 서류 관리 url 삭제", description = "제출 서류 관리 url 정보를 삭제 합니다.", tags = "사이트 운영 > 거래지원 관리 > 제출 서류 관리 > url 삭제")
     public ResponseEntity<Mono<?>> deleteSubmittedDocumentUrl(@Parameter(name = "id", description = "id 정보", in = ParameterIn.PATH)
                                                             @PathVariable("id") String id) {
-
         return ResponseEntity.ok().body(submittedDocumentUrlService.deleteSubmittedDocumentUrl(id).then(
                 Mono.just(new SingleResponse()))
         );

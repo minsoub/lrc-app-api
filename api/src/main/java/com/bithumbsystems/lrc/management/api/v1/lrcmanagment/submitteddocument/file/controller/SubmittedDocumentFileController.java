@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
@@ -31,7 +30,7 @@ public class SubmittedDocumentFileController {
      * @return SubmittedDocumentResponse Object
      */
     @GetMapping("/submitted-document/file/type")
-    @Operation(summary = "제출 서류 목록", description = "제출 서류 목록 정보를 조회합니다.")
+    @Operation(summary = "제출 서류 목록", description = "제출 서류 목록 정보를 조회합니다.", tags = "사이트 운영 > 거래지원 관리 > 제출 서류 관리 > 검색")
     public ResponseEntity<Mono<?>> getSubmittedDocumentType() {
         return ResponseEntity.ok().body(Mono.just(SubmittedDocumentEnums.values())
                 .map(c -> new SingleResponse(c))
@@ -44,7 +43,7 @@ public class SubmittedDocumentFileController {
      * @return SubmittedDocumentResponse Object
      */
     @GetMapping("/submitted-document/file")
-    @Operation(summary = "제출 서류 관리 project id로 file 찾기", description = "projectId를 이용하여 제출 서류 관리 file 정보를 조회합니다.")
+    @Operation(summary = "제출 서류 관리 project id로 file 찾기", description = "projectId를 이용하여 제출 서류 관리 file 정보를 조회합니다.", tags = "사이트 운영 > 거래지원 관리 > 제출 서류 관리 > 파일 검색")
     public ResponseEntity<Mono<?>> getSubmittedDocumentFile(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.QUERY)
                                                                 @RequestParam("projectId") String projectId) {
         return ResponseEntity.ok().body(submittedDocumentService.findByProjectId(projectId)
@@ -58,7 +57,7 @@ public class SubmittedDocumentFileController {
      * @return SubmittedDocumentResponse Object
      */
     @PostMapping(value = "/submitted-document/file", consumes = MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "제출 서류 관리 file 저장", description = "제출 서류 관리 file 정보를 저장 합니다.")
+    @Operation(summary = "제출 서류 관리 file 저장", description = "제출 서류 관리 file 정보를 저장 합니다.", tags = "사이트 운영 > 거래지원 관리 > 제출 서류 관리 > 파일 저장")
     public ResponseEntity<Mono<?>> createSubmittedDocumentFile(@ModelAttribute(value = "submittedDocumentRequest") SubmittedDocumentFileRequest submittedDocumentRequest,
                                                                @Parameter(hidden = true) @CurrentUser Account account) {
         return ResponseEntity.ok().body(submittedDocumentService.saveAll(Mono.just(submittedDocumentRequest), account)
@@ -70,7 +69,7 @@ public class SubmittedDocumentFileController {
      * @return SubmittedDocumentResponse Object
      */
     @DeleteMapping("/submitted-document/file/{id}")
-    @Operation(summary = "제출 서류 관리 file 삭제", description = "제출 서류 관리 file 정보를 삭제 합니다.")
+    @Operation(summary = "제출 서류 관리 file 삭제", description = "제출 서류 관리 file 정보를 삭제 합니다.", tags = "사이트 운영 > 거래지원 관리 > 제출 서류 관리 > 파일 삭제")
     public ResponseEntity<Mono<?>> deleteSubmittedDocumentFile(@Parameter(name = "id", description = "id 정보", in = ParameterIn.PATH)
                                                                 @PathVariable("id") String id) {
 

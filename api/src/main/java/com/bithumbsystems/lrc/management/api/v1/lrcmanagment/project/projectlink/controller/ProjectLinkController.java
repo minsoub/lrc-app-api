@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
@@ -25,7 +24,7 @@ public class ProjectLinkController {
      * @return FoundationResponse
      */
     @GetMapping("/project-link/link/{projectId}")
-    @Operation(summary = "프로젝트 링크 가져오기", description = "프로젝크 링크 정보를 조회 합니다.")
+    @Operation(summary = "프로젝트 링크 가져오기", description = "프로젝크 링크 정보를 조회 합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 프로젝트 연결 > 검색")
     public ResponseEntity<Mono<?>> getProjectLink(@PathVariable String projectId) {
         return ResponseEntity.ok().body(projectLinkService.findByProjectLinkList(projectId)
                 .map(c -> new SingleResponse(c))
@@ -38,7 +37,7 @@ public class ProjectLinkController {
      * @return FoundationResponse
      */
     @GetMapping("/project-link/foundation")
-    @Operation(summary = "프로젝트 연결을 위한 재단 검색", description = "프로젝트 연결을 위한 재단을 조회 합니다.")
+    @Operation(summary = "프로젝트 연결을 위한 재단 검색", description = "프로젝트 연결을 위한 재단을 조회 합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 프로젝트 연결 > 재단 검색")
     public ResponseEntity<Mono<?>> getFoundationList(@RequestParam String symbol, @RequestParam String projectId) {
         return ResponseEntity.ok().body(projectLinkService.findBySymbolLike(symbol, projectId)
                 .map(c -> new SingleResponse(c))
@@ -64,7 +63,7 @@ public class ProjectLinkController {
      * @return FoundationResponse
      */
     @PostMapping("/project-link")
-    @Operation(summary = "프로젝트 링크 저장", description = "프로젝크 링크 정보를 저장 합니다.")
+    @Operation(summary = "프로젝트 링크 저장", description = "프로젝크 링크 정보를 저장 합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 프로젝트 연결 > 링크 저장")
     public ResponseEntity<Mono<?>> createProjectLink(@RequestBody ProjectLinkRequest projectLinkRequest) {
         return ResponseEntity.ok().body(projectLinkService.create(projectLinkRequest)
                 .map(c -> new SingleResponse(c))
@@ -77,7 +76,7 @@ public class ProjectLinkController {
      * @return FoundationResponse
      */
     @DeleteMapping("/project-link/{linkId}")
-    @Operation(summary = "프로젝트 링크 삭제(링크해제)", description = "프로젝크 링크 정보를 삭제 합니다.")
+    @Operation(summary = "프로젝트 링크 삭제(링크해제)", description = "프로젝크 링크 정보를 삭제 합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 프로젝트 연결 > 링크 삭제")
     public ResponseEntity<Mono<?>> disconnectLink(@PathVariable String linkId) {
         return ResponseEntity.ok().body(projectLinkService.deleteLinkProject(linkId)
                 .map(c -> new SingleResponse(c))
