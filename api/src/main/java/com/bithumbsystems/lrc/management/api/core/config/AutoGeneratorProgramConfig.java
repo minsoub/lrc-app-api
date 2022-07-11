@@ -59,19 +59,19 @@ public class AutoGeneratorProgramConfig {
         log.debug(">> map => {}", map);
         map.entrySet()
                 .stream()
-                .filter(e -> e.getValue().getMethodAnnotation(Operation.class) != null)
+                .filter(e -> e.getValue().getMethod().isAnnotationPresent(Operation.class))
                 .filter(e -> {
                     final var url = e.getKey().getPatternsCondition().getPatterns().iterator().next()
                             .getPatternString();
                     log.debug(">> url => {} << ", url);
                     return !url.contains("api-docs") && !url.contains("swagger-ui");
                 }).map(e -> {
-                    var operation = e.getValue().getMethodAnnotation(Operation.class);
+                    var operation = e.getValue().getMethod().getAnnotation(Operation.class);
                     log.debug(">> operation : {}", operation);
                     return Program.builder()
                             .name(Objects.requireNonNull(operation).summary())
                             .type(RoleType.valueOf(applicationProperties.getRoleType()))
-                            .kindName(operation.tags() != null ? operation.tags()[0] : null)
+                            .kindName(operation.tags() != null && operation.tags().length > 0 ? operation.tags()[0] : null)
                             .actionMethod(ActionMethod.valueOf(
                                     e.getKey().getMethodsCondition().getMethods().iterator().next().name()))
                             .actionUrl(e.getKey().getPatternsCondition().getPatterns().iterator().next()
@@ -80,7 +80,7 @@ public class AutoGeneratorProgramConfig {
                             .description(operation.description())
                             .build();
                 })
-                .map(
+                .forEach(
                         program -> existsRegisterUrls(program.getActionMethod().name(),
                                 program.getActionUrl())
                                 .filter(exists -> !exists)
@@ -94,7 +94,7 @@ public class AutoGeneratorProgramConfig {
                                     log.debug(">> register program : {}" , p.toString());
                                     return reactiveMongoTemplate.save(program);
                                 }).subscribe()
-                ).close();
+                );
     }
 
     public Mono<Boolean> existsRegisterUrls(String method, String path) {
