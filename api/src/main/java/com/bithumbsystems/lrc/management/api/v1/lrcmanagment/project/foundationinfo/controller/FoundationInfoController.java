@@ -28,7 +28,7 @@ public class FoundationInfoController {
      * @return FoundationInfoResponse Object
      */
     @GetMapping("/foundation-info/{id}")
-    @Operation(summary = "재단 정보 조회", description = "projectId를 이용하여 project를 조회합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 검색")
+    @Operation(summary = "거래지원 관리 - 재단 정보 조회", description = "projectId를 이용하여 project를 조회합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 검색")
     public ResponseEntity<Mono<?>> getFoundationInfo(@Parameter(name = "id", description = "project 의 id", in = ParameterIn.PATH)
                                                      @PathVariable("id") String id) {
         return ResponseEntity.ok().body(foundationInfoService.findById(id)
@@ -43,7 +43,7 @@ public class FoundationInfoController {
      * @return FoundationInfoResponse Object
      */
     @PostMapping("/foundation-info/{id}")
-    @Operation(summary = "재단 정보 업데이트", description = "projectId를 이용하여 project를 수정 합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 수정")
+    @Operation(summary = "거래지원 관리 - 재단 정보 업데이트", description = "projectId를 이용하여 project를 수정 합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 수정")
     public ResponseEntity<Mono<?>> updateFoundationInfo(@Parameter(name = "projectId", description = "project 의 id", in = ParameterIn.PATH)
                                                             @PathVariable("id") String id,
                                                         @RequestBody FoundationInfoRequest foundationInfoRequest,

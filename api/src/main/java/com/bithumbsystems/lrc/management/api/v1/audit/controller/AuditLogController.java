@@ -32,7 +32,7 @@ public class AuditLogController {
     private final AuditLogService auditLogService;
 
     @GetMapping("/logs")
-    @Operation(summary = "서비스 로그 조회" , description = "서비스 로그 관리 목록 정보를 조회합니다.", tags = "사이트 관리 > 서비스 로그 관리 > 검색")
+    @Operation(summary = "서비스 로그 관리 - 서비스 로그 조회" , description = "서비스 로그 관리 목록 정보를 조회합니다.", tags = "사이트 관리 > 서비스 로그 관리 > 검색")
     public ResponseEntity<Mono<?>> getAuditLog(@Parameter(name = "fromDate", description = "fromDate 이전 날짜(* 날짜 입력 형식 2022-02-22)", required = true) @RequestParam(required = false) String fromDate,
                                                @Parameter(name = "toDate", description = "toDate 다음 날짜(* 날짜 입력 형식 2022-02-22)", required = true) @RequestParam(required = false) String toDate,
                                                @Parameter(name = "keyword", description = "로그 관련 키워드 조건 검색") @RequestParam(required = false) String keyword,
@@ -59,7 +59,7 @@ public class AuditLogController {
      * @return
      */
     @GetMapping("/logs/{id}")
-    @Operation(summary = "서비스 상세 로그 조회" , description = "서비스 로그 관리 상세 정보를 조회합니다.", tags = "사이트 관리 > 서비스 로그 관리 > id 검색")
+    @Operation(summary = "서비스 로그 관리 - 서비스 상세 로그 조회" , description = "서비스 로그 관리 상세 정보를 조회합니다.", tags = "사이트 관리 > 서비스 로그 관리 > id 검색")
     public ResponseEntity<Mono<?>> getDetailAuditLog(@Parameter(name = "id", description = "id 정보", in = ParameterIn.PATH)
                                                    @PathVariable("id") String id,
                                                @Parameter(hidden = true) @CurrentUser Account account) {
@@ -69,7 +69,7 @@ public class AuditLogController {
     }
 
     @GetMapping(value = "/logs/excel/export", produces = APPLICATION_OCTET_STREAM_VALUE)
-    @Operation(summary = "엑셀 다운로드", description = "사기 신고 관리: 엑셀 다운로드", tags = "사기 신고 관리")
+    @Operation(summary = "서비스 로그 관리 - 엑셀 다운로드", description = "사기 신고 관리: 엑셀 다운로드", tags = "사기 신고 관리")
     public Mono<ResponseEntity<?>> downloadExcel(@Parameter(name = "fromDate", description = "fromDate 이전 날짜(* 날짜 입력 형식 2022-02-22)", required = true) @RequestParam(required = false) String fromDate,
                                                  @Parameter(name = "toDate", description = "toDate 다음 날짜(* 날짜 입력 형식 2022-02-22)", required = true) @RequestParam(required = false) String toDate,
                                                  @Parameter(name = "keyword", description = "로그 관련 키워드 조건 검색") @RequestParam(required = false) String keyword,

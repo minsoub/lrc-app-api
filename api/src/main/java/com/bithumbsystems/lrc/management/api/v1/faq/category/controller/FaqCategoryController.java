@@ -32,7 +32,7 @@ public class FaqCategoryController {
      * @return FaqCategoryResponse object
      */
     @GetMapping("/category")
-    @Operation(summary = "카테고리 모든 정보", description = "카테고리 모든 정보를 조회합니다.", tags = "사이트 운영 > FAQ 관리 > 카테고리 관리 > 카테고리 검색")
+    @Operation(summary = "FAQ 관리 - 카테고리 관리 - 카테고리 모든 정보", description = "카테고리 모든 정보를 조회합니다.", tags = "사이트 운영 > FAQ 관리 > 카테고리 관리 > 카테고리 검색")
     public ResponseEntity<Mono<?>> getAllCategory( @RequestParam(required = true) LanguageType language) {
         return ResponseEntity.ok().body(faqCategoryService.findAll(language)
                 .collectList()
@@ -46,7 +46,7 @@ public class FaqCategoryController {
      * @return FaqContentResponse object
      */
     @GetMapping("/category/{id}")
-    @Operation(summary = "카테고리 1개 찾기", description = "카테고리 정보 1개 조회합니다.", tags = "사이트 운영 > FAQ 관리 > 카테고리 관리 > 카테고리 1개 검색")
+    @Operation(summary = "FAQ 관리 - 카테고리 관리 - 카테고리 1개 찾기", description = "카테고리 정보 1개 조회합니다.", tags = "사이트 운영 > FAQ 관리 > 카테고리 관리 > 카테고리 1개 검색")
     public ResponseEntity<Mono<?>> getCategory(@Parameter(name = "id", description = "id 정보", in = ParameterIn.PATH)
                                                    @PathVariable("id") String id) {
         return ResponseEntity.ok().body(faqCategoryService.findCategoryById(id)
@@ -60,7 +60,7 @@ public class FaqCategoryController {
      * @return FaqCategoryResponse
      */
     @PostMapping("/category")
-    @Operation(summary = "카테고리 1개 저장", description = "카테고리 정보 저장합니다.", tags = "사이트 운영 > FAQ 관리 > 카테고리 관리 > 카테고리 1개 저장")
+    @Operation(summary = "FAQ 관리 - 카테고리 관리 - 카테고리 1개 저장", description = "카테고리 정보 저장합니다.", tags = "사이트 운영 > FAQ 관리 > 카테고리 관리 > 카테고리 1개 저장")
     public ResponseEntity<Mono<?>> createCategory(@Parameter(name = "category Object", description = "카테고리 Model")
                                                       @RequestBody FaqCategoryRequest faqCategoryRequest,
                                                   @Parameter(hidden = true) @CurrentUser Account account) {
@@ -75,7 +75,7 @@ public class FaqCategoryController {
      * @return FaqCategoryResponse
      */
     @PutMapping("/category/{id}")
-    @Operation(summary = "카테고리 업데이트", description = "카테고리 정보 수정합니다.", tags = "사이트 운영 > FAQ 관리 > 카테고리 관리 > 카테고리 수정")
+    @Operation(summary = "FAQ 관리 - 카테고리 관리 - 카테고리 업데이트", description = "카테고리 정보 수정합니다.", tags = "사이트 운영 > FAQ 관리 > 카테고리 관리 > 카테고리 수정")
     public ResponseEntity<Mono<?>> updateCategory(@Parameter(name = "id", description = "id 정보", in = ParameterIn.PATH)
                                                       @PathVariable("id") String id, @RequestBody FaqCategoryRequest faqCategoryRequest,
                                                   @Parameter(hidden = true) @CurrentUser Account account) {
@@ -90,7 +90,7 @@ public class FaqCategoryController {
      * @return FaqCategoryResponse
      */
     @DeleteMapping("/category/{code}")
-    @Operation(summary = "카테고리 삭제", description = "카테고리 정보 삭제합니다.", tags = "사이트 운영 > FAQ 관리 > 카테고리 관리 > 카테고리 삭제")
+    @Operation(summary = "FAQ 관리 - 카테고리 관리 - 카테고리 삭제", description = "카테고리 정보 삭제합니다.", tags = "사이트 운영 > FAQ 관리 > 카테고리 관리 > 카테고리 삭제")
     public ResponseEntity<Mono<?>> deleteCategory(@Parameter(name = "code", description = "code Id", in = ParameterIn.PATH)
                                                       @PathVariable("code") String code,
                                                   @Parameter(hidden = true) @CurrentUser Account account) {
@@ -106,7 +106,7 @@ public class FaqCategoryController {
      * @return FaqContentResponse paging
      */
     @GetMapping("/category/all")
-    @Operation(summary = "카테고리 페이징", description = "카테고리 정보를 페이징 조회합니다.", tags = "사이트 운영 > FAQ 관리 > 카테고리 관리 > 카테고리 페이징")
+    @Operation(summary = "FAQ 관리 - 카테고리 관리 - 카테고리 페이징", description = "카테고리 정보를 페이징 조회합니다.", tags = "사이트 운영 > FAQ 관리 > 카테고리 관리 > 카테고리 페이징")
     public ResponseEntity<Mono<?>> getAll(@Parameter(name = "page", description = "page 정보", in = ParameterIn.QUERY)
                                               @RequestParam("page") int page,
                                           @Parameter(name = "size", description = "page size 정보", in = ParameterIn.QUERY)

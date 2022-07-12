@@ -29,7 +29,7 @@ public class LineMngController {
      * @return BusinessListResponse
      */
     @GetMapping("/line-code")
-    @Operation(summary = "계열 모두 가져오기", description = "계열 목록 정보를 조회합니다.", tags = "사이트 운영 > 상태값 관리 > 계열 관리 > 검색")
+    @Operation(summary = "상태값 관리 - 계열 관리 - 계열 모두 가져오기", description = "계열 목록 정보를 조회합니다.", tags = "사이트 운영 > 상태값 관리 > 계열 관리 > 검색")
     public ResponseEntity<Mono<?>> getLines(LineType type) {
         return ResponseEntity.ok().body(lineMngService.findAll(type)
                 .collectList()
@@ -44,7 +44,7 @@ public class LineMngController {
      * @return BusinessListResponse
      */
     @PostMapping("/line-code")
-    @Operation(summary = "계열관리 1개 저장", description = "계열관리 정보를 저장합니다.", tags = "사이트 운영 > 상태값 관리 > 계열 관리 > 1개 저장")
+    @Operation(summary = "상태값 관리 - 계열 관리 - 계열관리 1개 저장", description = "계열관리 정보를 저장합니다.", tags = "사이트 운영 > 상태값 관리 > 계열 관리 > 1개 저장")
     public ResponseEntity<Mono<?>> createLine(@Parameter(name = "business Object", description = "계열관리 Model", in = ParameterIn.PATH)
                                                       @RequestBody LineMngRequest lineMngRequest,
                                                   @Parameter(hidden = true) @CurrentUser Account account) {
@@ -60,7 +60,7 @@ public class LineMngController {
      * @return BusinessListResponse
      */
     @PutMapping("/line-code/{id}")
-    @Operation(summary = "계열관리 업데이트", description = "계열관리 정보를 수정합니다.", tags = "사이트 운영 > 상태값 관리 > 계열 관리 > 수정")
+    @Operation(summary = "상태값 관리 - 계열 관리 - 계열관리 업데이트", description = "계열관리 정보를 수정합니다.", tags = "사이트 운영 > 상태값 관리 > 계열 관리 > 수정")
     public ResponseEntity<Mono<?>> updateLines(@Parameter(name = "id", description = "계열관리 id", in = ParameterIn.PATH)
                                                       @PathVariable("id") String id,
                                                   @Parameter(name = "serviceLog", description = "계열관리 Model", in = ParameterIn.PATH)
@@ -77,7 +77,7 @@ public class LineMngController {
      * @return null
      */
     @DeleteMapping("/line-code/{id}")
-    @Operation(summary = "계열관리 삭제", description = "계열관리 정보를 삭제합니다.", tags = "사이트 운영 > 상태값 관리 > 계열 관리 > 삭제")
+    @Operation(summary = "상태값 관리 - 계열 관리 - 계열관리 삭제", description = "계열관리 정보를 삭제합니다.", tags = "사이트 운영 > 상태값 관리 > 계열 관리 > 삭제")
     public ResponseEntity<Mono<?>> deleteBusiness(@Parameter(name = "id", description = "계열관리 id", in = ParameterIn.PATH)
                                                       @PathVariable("id") String id,
                                                   @Parameter(hidden = true) @CurrentUser Account account) {

@@ -28,7 +28,7 @@ public class MarketingQuantityController {
      * @return MarketingQuantityResponse Object
      */
     @GetMapping("/marketing-quantity/{projectId}")
-    @Operation(summary = "마케징 수량 조회", description = "projectId를 이용하여 마케팅 수량 정보를 조회합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 마케팅 수량 > 1개 검색")
+    @Operation(summary = "거래지원 관리 - 마케징 수량 조회", description = "projectId를 이용하여 마케팅 수량 정보를 조회합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 마케팅 수량 > 1개 검색")
     public ResponseEntity<Mono<?>> getMarketingQuantity(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
                                                             @PathVariable("projectId") String projectId) {
         return ResponseEntity.ok().body(marketingQuantityService.findByProjectId(projectId)
@@ -42,7 +42,7 @@ public class MarketingQuantityController {
      * @return MarketingQuantityResponse Object
      */
     @PostMapping("/marketing-quantity/{projectId}")
-    @Operation(summary = "마케팅 수량 여러개 저장 및 업데이트", description = "projectId를 이용하여 마케징 수량 정보를 저장/삭제 합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 마케팅 수량 > 저장 및 수정")
+    @Operation(summary = "거래지원 관리 - 마케팅 수량 여러개 저장 및 업데이트", description = "projectId를 이용하여 마케징 수량 정보를 저장/삭제 합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 마케팅 수량 > 저장 및 수정")
     public ResponseEntity<Mono<?>> createMarketingQuantity(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
                                                                @PathVariable("projectId") String projectId,
                                                            @RequestBody MarketingQuantityRequest marketingQuantityRequest,
