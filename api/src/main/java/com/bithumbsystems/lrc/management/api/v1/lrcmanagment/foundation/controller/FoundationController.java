@@ -37,7 +37,7 @@ public class FoundationController {
      * @return FoundationResponse
      */
     @GetMapping("/foundation")
-    @Operation(summary = "재단 가져오기", description = "재단 목록 정보를 조회합니다.", tags = "사이트 운영  > 거래지원 관리 > 거래지원 검색")
+    @Operation(summary = "거래지원관리 - 재단 가져오기", description = "재단 목록 정보를 조회합니다.", tags = "사이트 운영  > 거래지원 관리 > 거래지원 검색")
     public ResponseEntity<Mono<?>> getFoundation(@Parameter(name = "keyWord", description = "심볼 검색", in = ParameterIn.QUERY) @RequestParam(required = true) String keyWord) {
         return ResponseEntity.ok().body(foundationService.getFoundationKeyWordSearch(keyWord)
                 .map(c -> new MultiResponse(c))
