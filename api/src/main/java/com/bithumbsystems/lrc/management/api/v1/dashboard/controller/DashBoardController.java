@@ -27,7 +27,7 @@ public class DashBoardController {
      * @return DashBoardStatusCodeResponse
      */
     @GetMapping("/status-code")
-    @Operation(summary = "상태값 통계 모두 가져오기", description = "상태값 통계 목록 정보를 조회합니다.")
+    @Operation(summary = "거래지원 현황 - 상태값 통계 모두 가져오기", description = "상태값 통계 목록 정보를 조회합니다.", tags = "사이트 운영 > 거래지원 현황 > 상태값 조회")
     public ResponseEntity<Mono<?>> getStatusValue() {
         return ResponseEntity.ok().body(dashBoardService.getStatusCode()
                 .map(c -> new SingleResponse(c))
@@ -39,7 +39,7 @@ public class DashBoardController {
      * @return DashBoardLineMngResponse
      */
     @GetMapping("/line-code")
-    @Operation(summary = "계열관리 통계 모두 가져오기", description = "계열관리 통계 목록 정보를 조회합니다.")
+    @Operation(summary = "거래지원 현황 - 계열관리 통계 모두 가져오기", description = "계열관리 통계 목록 정보를 조회합니다.", tags = "사이트 운영 > 거래지원 현황 > 계열관리 조회")
     public ResponseEntity<Mono<?>> getLineMng() {
         return ResponseEntity.ok().body(dashBoardService.getLineMng()
                 .map(c -> new SingleResponse(c))

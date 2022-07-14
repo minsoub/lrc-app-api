@@ -29,7 +29,7 @@ public class IcoInfoController {
      * @return IcoInfoResponse Object
      */
     @GetMapping("/ico-info/{projectId}")
-    @Operation(summary = "상장 정보 조회", description = "projectId를 이용하여 상정 정보를 조회합니다.")
+    @Operation(summary = "거래지원 관리 - 상장 정보 조회", description = "projectId를 이용하여 상정 정보를 조회합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 상장정보 > 검색")
     public ResponseEntity<Mono<?>> getIcoInfo(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
                                                   @PathVariable("projectId") String projectId) {
         return ResponseEntity.ok().body(icoInfoService.findByProjectId(projectId)
@@ -43,7 +43,7 @@ public class IcoInfoController {
      * @return IcoInfoResponse Object
      */
     @PostMapping("/ico-info/{projectId}")
-    @Operation(summary = "상장 정보 여러개 저장 및 업데이트", description = "projectId를 이용하여 상정 정보를 저장합니다.")
+    @Operation(summary = "거래지원 관리 - 상장 정보 여러개 저장 및 업데이트", description = "projectId를 이용하여 상정 정보를 저장합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 상장정보 > 수정")
     public ResponseEntity<Mono<?>> createIcoInfo(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
                                                      @PathVariable("projectId") String projectId,
                                                  @RequestBody IcoInfoRequest icoInfoRequest,

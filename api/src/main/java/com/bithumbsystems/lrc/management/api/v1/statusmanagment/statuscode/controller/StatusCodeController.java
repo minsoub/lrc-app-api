@@ -31,7 +31,7 @@ public class StatusCodeController {
      * @return StatusCodeResponse
      */
     @GetMapping("/status-code")
-    @Operation(summary = "상태값 관리 모두 가져오기", description = "상태값 관리 목록 정보를 조회합니다.")
+    @Operation(summary = "상태값 관리 - 상태값 관리 - 상태값 관리 모두 가져오기", description = "상태값 관리 목록 정보를 조회합니다.", tags = "사이트 운영 > 상태값 관리 > 상태값 관리 > 검색")
     public ResponseEntity<Mono<?>> getStatusValue() {
         return ResponseEntity.ok().body(statusCodeService.getStatusValue()
                 .collectList()
@@ -44,7 +44,7 @@ public class StatusCodeController {
      * @return StatusCodeResponse
      */
     @GetMapping("/status-code/tree")
-    @Operation(summary = "상태값 관리 트리 구조 만들기", description = "상태값 관리 트리 목록 정보를 조회합니다.")
+    @Operation(summary = "상태값 관리 - 상태값 관리 - 상태값 관리 트리 구조 만들기", description = "상태값 관리 트리 목록 정보를 조회합니다.", tags = "사이트 운영 > 상태값 관리 > 상태값 관리 > 트리구조 만들기")
     public ResponseEntity<Mono<SingleResponse>> getStatusValueTree() {
         return ResponseEntity.ok().body(statusCodeService.getStatusValueTree()
                 .map(c -> new SingleResponse(c))
@@ -57,8 +57,8 @@ public class StatusCodeController {
      * @return StatusCodeResponse
      */
     @PostMapping("/status-code")
-    @Operation(summary = "상태값 관리 1개 저장", description = "상태값 관리를 저장 할때 트리 order를 수정 해야 한다. 저장합니다.")
-    public ResponseEntity<Mono<?>> createStatusValue(@Parameter(name = "status Object", description = "상태값 관리 Model", in = ParameterIn.PATH)
+    @Operation(summary = "상태값 관리 - 상태값 관리 - 상태값 관리 1개 저장", description = "상태값 관리를 저장 할때 트리 order를 수정 해야 한다. 저장합니다.", tags = "사이트 운영 > 상태값 관리 > 상태값 관리 > 1개 저장")
+    public ResponseEntity<Mono<?>> createStatusValue(@Parameter(name = "status Object", description = "상태값 관리 Model")
                                                          @RequestBody StatusCodeRequest statusCodeRequest,
                                                      @Parameter(hidden = true) @CurrentUser Account account) {
         return ResponseEntity.ok().body(statusCodeService.create(statusCodeRequest, account)
@@ -67,12 +67,12 @@ public class StatusCodeController {
     }
 
     /**
-     * 상태값 관리 1개 수정
+     * 상태값 관리 order 수정
      * @param statusModifyRequest
      * @return StatusCodeResponse
      */
     @PutMapping("/status-code")
-    @Operation(summary = "상태값 관리 1개 수정", description = "상태값 관리 수정 할때 트리 order를 수정 해야 한다.")
+    @Operation(summary = "상태값 관리 - 상태값 관리 - 상태값 관리 oder 수정", description = "상태값 관리 수정 할때 트리 order를 수정 해야 한다.", tags = "사이트 운영 > 상태값 관리 > 상태값 관리 > order 수정")
     public ResponseEntity<Mono<?>> updateStatusValue(@Parameter(name = "status Object", description = "상태값 관리 Model", in = ParameterIn.PATH)
                                                      @RequestBody StatusModifyRequest statusModifyRequest,
                                                      @Parameter(hidden = true) @CurrentUser Account account) {
@@ -87,7 +87,7 @@ public class StatusCodeController {
      * @return StatusCodeResponse
      */
     @DeleteMapping("/statuscode/{id}")
-    @Operation(summary = "상태값 관리 1개 삭제", description = "상태값 관리를 저장 할때 트리 order를 수정 해야 한다. 삭제합니다.")
+    @Operation(summary = "상태값 관리 - 상태값 관리 - 상태값 관리 1개 삭제", description = "상태값 관리를 저장 할때 트리 order를 수정 해야 한다. 삭제합니다.", tags = "사이트 운영 > 상태값 관리 > 상태값 관리 > 삭제")
     public ResponseEntity<Mono<?>> deleteStatusValue(@Parameter(name = "id", description = "상태값 관리 id", in = ParameterIn.PATH)
                                                          @PathVariable("id") String id) {
         return ResponseEntity.ok().body(statusCodeService.deleteStatusValue(id).then(

@@ -37,7 +37,7 @@ public class FoundationController {
      * @return FoundationResponse
      */
     @GetMapping("/foundation")
-    @Operation(summary = "재단 가져오기", description = "재단 목록 정보를 조회합니다.")
+    @Operation(summary = "거래지원 관리 - 재단 가져오기", description = "재단 목록 정보를 조회합니다.", tags = "사이트 운영  > 거래지원 관리 > 거래지원 검색")
     public ResponseEntity<Mono<?>> getFoundation(@Parameter(name = "keyWord", description = "심볼 검색", in = ParameterIn.QUERY) @RequestParam(required = true) String keyWord) {
         return ResponseEntity.ok().body(foundationService.getFoundationKeyWordSearch(keyWord)
                 .map(c -> new MultiResponse(c))
@@ -49,7 +49,7 @@ public class FoundationController {
      * @return FoundationResponse
      */
     @GetMapping("/foundation/{contractCode}")
-    @Operation(summary = "재단 계약 상태 가져오기", description = "재단 계약 상태 목록 정보를 조회합니다.")
+    @Operation(summary = "거래지원 관리 - 재단 계약 상태 가져오기", description = "재단 계약 상태 목록 정보를 조회합니다.", tags = "사이트 운영  > 거래지원 관리 > 재단 계약상태 검색")
     public ResponseEntity<Mono<?>> getFoundationContract(@PathVariable String contractCode) {
         return ResponseEntity.ok().body(foundationService.getFoundation(contractCode)
                 .map(c -> new MultiResponse(c))
@@ -62,7 +62,7 @@ public class FoundationController {
      * @return FoundationResponse
      */
     @PostMapping("/foundation")
-    @Operation(hidden = true, summary = "재단 1개 저장", description = "재단 정보를 저장합니다.")
+    @Operation(hidden = true, summary = "거래지원 관리 - 재단 1개 저장", description = "재단 정보를 저장합니다.")
     public ResponseEntity<Mono<?>> createFoundation(@Parameter(name = "foundation Object", description = "재단의 Model", in = ParameterIn.QUERY)
                                                         @RequestBody FoundationRequest foundationRequest) {
         return ResponseEntity.ok().body(foundationService.create(foundationRequest)
@@ -76,7 +76,7 @@ public class FoundationController {
      * @return FoundationResponse
      */
     @PostMapping("/foundation/{projectId}")
-    @Operation(hidden = true, summary = "재단 1개 저장", description = "재단 정보를 저장합니다.")
+    @Operation(hidden = true, summary = "거래지원 관리 - 재단 1개 저장", description = "재단 정보를 저장합니다.")
     public ResponseEntity<Mono<?>> createFoundation1(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.QUERY)
                                                          @PathVariable("projectId") String projectId,
                                                      @Parameter(name = "foundation Object", description = "재단의 Model", in = ParameterIn.QUERY)
@@ -98,7 +98,7 @@ public class FoundationController {
      * @return Foundation Object
      */
     @GetMapping("foundation/search")
-    @Operation(summary = "재단 검색 하기", description = "재단 정보를 저장합니다.")
+    @Operation(summary = "거래지원 관리 - 재단 검색 하기", description = "재단 정보를 저장합니다.", tags = "사이트 운영 > 거래지원 관리 > 재단 검색")
     public ResponseEntity<Mono<?>> getFoundationSearch(@Parameter(name = "fromDate", description = "fromDate 이전 날짜", required = true) @RequestParam(required = false) String fromDate,
                                               @Parameter(name = "toDate", description = "toDate 다음 날짜", required = true) @RequestParam(required = false) String toDate,
                                               @Parameter(name = "contractCode", description = "계약상태", in = ParameterIn.QUERY) @RequestParam(required = false) String contractCode,
