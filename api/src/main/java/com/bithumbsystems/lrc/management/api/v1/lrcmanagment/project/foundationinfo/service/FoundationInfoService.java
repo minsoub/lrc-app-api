@@ -85,13 +85,13 @@ public class FoundationInfoService {
                     if (!c.getSymbol().equals(foundationInfoRequest.getSymbol())) {
                         historyLogSend(id, "프로젝트 관리>재단정보", "심볼", "수정", account);
                     }
-                    if (!c.getContractCode().equals(foundationInfoRequest.getContractCode())) {
+                    if ((c.getContractCode() == null && foundationInfoRequest.getContractCode() != null) || !c.getContractCode().equals(foundationInfoRequest.getContractCode())) {
                         historyLogSend(id, "프로젝트 관리>재단정보", "계약상태", "상태변경", account);
                     }
-                    if (!c.getProcessCode().equals(foundationInfoRequest.getProcessCode())) {
+                    if ((c.getProcessCode() == null && foundationInfoRequest.getProcessCode() != null) ||  !c.getProcessCode().equals(foundationInfoRequest.getProcessCode())) {
                         historyLogSend(id, "프로젝트 관리>재단정보", "진행상태", "상태변경", account);
                     }
-                    if (!c.getMemo().equals(foundationInfoRequest.getAdminMemo())) {
+                    if ((c.getMemo() == null && foundationInfoRequest.getAdminMemo() != null) || !c.getMemo().equals(foundationInfoRequest.getAdminMemo())) {
                         historyLogSend(id, "프로젝트 관리>재단정보", "관리자 메모", "수정", account);
                     }
                     c.setName(foundationInfoRequest.getProjectName());

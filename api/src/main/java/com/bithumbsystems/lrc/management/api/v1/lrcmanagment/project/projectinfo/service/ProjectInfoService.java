@@ -72,19 +72,19 @@ public class ProjectInfoService {
         return projectInfoDomainService.findByProjectId(projectId)
                 .flatMap(c -> {
                     // 변경 히스토리 추가
-                    if (!c.getBusinessCode().equals(projectInfoRequest.getBusinessCode())) {
+                    if ((c.getBusinessCode() == null && projectInfoRequest.getBusinessCode() != null) || !c.getBusinessCode().equals(projectInfoRequest.getBusinessCode())) {
                         historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "사업 계열", "수정", account);
                     }
-                    if (!c.getNetworkCode().equals(projectInfoRequest.getNetworkCode())) {
+                    if ((c.getNetworkCode() == null && projectInfoRequest.getNetworkCode() != null) || !c.getNetworkCode().equals(projectInfoRequest.getNetworkCode())) {
                         historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "네트워크 계열", "수정", account);
                     }
-                    if (!c.getWhitepaperLink().equals(projectInfoRequest.getWhitepaperLink())) {
+                    if ((c.getWhitepaperLink() == null && projectInfoRequest.getWhitepaperLink() != null) || !c.getWhitepaperLink().equals(projectInfoRequest.getWhitepaperLink())) {
                         historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "백서 링크", "수정", account);
                     }
-                    if (!c.getCreateDate().equals(projectInfoRequest.getCreateDate())) {
+                    if ((c.getCreateDate() == null && projectInfoRequest.getCreateDate() != null) || !c.getCreateDate().equals(projectInfoRequest.getCreateDate())) {
                         historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "최초 발행일", "수정", account);
                     }
-                    if (!c.getContractAddress().equals(projectInfoRequest.getContractAddress())) {
+                    if ((c.getContractAddress() == null && projectInfoRequest.getContractAddress() != null) || !c.getContractAddress().equals(projectInfoRequest.getContractAddress())) {
                         historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "컨트렉트 주소", "수정", account);
                     }
                     c.setBusinessCode(projectInfoRequest.getBusinessCode());

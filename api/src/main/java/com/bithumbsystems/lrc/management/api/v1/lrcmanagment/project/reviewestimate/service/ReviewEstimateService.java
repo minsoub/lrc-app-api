@@ -30,6 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 @Slf4j
@@ -74,14 +75,19 @@ public class ReviewEstimateService {
         //List<ReviewEstimateRequest> array = new ArrayList<>();
         //array.addAll(Arrays.asList(reviewEstimateRequest));
 
+        log.debug("{}", reviewEstimateRequest);
         Queue<FilePart> fileList = new LinkedList<FilePart>();
         if (reviewEstimateRequest.getFile() != null)
             fileList.addAll(reviewEstimateRequest.getFile());
-
+        AtomicReference<String> id = new AtomicReference<>("");
         return  Flux.fromIterable(reviewEstimateRequest.getNo())
                 .flatMap(index -> {
 
-                    String id = reviewEstimateRequest.getId().get(index);
+                    if (reviewEstimateRequest.getId().size() == 0) {
+                        id.set("");
+                    } else {
+                        id.set(reviewEstimateRequest.getId().get(index));
+                    }
                     String projectId = reviewEstimateRequest.getProjectId().get(index);
                     String organization = reviewEstimateRequest.getOrganization().get(index);
                     String result  = reviewEstimateRequest.getResult().get(index);
@@ -91,7 +97,7 @@ public class ReviewEstimateService {
                     String fileName = reviewEstimateRequest.getFileName().get(index);
 
                     // file part
-                    if (StringUtils.hasLength(id)) {   // 수정 모드
+                    if (StringUtils.hasLength(id.get())) {   // 수정 모드
                         if(isFile) {  //첨부파일 확인
                             return DataBufferUtils.join(fileList.poll().content())
                                     .flatMap(dataBuffer -> {
@@ -106,7 +112,7 @@ public class ReviewEstimateService {
                                                     log.info("service upload res   =>       {}", res);
                                                     log.info("service upload fileName   =>       {}", fileName.toString());
 
-                                                    return reviewEstimateDomainService.findById(id)
+                                                    return reviewEstimateDomainService.findById(id.get())
                                                             .flatMap(mode -> {
                                                                 if (!mode.getOrganization().equals(organization)) {
                                                                     historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 기관", "수정", account);
@@ -124,7 +130,7 @@ public class ReviewEstimateService {
 
                                                                 return reviewEstimateDomainService.save(
                                                                         ReviewEstimate.builder()
-                                                                                .id(id)
+                                                                                .id(String.valueOf(id))
                                                                                 .projectId(projectId)
                                                                                 .organization(organization)
                                                                                 .result(result)
@@ -137,7 +143,7 @@ public class ReviewEstimateService {
                                                 });
                                     });
                         } else {
-                            return reviewEstimateDomainService.findById(id)
+                            return reviewEstimateDomainService.findById(id.get())
                                             .flatMap(mode -> {
                                                 if (!mode.getOrganization().equals(organization)) {
                                                     historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 기관", "수정", account);
@@ -155,7 +161,7 @@ public class ReviewEstimateService {
 
                                                 return reviewEstimateDomainService.save(
                                                         ReviewEstimate.builder()
-                                                                .id(id)
+                                                                .id(String.valueOf(id))
                                                                 .projectId(projectId)
                                                                 .organization(organization)
                                                                 .result(result)
