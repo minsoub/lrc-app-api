@@ -20,7 +20,7 @@ public class FaqContentResponse {
     private String userId;      //사용자 id
 
     @Schema(description = "노출순서")
-    private Integer order;       //노출순서
+    private Integer orderNo;       //노출순서
 
     @Schema(description = "카테고리")
     private String category;    //카테고리

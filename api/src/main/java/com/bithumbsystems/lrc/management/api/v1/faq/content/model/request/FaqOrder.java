@@ -14,5 +14,5 @@ public class FaqOrder {
     private String id;      //사용자 id
 
     @Schema(description = "노출순서")
-    private Integer order;       //노출순서
+    private Integer orderNo;       //노출순서
 }

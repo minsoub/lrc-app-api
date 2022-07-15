@@ -19,7 +19,7 @@ public class FaqContent {
     @Id
     private String id;
     private String userId;      //사용자 id
-    private Integer order;       //노출순서
+    private Integer orderNo;       //노출순서
     private String categoryCode;    //카테고리 코드
     private String title;       //제목
     private String content;     //내용
