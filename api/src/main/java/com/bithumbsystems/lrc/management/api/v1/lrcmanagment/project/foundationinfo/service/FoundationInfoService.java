@@ -52,7 +52,18 @@ public class FoundationInfoService {
                                             res.setProcessName(r2.getName());
                                             return Mono.just(res);
                                         });
-                            });
+                            })
+                            .switchIfEmpty(
+                                    Mono.just(FoundationInfoResponse.builder()
+                                            .id(result.getId())
+                                            .adminMemo(result.getMemo())
+                                            .symbol(result.getSymbol())
+                                            .projectName(result.getName())
+                                            .contractCode(result.getContractCode())
+                                            .contractName("")
+                                            .processCode(result.getProcessCode())
+                                            .build())
+                            );
                 })
                 //.map(FoundationInfoMapper.INSTANCE::foundationInfoResponse)
                 .switchIfEmpty(Mono.error(new FoundationInfoException(ErrorCode.NOT_FOUND_CONTENT)));
