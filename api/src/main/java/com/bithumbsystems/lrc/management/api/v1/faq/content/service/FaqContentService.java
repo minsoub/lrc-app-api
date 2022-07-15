@@ -58,7 +58,7 @@ public class FaqContentService {
                     return faqContentResponse;
                 })
                     .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT))))
-                .collectSortedList(Comparator.comparing(FaqContentResponse::getOrder));
+                .collectSortedList(Comparator.comparing(FaqContentResponse::getOrderNo));
     }
 
     /**
@@ -76,7 +76,7 @@ public class FaqContentService {
                             return faqContentResponse;
                         })
                         .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT))))
-                .collectSortedList(Comparator.comparing(FaqContentResponse::getOrder));
+                .collectSortedList(Comparator.comparing(FaqContentResponse::getOrderNo));
     }
 
     /**
@@ -112,7 +112,7 @@ public class FaqContentService {
                                 .title(faqContentRequest.getTitle())
                                 .content(faqContentRequest.getContent())
                                 .useYn(faqContentRequest.getUseYn())
-                                .order(faqContentRequest.getOrder())
+                                .orderNo(faqContentRequest.getOrderNo())
                                 .email(account.getEmail())
                                 .language(faqContentRequest.getLanguage())
                                 .createDate(LocalDateTime.now())
@@ -130,7 +130,7 @@ public class FaqContentService {
     public Mono<FaqContentResponse> updateContent(String id, FaqContentRequest faqContentRequest, Account account) {
         return faqDomainService.findFaqById(id).flatMap(c -> {
             c.setCategoryCode(faqContentRequest.getCategoryCode());
-            c.setOrder(faqContentRequest.getOrder());
+            c.setOrderNo(faqContentRequest.getOrderNo());
             c.setTitle(faqContentRequest.getTitle());
             c.setContent(faqContentRequest.getContent());
             c.setUpdateDate(LocalDateTime.now());
@@ -150,7 +150,7 @@ public class FaqContentService {
         return Flux.fromIterable(faqOrderRequest.getOrderList())
                 .flatMap(item -> faqDomainService.findFaqById(item.getId())
                         .flatMap(result -> {
-                            result.setOrder(item.getOrder());
+                            result.setOrderNo(item.getOrderNo());
                             result.setUpdateDate(LocalDateTime.now());
                             result.setUpdateAdminAccountId(account.getAccountId());
                             return faqDomainService.updateContent(result)
