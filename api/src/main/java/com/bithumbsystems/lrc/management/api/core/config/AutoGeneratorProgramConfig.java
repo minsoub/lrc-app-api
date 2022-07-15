@@ -22,6 +22,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -119,14 +120,21 @@ public class AutoGeneratorProgramConfig {
         private String id;
         private String name;
         private RoleType type;
+        @Field("kind_name")
         private String kindName;
+        @Field("action_method")
         private ActionMethod actionMethod;
+        @Field("action_url")
         private String actionUrl;
+        @Field("is_use")
         private Boolean isUse;
         private String description;
         @Indexed
+        @Field("site_id")
         private String siteId;
+        @Field("create_date")
         private LocalDateTime createDate;
+        @Field("create_admin_account_id")
         private String createAdminAccountId;
     }
 }
