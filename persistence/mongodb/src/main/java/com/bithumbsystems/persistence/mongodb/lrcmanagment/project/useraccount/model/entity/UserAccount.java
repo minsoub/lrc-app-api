@@ -8,6 +8,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,4 +21,12 @@ public class UserAccount {
     private String projectId;               //프로젝트 코드
     private String userAccountId;           //회원 아이디
     private String userType;                //마스터/담당자구분
+    private String name;
+    private String phone;
+    private String snsId;
+    private String contactEmail;
+    private LocalDateTime createDate;
+    private String createAccountId;
+    private LocalDateTime updateDate;
+    private String updateAccountId;
 }

@@ -37,18 +37,15 @@ public class UserAccountService {
         return userAccountDomainService.findByProjectId(projectId)
                 .flatMap(user -> {
                     log.debug("user info => {}", user);
-                    return userInfoDomainService.findById(user.getUserAccountId())
-                            .flatMap(u -> {
                                 return Mono.just(UserAccountResponse.builder()
                                         .id(user.getId())
                                         .userAccountId(user.getUserAccountId())
                                         .projectId(user.getProjectId())
-                                        .userName(AES256Util.decryptAES(properties.getKmsKey(), u.getName()))
-                                        .snsId(u.getSnsId())
-                                        .email(AES256Util.decryptAES(properties.getKmsKey(), u.getEmail()))
-                                        .phone(AES256Util.decryptAES(properties.getKmsKey(), u.getPhone()))
+                                        .userName(AES256Util.decryptAES(properties.getKmsKey(), user.getName()))
+                                        .snsId(user.getSnsId())
+                                        .email(AES256Util.decryptAES(properties.getKmsKey(), user.getContactEmail()))
+                                        .phone(AES256Util.decryptAES(properties.getKmsKey(), user.getPhone()))
                                         .build());
-                            });
                 })
                 //.map(UserAccountMapper.INSTANCE::userAccountResponse)
                 .collectList()

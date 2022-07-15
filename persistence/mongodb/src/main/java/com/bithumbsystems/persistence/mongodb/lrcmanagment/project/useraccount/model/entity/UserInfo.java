@@ -20,10 +20,10 @@ public class UserInfo {
     private String email;
     private String password;
     private LocalDateTime lastLoginDate;
-    private String name;
-    private String phone;
-    private String snsId;
-    private String contactEmail;
+//    private String name;
+//    private String phone;
+//    private String snsId;
+//    private String contactEmail;
     private String status;
     private String otpSecretKey;
     private LocalDateTime createDate;
