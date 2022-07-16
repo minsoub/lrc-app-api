@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class MarketingQuantityDomainService {
@@ -37,6 +39,16 @@ public class MarketingQuantityDomainService {
      * @return MarketingQuantityResponse Object
      */
     public Mono<MarketingQuantity> save(MarketingQuantity marketingQuantity) {
+        return marketingQuantityRepository.save(marketingQuantity);
+    }
+
+    /**
+     * 마케팅 수량 신규 등록
+     * @param marketingQuantity
+     * @return
+     */
+    public Mono<MarketingQuantity> insert(MarketingQuantity marketingQuantity) {
+        marketingQuantity.setId(UUID.randomUUID().toString());
         return marketingQuantityRepository.save(marketingQuantity);
     }
 }

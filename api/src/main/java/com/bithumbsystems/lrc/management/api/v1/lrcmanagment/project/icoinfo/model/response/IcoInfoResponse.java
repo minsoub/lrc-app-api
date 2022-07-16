@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Schema(description = "상장 정보")
 public class IcoInfoResponse {
-
+    @Schema(description = "상장정보 ID")
     private String id;
 
     @Schema(description = "프로젝트 코드")
@@ -23,7 +23,7 @@ public class IcoInfoResponse {
     private String marketInfo;          //마켓 정보
 
     @Schema(description = "상장가(원)")
-    private Long price;                 //상장가(원)
+    private Double price;                 //상장가(원)
 
     @Schema(description = "상장일")
     private LocalDate icoDate;      //상장일

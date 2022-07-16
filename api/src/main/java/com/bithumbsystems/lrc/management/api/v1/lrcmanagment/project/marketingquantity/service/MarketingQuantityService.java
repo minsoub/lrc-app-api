@@ -70,7 +70,7 @@ public class MarketingQuantityService {
                             } else { // 신규 등록...
                                 historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "최소 지원 수량", "등록", account);
                                 historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "실제 상장 지원 수량", "등록", account);
-                                return marketingQuantityDomainService.save(MarketingQuantityMapper.INSTANCE.marketingQuantityResponseToMarketingQuantity(marketing));
+                                return marketingQuantityDomainService.insert(MarketingQuantityMapper.INSTANCE.marketingQuantityResponseToMarketingQuantity(marketing));
                             }
                         }
                 )

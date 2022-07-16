@@ -16,6 +16,6 @@ public class MarketingQuantity {
     private String id;
     private String projectId;           //프로젝트 id
     private String symbol;              //심볼
-    private Long minimumQuantity;     //최소 지원 수량
-    private Long actualQuantity;      //실제 상장 지원 수량
+    private Double minimumQuantity;     //최소 지원 수량
+    private Double actualQuantity;      //실제 상장 지원 수량
 }

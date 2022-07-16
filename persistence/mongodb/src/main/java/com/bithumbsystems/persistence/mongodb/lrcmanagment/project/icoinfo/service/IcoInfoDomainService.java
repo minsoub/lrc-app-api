@@ -38,4 +38,13 @@ public class IcoInfoDomainService {
     public Mono<IcoInfo> save(IcoInfo icoInfo) {
         return icoInfoRepository.save(icoInfo);
     }
+
+    /**
+     * 상장 정보 신규 등록
+     * @param icoInfo
+     * @return
+     */
+    public Mono<IcoInfo> insert(IcoInfo icoInfo) {
+        return icoInfoRepository.insert(icoInfo);
+    }
 }

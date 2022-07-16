@@ -1,5 +1,6 @@
 package com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectinfo.model.entity;
 
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -8,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
+@Builder
 @Document("lrc_project_info")
 public class ProjectInfo {
 

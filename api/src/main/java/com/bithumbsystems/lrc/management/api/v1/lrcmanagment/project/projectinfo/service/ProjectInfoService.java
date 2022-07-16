@@ -7,12 +7,17 @@ import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.mapper.ProjectInfoMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.model.request.ProjectInfoRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.model.response.ProjectInfoResponse;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectinfo.model.entity.ProjectInfo;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectinfo.service.ProjectInfoDomainService;
 import com.bithumbsystems.persistence.mongodb.statusmanagement.linemng.service.LineMngDomainService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
+
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class ProjectInfoService {
@@ -69,6 +74,7 @@ public class ProjectInfoService {
      * @return ProjectInfoResponse Object
      */
     public Mono<ProjectInfoResponse> updateProjectInfo(String projectId, ProjectInfoRequest projectInfoRequest, Account account) {
+
         return projectInfoDomainService.findByProjectId(projectId)
                 .flatMap(c -> {
                     // 변경 히스토리 추가
@@ -95,7 +101,35 @@ public class ProjectInfoService {
                     return projectInfoDomainService.updateProjectInfo(c)
                             .map(ProjectInfoMapper.INSTANCE::projectInfoResponse);
                 })
-                .switchIfEmpty(Mono.error(new ProjectInfoException(ErrorCode.FAIL_UPDATE_CONTENT)));
+                .switchIfEmpty(Mono.defer(() -> {
+                        if (StringUtils.hasLength(projectInfoRequest.getBusinessCode())) {
+                            historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "사업 계열", "등록", account);
+                        }
+                        if (StringUtils.hasLength(projectInfoRequest.getNetworkCode())) {
+                             historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "네트워크 계열", "등록", account);
+                        }
+                        if (StringUtils.hasLength(projectInfoRequest.getWhitepaperLink())) {
+                            historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "백서 링크", "등록", account);
+                        }
+                        if (StringUtils.hasLength(projectInfoRequest.getContractAddress())) {
+                            historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "최초 발행일", "등록", account);
+                        }
+                        if (!StringUtils.isEmpty(projectInfoRequest.getCreateDate())) {
+                            historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "컨트렉트 주소", "등록", account);
+                        }
+                       return  projectInfoDomainService.save(ProjectInfo.builder()
+                                        .id(UUID.randomUUID().toString())
+                                        .projectId(projectInfoRequest.getProjectId())
+                                        .networkCode(projectInfoRequest.getNetworkCode())
+                                        .businessCode(projectInfoRequest.getBusinessCode())
+                                        .whitepaperLink(projectInfoRequest.getWhitepaperLink())
+                                        .contractAddress(projectInfoRequest.getContractAddress())
+                                        .createDate(projectInfoRequest.getCreateDate())
+                                        .build())
+                                .map(ProjectInfoMapper.INSTANCE::projectInfoResponse);
+
+                    })
+                );
     }
 
     /**

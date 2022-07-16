@@ -9,6 +9,7 @@ import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.icoinfo.mod
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.listener.HistoryDto;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.history.model.entity.History;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.history.service.HistoryDomainService;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.icoinfo.model.entity.IcoInfo;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.icoinfo.service.IcoInfoDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -70,9 +71,27 @@ public class IcoInfoService {
                                                     historyLogSend(projectId, "프로젝트 관리>상장 정보", "BTC 상장일", "수정", account);
                                                 }
                                             }
-                                            return  Mono.just(result);
+                                            return  icoInfoDomainService.save(IcoInfoMapper.INSTANCE.icoInfoRequestToIcoInfo(icoInfo));
                                         })
-                                        .flatMap(res ->icoInfoDomainService.save(IcoInfoMapper.INSTANCE.icoInfoRequestToIcoInfo(icoInfo)));
+                                        .switchIfEmpty(Mono.defer(() -> {
+                                            log.debug("ico insert mode => ");
+                                            if (icoInfo.getMarketInfo().equals("KRW")) {
+                                                    historyLogSend(projectId, "프로젝트 관리>상장 정보", "KRW 상장가", "신규", account);
+                                                    historyLogSend(projectId, "프로젝트 관리>상장 정보", "KRW 상장일", "신규", account);
+                                            }else {
+                                                    historyLogSend(projectId, "프로젝트 관리>상장 정보", "BTC 상장가", "신규", account);
+                                                    historyLogSend(projectId, "프로젝트 관리>상장 정보", "BTC 상장일", "신규", account);
+                                            }
+                                            return icoInfoDomainService.insert(
+                                                    IcoInfo.builder()
+                                                            .id(UUID.randomUUID().toString())
+                                                            .projectId(icoInfo.getProjectId())
+                                                            .marketInfo(icoInfo.getMarketInfo())
+                                                            .price(icoInfo.getPrice())
+                                                            .icoDate(icoInfo.getIcoDate())
+                                                            .build()
+                                            );
+                                        }));
                         }
                 )
                 .then(this.findByProjectId(projectId));

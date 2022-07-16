@@ -27,9 +27,9 @@ public class MarketingQuantityRequest {
         private String symbol;              //심볼
 
         @Schema(description = "최조 지원 수량")
-        private Long minimumQuantity;     //최소 지원 수량
+        private Double minimumQuantity;     //최소 지원 수량
 
         @Schema(description = "실제 상장 지원 수량")
-        private Long actualQuantity;      //실제 상장 지원 수량
+        private Double actualQuantity;      //실제 상장 지원 수량
     }
 }
