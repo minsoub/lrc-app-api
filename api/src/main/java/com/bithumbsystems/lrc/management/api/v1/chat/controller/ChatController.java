@@ -60,4 +60,21 @@ public class ChatController {
         return ResponseEntity.ok().body(chatService.fileSave(Mono.just(chattFileRequest), account)
                 .map(c -> new SingleResponse(c)));
     }
+
+    /**
+     * Chat Message 삭제
+     *
+     * @param id
+     * @param account
+     * @return
+     */
+    @DeleteMapping("/chat/{id}")
+    @Operation(summary = "Chat message 삭제", description = "Chat Message 삭제", tags = "chat/메시지 삭제")
+    public ResponseEntity<Mono<?>> deleteChatMessage(@Parameter(name="id", description = "Chat Message Id", in=ParameterIn.PATH)
+                                                     @PathVariable("id") String id,
+                                                     @Parameter(hidden = true) @CurrentUser Account account) {
+
+        return ResponseEntity.ok().body(chatService.deleteMessage(id, account)
+                .map(c -> new SingleResponse(c)));
+    }
 }

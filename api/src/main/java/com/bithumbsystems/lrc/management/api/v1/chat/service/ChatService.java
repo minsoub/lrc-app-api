@@ -152,4 +152,21 @@ public class ChatService {
                         .createDate(res.getCreateDate())
                         .build());
     }
+
+    /**
+     * 채팅 메시지를 삭제한다.
+     *
+     * @param id
+     * @param account
+     * @return
+     */
+    public Mono<ChatResponse> deleteMessage(String id, Account account) {
+        return chatDomainService.findById(id)
+                .flatMap(result -> {
+                    return chatDomainService.delete(result)
+                            .flatMap(s -> {
+                                return Mono.just(ChatResponse.builder().isUse(true).build());
+                            });
+                });
+    }
 }

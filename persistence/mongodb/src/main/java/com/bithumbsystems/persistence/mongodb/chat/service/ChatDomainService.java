@@ -2,7 +2,9 @@ package com.bithumbsystems.persistence.mongodb.chat.service;
 
 import com.bithumbsystems.persistence.mongodb.chat.model.entity.ChatChannel;
 import com.bithumbsystems.persistence.mongodb.chat.model.entity.ChatFile;
+import com.bithumbsystems.persistence.mongodb.chat.model.entity.ChatMessage;
 import com.bithumbsystems.persistence.mongodb.chat.repository.ChatFileRepository;
+import com.bithumbsystems.persistence.mongodb.chat.repository.ChatMessageRepository;
 import com.bithumbsystems.persistence.mongodb.chat.repository.ChatRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,8 @@ import reactor.core.publisher.Mono;
 public class ChatDomainService {
     private final ChatRepository chatRepository;
     private final ChatFileRepository chatFileRepository;
+
+    private final ChatMessageRepository chatMessageRepository;
 
     /**
      * 채팅방에 등록된 사용자 정보를 리턴한다.
@@ -61,5 +65,25 @@ public class ChatDomainService {
      */
     public Mono<ChatFile> save(ChatFile chatFile) {
         return chatFileRepository.save(chatFile);
+    }
+
+    /**
+     * 채팅 메시지 정보를 리턴한다.
+     *
+     * @param id
+     * @return
+     */
+    public Mono<ChatMessage> findById(String id) {
+        return chatMessageRepository.findById(id);
+    }
+
+    /**
+     * 채팅 메시지를 삭제한다.
+     *
+     * @param entity
+     * @return
+     */
+    public Mono<Void> delete(ChatMessage entity) {
+        return chatMessageRepository.delete(entity);
     }
 }
