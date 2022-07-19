@@ -77,6 +77,7 @@ public class StatusCodeService {
                 StatusCode.builder()
                         .id(UUID.randomUUID().toString())
                         .name(statusCodeRequest.getName())
+                        .nameEn(statusCodeRequest.getNameEn())
                         .parentCode(statusCodeRequest.getParentCode())
                         .orderNo(statusCodeRequest.getOrderNo())
                         .useYn(statusCodeRequest.getUseYn())
@@ -97,6 +98,7 @@ public class StatusCodeService {
         return statusValueDomainService.findStatusValueById(statusModifyRequest.getId())
                 .flatMap(result -> {
                     result.setName(statusModifyRequest.getName());
+                    result.setNameEn(statusModifyRequest.getNameEn());
                     result.setOrderNo(statusModifyRequest.getOrderNo());
                     result.setParentCode(statusModifyRequest.getParentCode());
                     result.setCreateDate(result.getCreateDate());
