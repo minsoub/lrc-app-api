@@ -17,6 +17,7 @@ public class StatusCode {
     @MongoId(value = FieldType.STRING, targetType = FieldType.STRING)
     private String id;          //상태코드
     private String name;        //상태명
+    private String nameEn;      // 상태명(영문)
     private Integer orderNo;       //순서
     private String parentCode;  //상위분류코드
     private Boolean useYn;      //사용 여부

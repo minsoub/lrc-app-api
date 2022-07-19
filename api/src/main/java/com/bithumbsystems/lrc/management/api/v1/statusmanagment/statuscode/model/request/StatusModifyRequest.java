@@ -15,6 +15,9 @@ public class StatusModifyRequest {
     @Schema(description = "상태명")
     private String name;        //상태명
 
+    @Schema(description = "상태명(영문)")
+    private String nameEn;
+
     @Schema(description = "순서")
     private Integer orderNo;       //순서
 
