@@ -6,6 +6,7 @@ import com.bithumbsystems.persistence.mongodb.chat.model.entity.ChatMessage;
 import com.bithumbsystems.persistence.mongodb.chat.repository.ChatFileRepository;
 import com.bithumbsystems.persistence.mongodb.chat.repository.ChatMessageRepository;
 import com.bithumbsystems.persistence.mongodb.chat.repository.ChatRepository;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -83,7 +84,9 @@ public class ChatDomainService {
      * @param entity
      * @return
      */
-    public Mono<Void> delete(ChatMessage entity) {
-        return chatMessageRepository.delete(entity);
+    public Mono<ChatMessage> delete(ChatMessage entity) {
+        entity.setIsDelete(true);
+        entity.setDeleteDate(LocalDateTime.now());
+        return chatMessageRepository.save(entity);
     }
 }
