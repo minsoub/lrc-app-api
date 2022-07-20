@@ -14,6 +14,8 @@ import io.swagger.v3.core.jackson.ModelResolver;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.TimeZone;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -56,8 +58,7 @@ public class WebFluxConfig implements WebFluxConfigurer {
   @Primary
   public ObjectMapper objectMapper() {
     JavaTimeModule module = new JavaTimeModule();
-    LocalDateTimeSerializer localDateTimeSerializer = new LocalDateTimeSerializer(
-        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+    LocalDateTimeSerializer localDateTimeSerializer = new LocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
     LocalDateTimeDeserializer localDateTimeDeserializer = new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
     module.addSerializer(LocalDateTime.class, localDateTimeSerializer);
     module.addDeserializer(LocalDateTime.class, localDateTimeDeserializer);
@@ -67,6 +68,7 @@ public class WebFluxConfig implements WebFluxConfigurer {
     simpleModule.addDeserializer(String.class, stringDeserializer);
 
     ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
     objectMapper.registerModule(module);
     objectMapper.registerModule(simpleModule);
     objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
