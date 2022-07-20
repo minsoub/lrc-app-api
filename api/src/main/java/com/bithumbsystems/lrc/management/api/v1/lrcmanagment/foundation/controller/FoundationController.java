@@ -117,6 +117,8 @@ public class FoundationController {
         if(DateUtil.isBetterThenPrevious(nFromDate, nToDate, 3))    //최대 3개월
             throw new AuditLogException(ErrorCode.INVALID_DATE_MONTH_AFTER);
 
+        nToDate = nToDate.plusDays(1);
+
         List<String> business = new ArrayList<String>();
         if(StringUtils.isNotEmpty(businessCode)) {
             business = Arrays.asList(URLDecoder.decode(businessCode, "UTF-8").split(";"));
