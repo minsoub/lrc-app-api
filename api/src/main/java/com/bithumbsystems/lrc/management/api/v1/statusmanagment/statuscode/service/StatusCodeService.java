@@ -105,6 +105,7 @@ public class StatusCodeService {
                     result.setCreateAdminAccountId(result.getCreateAdminAccountId());
                     result.setUpdateDate(LocalDateTime.now());
                     result.setUpdateAdminAccountId(account.getAccountId());
+                    result.setUseYn(statusModifyRequest.getUseYn());
                     return statusValueDomainService.update(result)
                             .map(StatusCodeMapper.INSTANCE::statusCodeResponse);
                 })
