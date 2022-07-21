@@ -87,7 +87,7 @@ public class FoundationInfoCustomRepositoryImpl implements FoundationInfoCustomR
         }
 
         if(StringUtils.isNotEmpty(progressCode)) {
-            query.addCriteria(Criteria.where("progress_code").is(progressCode));    //진행상테
+            query.addCriteria(Criteria.where("process_code").is(progressCode));    //진행상테
         }
 
         if(StringUtils.isNotEmpty(keyword)) {   //프로젝트명 심볼
