@@ -33,6 +33,7 @@ public class CustomArgumentResolver implements HandlerMethodArgumentResolver {
     var token = "";
     final String AUTHORIZATION = "Authorization";
     final String BEARER_TYPE = "Bearer";
+    final String MY_SITE_ID = "my_site_id";
 
     for (String value : Objects.requireNonNull(
         exchange.getRequest().getHeaders().get(AUTHORIZATION))) {
@@ -40,6 +41,9 @@ public class CustomArgumentResolver implements HandlerMethodArgumentResolver {
         token = value.substring(BEARER_TYPE.length()).trim();
       }
     }
+
+      String my_site_id = exchange.getRequest().getHeaders().get(MY_SITE_ID) != null ?
+              Objects.requireNonNull(exchange.getRequest().getHeaders().get(MY_SITE_ID)).get(0) : "";
     log.debug(token);
     return reactiveJwtDecoder.decode(token)
         .flatMap((jwt) -> {
@@ -50,7 +54,7 @@ public class CustomArgumentResolver implements HandlerMethodArgumentResolver {
           final var accountId = jwt.getClaimAsString("account_id");
           final var roles = (JSONArray)jwt.getClaim("ROLE");
           final var email = jwt.getClaimAsString("user_id");
-          final var mySiteId = jwt.getSubject();
+          final var mySiteId = my_site_id; // jwt.getSubject();
           return Mono.just(new Account(accountId, roles.stream().map(Object::toString).collect(Collectors.toSet()), email, mySiteId));
         });
   }

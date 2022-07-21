@@ -47,7 +47,7 @@ public class AuditLogController {
         if(DateUtil.isBetterThenPrevious(nFromDate, nToDate, 3))    //최대 3개월
             throw new AuditLogException(ErrorCode.INVALID_DATE_MONTH_AFTER);
 
-
+        nToDate = nToDate.plusDays(1);
         return ResponseEntity.ok().body(auditLogService.findAuditServiceLog(nFromDate, nToDate, keyword, account.getMySiteId())
                 .map(SingleResponse::new));
     }
