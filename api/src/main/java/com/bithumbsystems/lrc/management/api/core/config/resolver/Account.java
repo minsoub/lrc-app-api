@@ -13,6 +13,6 @@ public class Account {
   private final Set<String> roles;
 
   private final String email;
-
+  private final String userIp;
   private final String mySiteId;
 }
