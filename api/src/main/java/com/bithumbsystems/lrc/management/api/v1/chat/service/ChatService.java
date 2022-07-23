@@ -3,6 +3,8 @@ package com.bithumbsystems.lrc.management.api.v1.chat.service;
 import com.bithumbsystems.lrc.management.api.core.config.property.AwsProperties;
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.util.AES256Util;
+import com.bithumbsystems.lrc.management.api.v1.audit.mapper.AuditLogMapper;
+import com.bithumbsystems.lrc.management.api.v1.audit.model.response.AuditLogResponse;
 import com.bithumbsystems.lrc.management.api.v1.chat.model.request.ChatFileRequest;
 import com.bithumbsystems.lrc.management.api.v1.chat.model.request.ChatRequest;
 import com.bithumbsystems.lrc.management.api.v1.chat.model.response.ChatFileResponse;
@@ -13,12 +15,15 @@ import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.f
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.model.response.SubmittedDocumentFileResponse;
 import com.bithumbsystems.persistence.mongodb.chat.model.entity.ChatChannel;
 import com.bithumbsystems.persistence.mongodb.chat.model.entity.ChatFile;
+import com.bithumbsystems.persistence.mongodb.chat.model.entity.ChatMessage;
 import com.bithumbsystems.persistence.mongodb.chat.model.enums.ChatRole;
 import com.bithumbsystems.persistence.mongodb.chat.service.ChatDomainService;
 import com.bithumbsystems.persistence.mongodb.file.model.entity.File;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.file.model.entity.SubmittedDocumentFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,13 +31,13 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.text.Normalizer;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -168,5 +173,85 @@ public class ChatService {
                                 return Mono.just(ChatResponse.builder().isUse(true).build());
                             });
                 });
+    }
+
+
+    /**
+     * 엑셀 파일을 만들어서 리턴한다.
+     *
+     * @param roomId
+     * @param siteId
+     * @return
+     */
+    public Mono<ByteArrayInputStream> downloadExcel(String roomId, String siteId) {
+        return chatDomainService.findChatMessage(roomId, siteId)
+                //.map(AuditLogMapper.INSTANCE::auditLogResponse)
+                .collectSortedList(Comparator.comparing(ChatMessage::getCreateDate))
+                .flatMap(list -> this.createExcelFile(list));
+    }
+
+    /**
+     * 엑셀 파일 생성.
+     *
+     * @param chatList
+     * @return
+     */
+    private Mono<ByteArrayInputStream> createExcelFile(List<ChatMessage> chatList) {
+        return Mono.fromCallable(() -> {
+                    log.debug("엑셀 파일 생성 시작");
+
+                    SXSSFWorkbook workbook = new SXSSFWorkbook(SXSSFWorkbook.DEFAULT_WINDOW_SIZE);  // keep 100 rows in memory, exceeding rows will be flushed to disk
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+                    CreationHelper creationHelper = workbook.getCreationHelper();
+
+                    Sheet sheet = workbook.createSheet("Chat Message");
+
+                    Font headerFont = workbook.createFont();
+                    headerFont.setFontName("맑은 고딕");
+                    headerFont.setFontHeight((short) (10 * 20));
+                    headerFont.setBold(true);
+                    headerFont.setColor(IndexedColors.BLACK.index);
+
+                    Font bodyFont = workbook.createFont();
+                    bodyFont.setFontName("맑은 고딕");
+                    bodyFont.setFontHeight((short) (10 * 20));
+
+                    // Cell 스타일 생성
+                    CellStyle headerStyle = workbook.createCellStyle();
+                    headerStyle.setAlignment(HorizontalAlignment.CENTER);
+                    headerStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+                    headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.index);
+                    headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                    headerStyle.setFont(headerFont);
+
+                    // Row for Header
+                    Row headerRow = sheet.createRow(0);
+
+                    // Header
+                    String[] fields = {"구분", "이메일", "내용", "삭제여부", "작성일자"};
+                    for (int col = 0; col < fields.length; col++) {
+                        Cell cell = headerRow.createCell(col);
+                        cell.setCellValue(fields[col]);
+                        cell.setCellStyle(headerStyle);
+                    }
+
+                    // Body
+                    int rowIdx = 1;
+                    for (ChatMessage res : chatList) {
+                        Row row = sheet.createRow(rowIdx++);
+
+                        row.createCell(0).setCellValue(res.getRole().toString());
+                        row.createCell(1).setCellValue(AES256Util.decryptAES(awsProperties.getKmsKey(), res.getEmail()));
+                        row.createCell(2).setCellValue(AES256Util.decryptAES(awsProperties.getKmsKey(), res.getContent()));
+                        row.createCell(3).setCellValue(res.getIsDelete());
+                        row.createCell(4).setCellValue(res.getCreateDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                    }
+                    workbook.write(out);
+
+                    log.debug("엑셀 파일 생성 종료");
+                    return new ByteArrayInputStream(out.toByteArray());
+                })
+                .log();
     }
 }

@@ -89,4 +89,15 @@ public class ChatDomainService {
         entity.setDeleteDate(LocalDateTime.now());
         return chatMessageRepository.save(entity);
     }
+
+    /**
+     * chat 메시지 리스트를 가져온다.
+     *
+     * @param roomId
+     * @param siteId
+     * @return
+     */
+    public Flux<ChatMessage> findChatMessage(String roomId, String siteId) {
+        return chatMessageRepository.findByChatRoomAndSiteId(roomId, siteId);
+    }
 }

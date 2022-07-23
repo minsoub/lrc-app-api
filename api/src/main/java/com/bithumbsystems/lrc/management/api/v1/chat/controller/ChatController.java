@@ -13,12 +13,17 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
 import java.util.Comparator;
 
+import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @RequiredArgsConstructor
@@ -76,5 +81,22 @@ public class ChatController {
 
         return ResponseEntity.ok().body(chatService.deleteMessage(id, account)
                 .map(c -> new SingleResponse(c)));
+    }
+
+
+    @GetMapping(value = "/chat/excel/export", produces = APPLICATION_OCTET_STREAM_VALUE)
+    @Operation(summary = "Chat Message - 엑셀 다운로드", description = "Chat Message: 엑셀 다운로드", tags = "chat/메시지 다운로드")
+    public Mono<ResponseEntity<?>> downloadExcel(@Parameter(name = "id", description = "chat room id", required = true) @RequestParam(required = false) String id,
+                                                 @Parameter(hidden = true) @CurrentUser Account account) {
+
+        return chatService.downloadExcel(id, account.getMySiteId())
+                .flatMap(inputStream -> {
+                    HttpHeaders headers = new HttpHeaders();
+                    String fileName = "ChatMessage.xlsx";
+                    headers.setContentDispositionFormData(fileName, fileName);
+                    return Mono.just(ResponseEntity.ok().cacheControl(CacheControl.noCache())
+                            .headers(headers)
+                            .body(new InputStreamResource(inputStream)));
+                });
     }
 }
