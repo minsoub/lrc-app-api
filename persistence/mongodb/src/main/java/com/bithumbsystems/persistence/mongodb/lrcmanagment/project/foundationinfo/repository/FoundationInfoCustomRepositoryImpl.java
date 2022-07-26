@@ -61,7 +61,7 @@ public class FoundationInfoCustomRepositoryImpl implements FoundationInfoCustomR
         Query query = new Query();
 
         if(StringUtils.isNotEmpty(symbol)) {
-            query.addCriteria(Criteria.where("symbol").is(symbol));    //symbol
+            query.addCriteria(Criteria.where("symbol").regex(symbol));    //symbol
         }
 
         return reactiveMongoTemplate.find(query, FoundationInfo.class);
