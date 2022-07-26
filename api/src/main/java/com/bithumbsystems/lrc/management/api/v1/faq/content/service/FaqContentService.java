@@ -38,8 +38,7 @@ public class FaqContentService {
      * @return FaqContentResponse
      */
     public Flux<FaqContentResponse> findAll() {
-        return faqDomainService.findAll().map(FaqContentMapper.INSTANCE::faqContentResponse)
-            .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+        return faqDomainService.findAll().map(FaqContentMapper.INSTANCE::faqContentResponse);
     }
 
     /**
@@ -56,8 +55,7 @@ public class FaqContentService {
                     FaqContentResponse faqContentResponse = FaqContentMapper.INSTANCE.faqContentResponse(m.getT1());
                     faqContentResponse.setCategory(m.getT2().getName());
                     return faqContentResponse;
-                })
-                    .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT))))
+                }))
                 .collectSortedList(Comparator.comparing(FaqContentResponse::getOrderNo));
     }
 
@@ -74,18 +72,17 @@ public class FaqContentService {
                             FaqContentResponse faqContentResponse = FaqContentMapper.INSTANCE.faqContentResponse(m.getT1());
                             faqContentResponse.setCategory(m.getT2().getName());
                             return faqContentResponse;
-                        })
-                        .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT))))
+                        }))
                 .collectSortedList(Comparator.comparing(FaqContentResponse::getOrderNo));
     }
 
     /**
      * 콘텐츠 1개 찾기
-     * @param userId
+     * @param contentsId
      * @return FaqContentResponse
      */
-    public Mono<FaqContentResponse> findFaqById(String  userId) {
-        return faqDomainService.findFaqById(userId).map(FaqContentMapper.INSTANCE::faqContentResponse)
+    public Mono<FaqContentResponse> findFaqById(String contentsId) {
+        return faqDomainService.findFaqById(contentsId).map(FaqContentMapper.INSTANCE::faqContentResponse)
             .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
     }
 
@@ -95,8 +92,7 @@ public class FaqContentService {
      * @return FaqContentResponse
      */
     public Mono<FaqContentResponse> findFaqByUserId(String userId) {
-        return faqDomainService.findFaqByUserId(userId).map(FaqContentMapper.INSTANCE::faqContentResponse)
-            .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+        return faqDomainService.findFaqByUserId(userId).map(FaqContentMapper.INSTANCE::faqContentResponse);
     }
 
     /**
@@ -192,7 +188,7 @@ public class FaqContentService {
      * @return FaqContentResponse
      */
     public Flux<Void> deleteContents(List<String> ids) {
-        return Flux.fromIterable(ids).flatMap((uuid) -> faqDomainService.deleteContent(uuid));
+        return Flux.fromIterable(ids).flatMap(faqDomainService::deleteContent);
     }
 
     /**
@@ -200,7 +196,6 @@ public class FaqContentService {
      * @return FaqContentResponse
      */
     public Flux<FaqContentResponse> search(String keyword) {
-        return faqDomainService.search(keyword).map(FaqContentMapper.INSTANCE::faqContentResponse)
-                .switchIfEmpty(Mono.error(new FaqContentException(ErrorCode.NOT_FOUND_CONTENT)));
+        return faqDomainService.search(keyword).map(FaqContentMapper.INSTANCE::faqContentResponse);
     }
 }

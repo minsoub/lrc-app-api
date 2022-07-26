@@ -61,10 +61,7 @@ public class SubmittedDocumentFileService {
                             .createAccountId(result.getCreateAccountId())
                             .build());
                 })
-                //.map(SubmittedDocumentFileMapper.INSTANCE::submittedDocumentFileResponse)
-                .switchIfEmpty(Mono.error(new SubmittedDocumentFileException(ErrorCode.NOT_FOUND_CONTENT)))
                 .collectSortedList(Comparator.comparing(SubmittedDocumentFileResponse::getCreateDate));
-
     }
 
     /**

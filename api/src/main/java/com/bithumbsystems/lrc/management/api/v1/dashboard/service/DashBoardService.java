@@ -1,8 +1,6 @@
 package com.bithumbsystems.lrc.management.api.v1.dashboard.service;
 
 
-import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
-import com.bithumbsystems.lrc.management.api.v1.dashboard.exception.DashBoardException;
 import com.bithumbsystems.lrc.management.api.v1.dashboard.model.response.DashBoardLineMngResponse;
 import com.bithumbsystems.lrc.management.api.v1.dashboard.model.response.DashBoardStatus;
 import com.bithumbsystems.lrc.management.api.v1.dashboard.model.response.DashBoardStatusCodeResponse;
@@ -10,14 +8,13 @@ import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.foundationinf
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectinfo.service.ProjectInfoDomainService;
 import com.bithumbsystems.persistence.mongodb.statusmanagement.linemng.service.LineMngDomainService;
 import com.bithumbsystems.persistence.mongodb.statusmanagement.statuscode.service.StatusCodeDomainService;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -44,7 +41,6 @@ public class DashBoardService {
                             .useYn(statusCode.getUseYn())
                             .build()
                 )
-                .switchIfEmpty(Mono.error(new DashBoardException(ErrorCode.NOT_FOUND_CONTENT)))
                 .filter(DashBoardStatus::getUseYn)
                 .flatMap(c ->
                         Mono.just(c)
@@ -91,7 +87,6 @@ public class DashBoardService {
                                 .useYn(lineMng.getUseYn())
                                 .build()
                 )
-                .switchIfEmpty(Mono.error(new DashBoardException(ErrorCode.NOT_FOUND_CONTENT)))
                 .filter(DashBoardLineMngResponse::getUseYn)
                 .flatMap(c ->
                         Mono.just(c)

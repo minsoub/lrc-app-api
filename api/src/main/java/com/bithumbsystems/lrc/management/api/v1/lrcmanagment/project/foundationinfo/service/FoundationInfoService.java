@@ -64,9 +64,7 @@ public class FoundationInfoService {
                                             .processCode(result.getProcessCode())
                                             .build())
                             );
-                })
-                //.map(FoundationInfoMapper.INSTANCE::foundationInfoResponse)
-                .switchIfEmpty(Mono.error(new FoundationInfoException(ErrorCode.NOT_FOUND_CONTENT)));
+                });
     }
 
     /**

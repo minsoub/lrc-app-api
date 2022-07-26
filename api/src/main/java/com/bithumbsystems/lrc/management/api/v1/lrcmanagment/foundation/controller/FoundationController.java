@@ -112,7 +112,7 @@ public class FoundationController {
         LocalDate nToDate = LocalDate.parse(toDate);
 
         if(DateUtil.isAfter(nFromDate, nToDate))
-            throw new AuditLogException(ErrorCode.INVALID_DATE_DAY_PRIVIOUS);
+            throw new AuditLogException(ErrorCode.INVALID_DATE_DAY_PREVIOUS);
 
         if(DateUtil.isBetterThenPrevious(nFromDate, nToDate, 3))    //최대 3개월
             throw new AuditLogException(ErrorCode.INVALID_DATE_MONTH_AFTER);

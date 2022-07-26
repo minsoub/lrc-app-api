@@ -2,16 +2,20 @@ package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewesti
 
 import com.bithumbsystems.lrc.management.api.core.config.property.AwsProperties;
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
-import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.v1.file.service.FileService;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.listener.HistoryDto;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.mapper.ReviewEstimateMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.model.request.ReviewEstimateRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.model.response.ReviewEstimateResponse;
-
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.exception.ReviewEstimateException;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.reviewestimate.model.entity.ReviewEstimate;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.reviewestimate.service.ReviewEstimateDomainService;
+import java.nio.ByteBuffer;
+import java.text.Normalizer;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -22,15 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.nio.ByteBuffer;
-import java.text.Normalizer;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 
 
 @Slf4j
@@ -52,7 +47,6 @@ public class ReviewEstimateService {
     public Mono<List<ReviewEstimateResponse>> findByProjectId(String projectId) {
         return reviewEstimateDomainService.findByProjectId(projectId)
                 .map(ReviewEstimateMapper.INSTANCE::reviewEstimateResponse)
-                .switchIfEmpty(Mono.error(new ReviewEstimateException(ErrorCode.NOT_FOUND_CONTENT)))
                 .collectList();
     }
 
@@ -72,8 +66,6 @@ public class ReviewEstimateService {
 
     @Transactional
     public Mono<List<ReviewEstimateResponse>> saveAll(ReviewEstimateRequest reviewEstimateRequest, Account account) {
-        //List<ReviewEstimateRequest> array = new ArrayList<>();
-        //array.addAll(Arrays.asList(reviewEstimateRequest));
 
         log.debug("{}", reviewEstimateRequest);
         Queue<FilePart> fileList = new LinkedList<FilePart>();

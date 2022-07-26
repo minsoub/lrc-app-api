@@ -274,7 +274,6 @@ public class FoundationService {
                         return Mono.just(res);
                     }
                 })
-                .switchIfEmpty(Mono.error(new FoundationException(ErrorCode.NOT_FOUND_CONTENT)))
                 .collectSortedList(Comparator.comparing(FoundationResponse::getCreateDate));
     }
 
@@ -297,9 +296,9 @@ public class FoundationService {
                                 .build()
                         )
                 )
-                .switchIfEmpty(Mono.error(new FoundationException(ErrorCode.NOT_FOUND_CONTENT)))
                 .collectSortedList(Comparator.comparing(FoundationResponse::getCreateDate));
     }
+
     /**
      * 재단 1개 id 찾기
      *
@@ -308,9 +307,7 @@ public class FoundationService {
      */
     public Mono<FoundationResponse> findByProjectId(String projectId) {
         return foundationDomainService.findByProjectId(projectId)
-                .map(FoundationMapper.INSTANCE::foundationResponse)
-                .switchIfEmpty(Mono.error(new FoundationException(ErrorCode.NOT_FOUND_CONTENT)));
-
+                .map(FoundationMapper.INSTANCE::foundationResponse);
     }
 
     /**
@@ -636,7 +633,6 @@ public class FoundationService {
                         return Mono.just(res);
                     }
                 })
-                .switchIfEmpty(Mono.error(new FoundationException(ErrorCode.NOT_FOUND_CONTENT)))
                 .collectSortedList(Comparator.comparing(FoundationResponse::getCreateDate));
 
     }

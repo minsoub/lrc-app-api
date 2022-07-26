@@ -36,8 +36,7 @@ public class FaqCategoryService {
         return faqCategoryDomainService.findAll()
                 .filter(f -> f.getLanguage().equals(languageType))
                 .filter(f -> f.getUseYn().equals(true))
-                .map(FaqCategoryMapper.INSTANCE::faqCategoryResponse)
-                .switchIfEmpty(Mono.error(new FaqCategoryException(ErrorCode.NOT_FOUND_CONTENT)));
+                .map(FaqCategoryMapper.INSTANCE::faqCategoryResponse);
     }
 
     /**

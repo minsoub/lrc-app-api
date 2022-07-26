@@ -1,5 +1,7 @@
 package com.bithumbsystems.lrc.management.api.v1.audit.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
+
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.config.resolver.CurrentUser;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
@@ -11,17 +13,18 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-
-import java.time.LocalDate;
-
-import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 
 @RequiredArgsConstructor
 @RestController
@@ -42,7 +45,7 @@ public class AuditLogController {
         LocalDate nToDate = LocalDate.parse(toDate);
 
         if(DateUtil.isAfter(nFromDate, nToDate))
-            throw new AuditLogException(ErrorCode.INVALID_DATE_DAY_PRIVIOUS);
+            throw new AuditLogException(ErrorCode.INVALID_DATE_DAY_PREVIOUS);
 
         if(DateUtil.isBetterThenPrevious(nFromDate, nToDate, 3))    //최대 3개월
             throw new AuditLogException(ErrorCode.INVALID_DATE_MONTH_AFTER);

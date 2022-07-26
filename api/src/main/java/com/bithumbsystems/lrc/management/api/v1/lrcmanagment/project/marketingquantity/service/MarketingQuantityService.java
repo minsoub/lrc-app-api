@@ -1,15 +1,12 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.marketingquantity.service;
 
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
-import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.listener.HistoryDto;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.marketingquantity.exception.MarketingQuantityException;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.marketingquantity.mapper.MarketingQuantityMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.marketingquantity.model.request.MarketingQuantityRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.marketingquantity.model.response.MarketingQuantityResponse;
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.history.model.entity.History;
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.history.service.HistoryDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.marketingquantity.service.MarketingQuantityDomainService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationEventPublisher;
@@ -17,10 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -38,9 +31,7 @@ public class MarketingQuantityService {
     public Mono<List<MarketingQuantityResponse>> findByProjectId(String projectId) {
         return marketingQuantityDomainService.findByProjectId(projectId)
                 .map(MarketingQuantityMapper.INSTANCE::marketingQuantityResponse)
-                .collectList()
-                .switchIfEmpty(Mono.error(new MarketingQuantityException(ErrorCode.NOT_FOUND_CONTENT)));
-
+                .collectList();
     }
 
     /**
@@ -51,7 +42,7 @@ public class MarketingQuantityService {
      */
     public Mono<List<MarketingQuantityResponse>> create(String projectId, MarketingQuantityRequest marketingQuantityRequest, Account account) {
         return Mono.just(marketingQuantityRequest.getMarketingList())
-                .flatMapMany(marketings -> Flux.fromIterable(marketings))
+                .flatMapMany(Flux::fromIterable)
                 .flatMap(marketing -> {
                             if (StringUtils.hasLength(marketing.getId())) {
                                 return marketingQuantityDomainService.findById(marketing.getId())

@@ -1,27 +1,20 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.icoinfo.service;
 
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
-import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.icoinfo.exception.IcoInfoException;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.icoinfo.mapper.IcoInfoMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.icoinfo.model.request.IcoInfoRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.icoinfo.model.response.IcoInfoResponse;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.listener.HistoryDto;
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.history.model.entity.History;
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.history.service.HistoryDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.icoinfo.model.entity.IcoInfo;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.icoinfo.service.IcoInfoDomainService;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -39,9 +32,7 @@ public class IcoInfoService {
     public Mono<List<IcoInfoResponse>> findByProjectId(String projectId) {
         return icoInfoDomainService.findByProjectId(projectId)
                 .map(IcoInfoMapper.INSTANCE::icoInfoResponse)
-                .collectList()
-                .switchIfEmpty(Mono.error(new IcoInfoException(ErrorCode.NOT_FOUND_CONTENT)));
-
+                .collectList();
     }
 
     /**

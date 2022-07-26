@@ -35,8 +35,7 @@ public class StatusCodeService {
      */
     public Flux<StatusCodeResponse> getStatusValue() {
         return statusValueDomainService.findAllStatus()
-                .map(StatusCodeMapper.INSTANCE::statusCodeResponse)
-                .switchIfEmpty(Mono.error(new StatusCodeException(ErrorCode.NOT_FOUND_CONTENT)));
+                .map(StatusCodeMapper.INSTANCE::statusCodeResponse);
     }
 
     /**
@@ -62,7 +61,6 @@ public class StatusCodeService {
                                 return Mono.just(res);
                             });
                 })
-                .switchIfEmpty(Mono.error(new StatusCodeException(ErrorCode.NOT_FOUND_CONTENT)))
                 .collectSortedList(Comparator.comparing(StatusCodeResponse::getOrderNo));
     }
 

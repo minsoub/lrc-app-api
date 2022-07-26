@@ -1,18 +1,15 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectlink.service;
 
-import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectlink.exception.ProjectLinkException;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectlink.mapper.ProjectLinkMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectlink.model.request.ProjectLinkRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectlink.model.response.FoundationLinkResponse;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectlink.model.response.ProjectLinkResponse;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.foundationinfo.service.FoundationInfoDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectlink.service.ProjectLinkDomainService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +40,6 @@ public class ProjectLinkService {
                             });
                     //ProjectLinkMapper.INSTANCE::projectLinkResponse
                 })
-                .switchIfEmpty(Mono.error(new ProjectLinkException(ErrorCode.NOT_FOUND_CONTENT)))
                 .collectList();
     }
 
@@ -64,7 +60,6 @@ public class ProjectLinkService {
                             .build();
                     return foundationLinkResponse;
                 })
-                .switchIfEmpty(Mono.error(new ProjectLinkException(ErrorCode.NOT_FOUND_CONTENT)))
                 .collectList();
     }
 
@@ -76,9 +71,7 @@ public class ProjectLinkService {
      */
     public Mono<ProjectLinkResponse> findByLinkProject(String projectId, String linkProjectId) {
         return projectLinkDomainService.findByLinkProject(projectId, linkProjectId)
-                .map(ProjectLinkMapper.INSTANCE::projectLinkResponse)
-                //.collectList()
-                .switchIfEmpty(Mono.error(new ProjectLinkException(ErrorCode.NOT_FOUND_CONTENT)));
+                .map(ProjectLinkMapper.INSTANCE::projectLinkResponse);
     }
 
     /**
@@ -108,10 +101,10 @@ public class ProjectLinkService {
      */
     public Mono<ProjectLinkResponse> deleteLinkProject(String linkId) {
         return projectLinkDomainService.findById(linkId)
-                .flatMap(projectLink ->projectLinkDomainService.deleteLinkProject(projectLink))
+                .flatMap(projectLinkDomainService::deleteLinkProject)
                 .map(r1 -> {
                     return projectLinkDomainService.findByLinkProject(r1.getLinkProjectId(), r1.getProjectId())
-                            .flatMap(r2 -> projectLinkDomainService.deleteLinkProject(r2));
+                            .flatMap(projectLinkDomainService::deleteLinkProject);
                 })
                 .flatMap(r2 -> r2.map(r -> {
                     return ProjectLinkResponse.builder()

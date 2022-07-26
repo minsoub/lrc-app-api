@@ -1,25 +1,17 @@
 package com.bithumbsystems.lrc.management.api.v1.audit.service;
 
-import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
-import com.bithumbsystems.lrc.management.api.v1.audit.exception.AuditLogException;
 import com.bithumbsystems.lrc.management.api.v1.audit.mapper.AuditLogMapper;
 import com.bithumbsystems.lrc.management.api.v1.audit.model.response.AuditLogDetailResponse;
 import com.bithumbsystems.lrc.management.api.v1.audit.model.response.AuditLogResponse;
 import com.bithumbsystems.persistence.mongodb.audit.service.AuditLogDomainService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CreationHelper;
@@ -31,6 +23,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 @Log4j2
 @Service
@@ -45,8 +39,7 @@ public class AuditLogService {
                         fromDate,
                         toDate, keyword, mySiteId)
                 .map(AuditLogMapper.INSTANCE::auditLogResponse)
-                .collectSortedList(Comparator.comparing(AuditLogResponse::getCreateDate))
-                .switchIfEmpty(Mono.error(new AuditLogException(ErrorCode.NOT_FOUND_CONTENT)));
+                .collectSortedList(Comparator.comparing(AuditLogResponse::getCreateDate));
     }
 
     /**
@@ -66,7 +59,7 @@ public class AuditLogService {
                         toDate, keyword, mySiteId)
                 .map(AuditLogMapper.INSTANCE::auditLogResponse)
                 .collectSortedList(Comparator.comparing(AuditLogResponse::getCreateDate))
-                .flatMap(list -> this.createExcelFile(list));
+                .flatMap(this::createExcelFile);
     }
 
     private Mono<ByteArrayInputStream> createExcelFile(List<AuditLogResponse> fraudReportList) {

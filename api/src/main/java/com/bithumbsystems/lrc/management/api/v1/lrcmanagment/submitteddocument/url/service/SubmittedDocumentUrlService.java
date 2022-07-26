@@ -50,8 +50,6 @@ public class SubmittedDocumentUrlService {
                             .createAccountId(result.getCreateAccountId())
                             .build());
                 })
-                //.map(SubmittedDocumentUrlMapper.INSTANCE::submittedDocumentUrlResponse)
-                .switchIfEmpty(Mono.error(new SubmittedDocumentUrlException(ErrorCode.NOT_FOUND_CONTENT)))
                 .collectList();
     }
 
