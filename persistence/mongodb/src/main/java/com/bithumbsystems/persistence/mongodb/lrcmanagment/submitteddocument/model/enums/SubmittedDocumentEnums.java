@@ -10,5 +10,6 @@ public enum SubmittedDocumentEnums {
     BUSINESS_LICENSE,               //사업자 등록증
     ETHICAL_WRITE_AUTH,             //윤리 서약서
     REGULATORY_COMPLIANCE,          //규제 준수 확약서
-    ETC                             //기타
+    ETC,                            //기타,
+    PERSONAL_INFO_REQ               // 별첨-1] 개인정보 요청서
 }
