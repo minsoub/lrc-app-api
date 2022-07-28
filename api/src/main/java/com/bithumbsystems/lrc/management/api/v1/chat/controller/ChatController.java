@@ -1,5 +1,6 @@
 package com.bithumbsystems.lrc.management.api.v1.chat.controller;
 
+import com.bithumbsystems.lrc.management.api.core.config.property.AwsProperties;
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.config.resolver.CurrentUser;
 import com.bithumbsystems.lrc.management.api.core.model.response.MultiResponse;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
@@ -22,10 +24,12 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("lrc/service")
@@ -33,6 +37,7 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 public class ChatController {
 
     private final ChatService chatService;
+    private final AwsProperties awsProperties;
 
     @PutMapping("/chat")
     @Operation(summary = "chat 참여 여부 조회 및 생성" , description = "chat 참여 여부 조회 및 생성", tags = "chat > chat 참여 여부 조회 및 생성")
@@ -43,6 +48,11 @@ public class ChatController {
                 .map(SingleResponse::new));
     }
 
+    /**
+     * 파일 목록 조회
+     * @param id
+     * @return
+     */
     @GetMapping("/chat/files/{id}")
     @Operation(summary = "파일 리스트 정보 조회", description = "projectId를 이용하여 파일리스트를 조회합니다.", tags = "chat > chat 파일 리스트 정보 보회")
     public ResponseEntity<Mono<?>> getFileList(@Parameter(name = "id", description = "project 의 id", in = ParameterIn.PATH)
@@ -54,7 +64,7 @@ public class ChatController {
     }
 
     /**
-     * 제출 서류 관리 file 저장
+     * file 저장
      * @param chattFileRequest
      * @return ChatFileResponse Object
      */
@@ -64,6 +74,35 @@ public class ChatController {
                                                                @Parameter(hidden = true) @CurrentUser Account account) {
         return ResponseEntity.ok().body(chatService.fileSave(Mono.just(chattFileRequest), account)
                 .map(c -> new SingleResponse(c)));
+    }
+
+    /**
+     * 파일 다운로드
+     * @param fileKey
+     * @return
+     */
+    @GetMapping(value = "/chat/file/{fileKey}", produces = APPLICATION_OCTET_STREAM_VALUE)
+    public Mono<ResponseEntity<?>> s3download(@PathVariable String fileKey) {
+
+        AtomicReference<String> fileName = new AtomicReference<>();
+
+        return chatService.findById(fileKey)
+                .flatMap(res -> {
+                    log.debug("find file => {}", res);
+                    fileName.set(res.getFileName());
+                    // s3에서 파일을 다운로드 받는다.
+                    return chatService.download(fileKey, awsProperties.getBucket());
+                })
+                .log()
+                .map(inputStream -> {
+                    log.debug("finaly result...here");
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.setContentDispositionFormData(fileName.toString(), fileName.toString());
+                    ResponseEntity<?> entity = ResponseEntity.ok().cacheControl(CacheControl.noCache())
+                            .headers(headers)
+                            .body(new InputStreamResource(inputStream));
+                    return entity;
+                });
     }
 
     /**
