@@ -40,9 +40,9 @@ public class WebFluxConfig implements WebFluxConfigurer {
   public void configurePathMatching(PathMatchConfigurer configurer) {
     configurer.addPathPrefix(applicationProperties.getPrefix() + applicationProperties.getVersion()
             + applicationProperties.getRoute()
-        , (path) -> Arrays
+        , path -> Arrays
             .stream(applicationProperties.getExcludePrefixPath())
-            .anyMatch(p -> !(path.getName().indexOf(p) > 0))
+            .anyMatch(p -> (path.getName().indexOf(p) <= 0))
     );
   }
 
