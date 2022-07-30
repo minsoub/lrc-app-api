@@ -13,12 +13,16 @@ import com.bithumbsystems.lrc.management.api.v1.file.service.FileService;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.mapper.SubmittedDocumentFileMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.model.request.SubmittedDocumentFileRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.model.response.SubmittedDocumentFileResponse;
+import com.bithumbsystems.persistence.mongodb.account.service.AccountDomainService;
 import com.bithumbsystems.persistence.mongodb.chat.model.entity.ChatChannel;
 import com.bithumbsystems.persistence.mongodb.chat.model.entity.ChatFile;
 import com.bithumbsystems.persistence.mongodb.chat.model.entity.ChatMessage;
 import com.bithumbsystems.persistence.mongodb.chat.model.enums.ChatRole;
+import com.bithumbsystems.persistence.mongodb.chat.model.enums.UserType;
 import com.bithumbsystems.persistence.mongodb.chat.service.ChatDomainService;
 import com.bithumbsystems.persistence.mongodb.file.model.entity.File;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.useraccount.service.UserAccountDomainService;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.useraccount.service.UserInfoDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.file.model.entity.SubmittedDocumentFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,9 +34,13 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import software.amazon.awssdk.core.async.AsyncResponseTransformer;
+import software.amazon.awssdk.services.s3.S3AsyncClient;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.text.Normalizer;
 import java.time.LocalDateTime;
@@ -46,8 +54,13 @@ public class ChatService {
 
     private final ChatDomainService chatDomainService;
 
+    private final AccountDomainService accountDomainService;
+    private final UserInfoDomainService userAccountDomainService;
+
     private final AwsProperties awsProperties;
     private final FileService fileService;
+
+    private final S3AsyncClient s3AsyncClient;
 
     /**
      * 사용자 존재하는 체크해서 없으면 채팅방에 신규 등록
@@ -88,7 +101,32 @@ public class ChatService {
                                 .switchIfEmpty(Mono.just(ChatResponse.builder().isUse(false).build()))
                 );
     }
+    public Mono<InputStream> download(String fileKey, String bucketName) {
 
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(fileKey)
+                .build();
+
+        return Mono.fromFuture(
+                s3AsyncClient.getObject(getObjectRequest, AsyncResponseTransformer.toBytes())
+                        .thenApply(bytes -> {
+                            return bytes.asInputStream();  // .asByteArray(); // ResponseBytes::asByteArray
+                        })
+                        .whenComplete((res, error) -> {
+                                    try {
+                                        if (res != null) {
+                                            log.debug("whenComplete -> {}", res);
+                                        }else {
+                                            error.printStackTrace();
+                                        }
+                                    }finally {
+                                        //s3AsyncClient.close();
+                                    }
+                                }
+                        )
+        );
+    }
     /**
      * 채팅 파일 리스트 정보를 리턴한다.
      *
@@ -98,17 +136,54 @@ public class ChatService {
     public Flux<ChatFileResponse> findByFileList(String projectId) {
         return chatDomainService.findByList(projectId)
                 .flatMap(result -> {
-                   return Mono.just(ChatFileResponse.builder()
-                           .id(result.getId())
-                           .projectId(result.getProjectId())
-                           .fileName(result.getFileName())
-                           .fileSize(result.getFileSize())
-                           .fileType(result.getFileType())
-                           .createDate(result.getCreateDate())
-                           .createAccountId(result.getCreateAccountId())
-                           .build());
+                    if (result.getUserType() == null) {
+                        return Mono.just(ChatFileResponse.builder()
+                                .id(result.getId())
+                                .projectId(result.getProjectId())
+                                .fileName(result.getFileName())
+                                .fileSize(result.getFileSize())
+                                .fileType(result.getFileType())
+                                .userType(result.getUserType())
+                                .userTypeName(null)
+                                .createDate(result.getCreateDate())
+                                .createAccountId(result.getCreateAccountId())
+                                .build());
+                    } else if (result.getUserType().equals(UserType.USER)) {
+                        return userAccountDomainService.findById(result.getCreateAccountId())
+                                .flatMap(r1 -> {
+                                   return  Mono.just(ChatFileResponse.builder()
+                                           .id(result.getId())
+                                           .projectId(result.getProjectId())
+                                           .fileName(result.getFileName())
+                                           .fileSize(result.getFileSize())
+                                           .fileType(result.getFileType())
+                                           .userType(result.getUserType())
+                                           .userTypeName(r1.getEmail())
+                                           .createDate(result.getCreateDate())
+                                           .createAccountId(result.getCreateAccountId())
+                                           .build());
+                                });
+                    }else if (result.getUserType().equals(UserType.ADMIN)) {
+                        return accountDomainService.findByAdminId(result.getCreateAccountId())
+                                .flatMap(r2 -> {
+                                    return  Mono.just(ChatFileResponse.builder()
+                                            .id(result.getId())
+                                            .projectId(result.getProjectId())
+                                            .fileName(result.getFileName())
+                                            .fileSize(result.getFileSize())
+                                            .fileType(result.getFileType())
+                                            .userType(result.getUserType())
+                                            .userTypeName(r2.getEmail())
+                                            .createDate(result.getCreateDate())
+                                            .createAccountId(result.getCreateAccountId())
+                                            .build());
+                                });
+                    }
+                    return null;
                 });
-
+    }
+    public Mono<ChatFile> findById(String fileKey) {
+        return chatDomainService.findByChatFileId(fileKey);
     }
     /**
      * 제출 서류 관리 file 저장
@@ -138,6 +213,7 @@ public class ChatService {
                                                                     .fileType(request.getFileType())
                                                                     .fileSize(request.getFileSize())
                                                                     .projectId(request.getProjectId())
+                                                                    .userType(UserType.ADMIN)
                                                                     .createAccountId(account.getAccountId())
                                                                     .createDate(LocalDateTime.now())
                                                                     .build()
@@ -153,6 +229,7 @@ public class ChatService {
                         .fileType(res.getFileType())
                         .fileSize(res.getFileSize())
                         .fileName(res.getFileName())
+                        .userType(UserType.ADMIN)
                         .createAccountId(res.getCreateAccountId())
                         .createDate(res.getCreateDate())
                         .build());

@@ -68,6 +68,10 @@ public class ChatDomainService {
         return chatFileRepository.save(chatFile);
     }
 
+    public Mono<ChatFile> findByChatFileId(String id) {
+        return chatFileRepository.findById(id);
+    }
+
     /**
      * 채팅 메시지 정보를 리턴한다.
      *

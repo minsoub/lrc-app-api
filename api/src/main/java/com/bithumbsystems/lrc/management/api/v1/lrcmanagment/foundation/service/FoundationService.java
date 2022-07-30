@@ -1,6 +1,7 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.service;
 
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
+import com.bithumbsystems.lrc.management.api.core.util.FormatUtil;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContentException;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.Mapper.FoundationMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.foundation.exception.FoundationException;
@@ -511,12 +512,12 @@ public class FoundationService {
                             .map(tuple -> {
                                 tuple.getT1().setMinimumQuantity(
                                         tuple.getT2().stream().map(t ->
-                                                t.getMinimumQuantity() + " " + t.getSymbol()
+                                                FormatUtil.formatCurrency(t.getMinimumQuantity()) + " " + t.getSymbol()
                                         ).collect(Collectors.joining(", "))
                                 );
                                 tuple.getT1().setActualQuantity(
                                         tuple.getT2().stream().map(t ->
-                                                t.getActualQuantity() + " " + t.getSymbol()
+                                                FormatUtil.formatCurrency(t.getActualQuantity()) + " " + t.getSymbol()
                                         ).collect(Collectors.joining(", "))
                                 );
 
