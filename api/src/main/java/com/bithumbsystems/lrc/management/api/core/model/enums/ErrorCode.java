@@ -14,7 +14,9 @@ public enum ErrorCode {
   FAIL_UPDATE_CONTENT("F005","cannot update content"),
   FAIL_CREATE_CONTENT("F006","cannot create content"),
   INVALID_DATE_MONTH_AFTER("F007", "It's up to 3 months."),
-  INVALID_DATE_DAY_PREVIOUS("F008", "It's bigger than the previous date");
+  INVALID_DATE_DAY_PREVIOUS("F008", "It's bigger than the previous date"),
+  INVALID_NUMBER_FORMAT("N004","You can enter up to 4 decimal places.");
+
 
   private final String code;
 
