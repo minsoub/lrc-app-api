@@ -92,7 +92,7 @@ public class FoundationInfoCustomRepositoryImpl implements FoundationInfoCustomR
 
         if(StringUtils.isNotEmpty(keyword)) {   //프로젝트명 심볼
             query.addCriteria(new Criteria().orOperator(
-                    Criteria.where("project_name").regex(".*" + keyword + ".*", "i"),
+                    Criteria.where("name").regex(".*" + keyword + ".*", "i"),
                     Criteria.where("symbol").regex(".*" + keyword + ".*", "i")
             ));
         }
