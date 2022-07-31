@@ -35,7 +35,7 @@ public class FaqCategoryService {
     public Flux<FaqCategoryResponse> findAll(LanguageType languageType) {
         return faqCategoryDomainService.findAll()
                 .filter(f -> f.getLanguage().equals(languageType))
-                .filter(f -> f.getUseYn().equals(true))
+                .filter(f -> (f.getDelYn() == null || f.getDelYn().equals(false)))
                 .map(FaqCategoryMapper.INSTANCE::faqCategoryResponse);
     }
 
@@ -62,6 +62,7 @@ public class FaqCategoryService {
                         .language(faqCategoryRequest.getLanguage())
                         .order_no(faqCategoryRequest.getOrder_no())
                         .useYn(faqCategoryRequest.getUseYn())
+                        .delYn(false)
                         .createDate(LocalDateTime.now())
                         .createAdminAccountId(account.getAccountId())
                         .build())
@@ -98,6 +99,7 @@ public class FaqCategoryService {
         return faqCategoryDomainService.findCategoryById(code)
                 .flatMap(c -> {
                     c.setUseYn(false);
+                    c.setDelYn(true);
                     c.setCreateDate(LocalDateTime.now());
                     c.setCreateAdminAccountId(account.getAccountId());
                     return faqCategoryDomainService.updateCategory(c)

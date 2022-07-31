@@ -21,6 +21,7 @@ public class LineMng {
     private String name;                    //계열명
     private LineType type;                  //계열 타입
     private Boolean useYn;                  //사용여부
+    private Boolean delYn;                  // 삭제 여부
     private LocalDateTime createDate;       //생성날짜
     private String createAdminAccountId;    //생성자 id
 

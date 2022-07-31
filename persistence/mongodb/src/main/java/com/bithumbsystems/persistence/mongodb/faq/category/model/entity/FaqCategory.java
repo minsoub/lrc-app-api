@@ -24,6 +24,7 @@ public class FaqCategory {
     private String order_no;       //노출순서
 
     private Boolean useYn;      //사용여부
+    private Boolean delYn;      // 삭제여부
     private LanguageType language;    //언어
 
     private LocalDateTime createDate; //생성날짜

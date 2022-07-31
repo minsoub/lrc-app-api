@@ -30,7 +30,8 @@ public class LineMngService {
     public Flux<LineMngResponse> findAll(LineType type) {
         return businessListDomainService.findAll()
                 .filter(f -> type == null || f.getType().equals(type))
-                .filter(LineMng::getUseYn)
+                .filter(f -> f.getDelYn() == null || f.getDelYn().equals(false))
+                //.filter(LineMng::getUseYn)
                 .map(LineMngMapper.INSTANCE::businessListResponse);
     }
 
@@ -45,6 +46,7 @@ public class LineMngService {
                         .name(lineMngRequest.getName())
                         .type(lineMngRequest.getType())
                         .useYn(true)
+                        .delYn(false)
                         .createDate(LocalDateTime.now())
                         .createAdminAccountId(account.getAccountId()).build())
                 .map(LineMngMapper.INSTANCE::businessListResponse)
@@ -60,6 +62,7 @@ public class LineMngService {
     public Mono<LineMngResponse> updateLine(String id, LineMngRequest lineMngRequest, Account account) {
         return businessListDomainService.findById(id).flatMap(c -> {
             c.setName(lineMngRequest.getName());
+            c.setUseYn(lineMngRequest.getUseYn());
             c.setUpdateDate(LocalDateTime.now());
             c.setUpdateAdminAccountId(account.getAccountId());
             return businessListDomainService.updateLine(c)
@@ -76,6 +79,7 @@ public class LineMngService {
     public Mono<LineMngResponse> deleteLine(String id, Account account) {
         return businessListDomainService.findById(id).flatMap(c -> {
                     c.setUseYn(false);  // 상태 여부만 변경
+                    c.setDelYn(true);
                     c.setUpdateDate(LocalDateTime.now());
                     c.setUpdateAdminAccountId(account.getAccountId());
                     return businessListDomainService.updateLine(c)
