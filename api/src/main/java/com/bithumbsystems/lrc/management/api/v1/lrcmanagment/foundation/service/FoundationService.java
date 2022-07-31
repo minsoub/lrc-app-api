@@ -547,10 +547,10 @@ public class FoundationService {
                 })
                 .flatMap(res -> {
                     Mono<FoundationResponse> res1 = Mono.just(res);
-
+                    // 연결 프로젝트
                     return res1.zipWith(projectLinkDomainService.findByProjectLinkList(res.getProjectId())
                                     .flatMap(projectLink ->
-                                            foundationInfoDomainService.findById(projectLink.getProjectId())
+                                            foundationInfoDomainService.findById(projectLink.getLinkProjectId())
                                                     .map(projectInfo -> LinkResponse.builder()
                                                             .projectId(res.getProjectId())
                                                             .projectName(projectInfo.getName())
