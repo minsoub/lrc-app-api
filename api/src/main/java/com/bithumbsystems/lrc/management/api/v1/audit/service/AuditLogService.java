@@ -1,8 +1,11 @@
 package com.bithumbsystems.lrc.management.api.v1.audit.service;
 
+import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
+import com.bithumbsystems.lrc.management.api.v1.accesslog.request.AccessLogRequest;
 import com.bithumbsystems.lrc.management.api.v1.audit.mapper.AuditLogMapper;
 import com.bithumbsystems.lrc.management.api.v1.audit.model.response.AuditLogDetailResponse;
 import com.bithumbsystems.lrc.management.api.v1.audit.model.response.AuditLogResponse;
+import com.bithumbsystems.persistence.mongodb.accesslog.model.enums.ActionType;
 import com.bithumbsystems.persistence.mongodb.audit.service.AuditLogDomainService;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -23,6 +26,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -32,6 +36,7 @@ import reactor.core.publisher.Mono;
 public class AuditLogService {
 
     private final AuditLogDomainService auditLogDomainService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public Mono<List<AuditLogResponse>> findAuditServiceLog(LocalDate fromDate, LocalDate toDate, String keyword, String mySiteId) {
 
@@ -53,10 +58,30 @@ public class AuditLogService {
                 .map(AuditLogMapper.INSTANCE::auditLogDetailResponse);
     }
 
-    public Mono<ByteArrayInputStream> downloadExcel(LocalDate fromDate, LocalDate toDate, String keyword, String mySiteId) {
+    public Mono<ByteArrayInputStream> downloadExcel(LocalDate fromDate, LocalDate toDate, String keyword, String reason, String type, Account account) { // String mySiteId) {
+
+        // log 전송
+        String title = "";
+        if (type.equals("1")) {
+            // 서비스 로그 조회
+            title = "서비스 로그 관리 > 엑셀 다운로드";
+        }else {
+            title = "감사로그 조회 > 엑셀 다운로드";
+        }
+        applicationEventPublisher.publishEvent(
+                AccessLogRequest.builder()
+                        .accountId(account.getAccountId())
+                        .actionType(ActionType.DOWNLOAD)
+                        .reason(reason)
+                        .email(account.getEmail())
+                        .description(title)
+                        .siteId(account.getMySiteId())
+                        .ip(account.getUserIp())
+                        .build()
+        );
         return auditLogDomainService.findPageBySearchText(
                         fromDate,
-                        toDate, keyword, mySiteId)
+                        toDate, keyword, account.getMySiteId())
                 .map(AuditLogMapper.INSTANCE::auditLogResponse)
                 .collectSortedList(Comparator.comparing(AuditLogResponse::getCreateDate))
                 .flatMap(this::createExcelFile);
