@@ -45,8 +45,8 @@ public class StatusCodeController {
      */
     @GetMapping("/status-code/tree")
     @Operation(summary = "상태값 관리 - 상태값 관리 - 상태값 관리 트리 구조 만들기", description = "상태값 관리 트리 목록 정보를 조회합니다.", tags = "사이트 운영 > 상태값 관리 > 상태값 관리 > 트리구조 만들기")
-    public ResponseEntity<Mono<SingleResponse>> getStatusValueTree() {
-        return ResponseEntity.ok().body(statusCodeService.getStatusValueTree()
+    public ResponseEntity<Mono<SingleResponse>> getStatusValueTree(@Parameter(name = "isUse", description = "사용안함 포함", in = ParameterIn.QUERY) @RequestParam(required = true) Boolean isUse) {
+        return ResponseEntity.ok().body(statusCodeService.getStatusValueTree(isUse)
                 .map(c -> new SingleResponse(c))
         );
     }

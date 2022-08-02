@@ -42,18 +42,18 @@ public class StatusCodeService {
      * 상태값 관리 트리 구조 만들기
      * @return StatusCodeResponse
      */
-    public Mono<List<StatusCodeResponse>> getStatusValueTree() {
+    public Mono<List<StatusCodeResponse>> getStatusValueTree(Boolean isUse) {
         return statusValueDomainService.findAllTree()
                 .map(StatusCodeMapper.INSTANCE::statusCodeResponse)
                 .filter( f -> f.getParentCode() == null || "".equals(f.getParentCode()) )
-                .filter( f -> f.getUseYn())
+                .filter( f -> (isUse == false ? f.getUseYn() : f.getUseYn() == true || f.getUseYn() == false))
                 .flatMap( res ->
                 {
                     log.debug("필터 값 : {}", res.getId());
                     res.setChildren(new ArrayList<>());
                     return statusValueDomainService.findParentCode(res.getId())
                             .map(StatusCodeMapper.INSTANCE::statusCodeResponse)
-                            .filter( f -> f.getUseYn())
+                            .filter( f -> (isUse == false ? f.getUseYn() : f.getUseYn() == true || f.getUseYn() == false))
                             .collectSortedList(Comparator.comparing(StatusCodeResponse::getOrderNo))
                             .flatMap(codeList -> {
                                 log.debug("data is exists....");

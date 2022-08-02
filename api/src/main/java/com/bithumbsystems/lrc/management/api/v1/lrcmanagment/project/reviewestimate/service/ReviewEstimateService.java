@@ -71,26 +71,30 @@ public class ReviewEstimateService {
         Queue<FilePart> fileList = new LinkedList<FilePart>();
         if (reviewEstimateRequest.getFile() != null)
             fileList.addAll(reviewEstimateRequest.getFile());
-        AtomicReference<String> id = new AtomicReference<>("");
+        //AtomicReference<String> id = new AtomicReference<>("");
         return  Flux.fromIterable(reviewEstimateRequest.getNo())
                 .flatMap(index -> {
+                    String _id = null;
 
                     if (reviewEstimateRequest.getId().size() == 0) {
-                        id.set("");
+                        //id.set("");
+                        _id = "";
                     } else {
-                        id.set(reviewEstimateRequest.getId().get(index));
+                        //id.set(reviewEstimateRequest.getId().get(index));
+                        _id = reviewEstimateRequest.getId().get(index);
                     }
                     String projectId = reviewEstimateRequest.getProjectId().get(index);
                     String organization = reviewEstimateRequest.getOrganization().get(index);
                     String result  = reviewEstimateRequest.getResult().get(index);
                     String reference = reviewEstimateRequest.getReference().get(index);
-                    String fileKey = reviewEstimateRequest.getFileKey().get(index);
+                    String fileKey = reviewEstimateRequest.getFileKey().size() == 0 ? "" : reviewEstimateRequest.getFileKey().get(index);
                     Boolean isFile = reviewEstimateRequest.getIsFile().get(index);
-                    String fileName = reviewEstimateRequest.getFileName().get(index);
+                    String fileName = reviewEstimateRequest.getFileName().size()  == 0 ? "": reviewEstimateRequest.getFileName().get(index);
 
                     // file part
-                    if (StringUtils.hasLength(id.get())) {   // 수정 모드
+                    if (StringUtils.hasLength(_id)) {   // 수정 모드
                         if(isFile) {  //첨부파일 확인
+                            String final_id = _id;
                             return DataBufferUtils.join(fileList.poll().content())
                                     .flatMap(dataBuffer -> {
                                         ByteBuffer buf = dataBuffer.asByteBuffer();
@@ -104,7 +108,7 @@ public class ReviewEstimateService {
                                                     log.info("service upload res   =>       {}", res);
                                                     log.info("service upload fileName   =>       {}", fileName.toString());
 
-                                                    return reviewEstimateDomainService.findById(id.get())
+                                                    return reviewEstimateDomainService.findById(final_id)
                                                             .flatMap(mode -> {
                                                                 if (!mode.getOrganization().equals(organization)) {
                                                                     historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 기관", "수정", account);
@@ -122,7 +126,7 @@ public class ReviewEstimateService {
 
                                                                 return reviewEstimateDomainService.save(
                                                                         ReviewEstimate.builder()
-                                                                                .id(String.valueOf(id))
+                                                                                .id(final_id)
                                                                                 .projectId(projectId)
                                                                                 .organization(organization)
                                                                                 .result(result)
@@ -135,7 +139,8 @@ public class ReviewEstimateService {
                                                 });
                                     });
                         } else {
-                            return reviewEstimateDomainService.findById(id.get())
+                            String final_id = _id;
+                            return reviewEstimateDomainService.findById(final_id)
                                             .flatMap(mode -> {
                                                 if (!mode.getOrganization().equals(organization)) {
                                                     historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 기관", "수정", account);
@@ -153,7 +158,7 @@ public class ReviewEstimateService {
 
                                                 return reviewEstimateDomainService.save(
                                                         ReviewEstimate.builder()
-                                                                .id(String.valueOf(id))
+                                                                .id(final_id)
                                                                 .projectId(projectId)
                                                                 .organization(organization)
                                                                 .result(result)
@@ -164,7 +169,7 @@ public class ReviewEstimateService {
                                             });
                         }
                     }else {     // 신규 등록
-                        if(isFile != null) {  //첨부파일 확인
+                        if(isFile) {  //첨부파일 확인
                             return DataBufferUtils.join(fileList.poll().content())
                                     .flatMap(dataBuffer -> {
                                         ByteBuffer buf = dataBuffer.asByteBuffer();
