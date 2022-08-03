@@ -98,7 +98,7 @@ public class FoundationInfoService {
                     c.setProcessCode(foundationInfoRequest.getProcessCode());
                     c.setMemo(foundationInfoRequest.getAdminMemo());
                     c.setUpdateDate(LocalDateTime.now());
-                    c.setUpdateAdminAccountId(account.getAccountId());
+                    c.setUpdateAccountId(account.getAccountId());
 
                     return foundationInfoDomainService.updateFoundationInfo(c)
                             .map(FoundationInfoMapper.INSTANCE::foundationInfoResponse);

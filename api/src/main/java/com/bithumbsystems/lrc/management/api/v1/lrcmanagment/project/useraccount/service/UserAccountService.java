@@ -2,9 +2,11 @@ package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.useraccoun
 
 import com.bithumbsystems.lrc.management.api.core.config.property.AwsProperties;
 import com.bithumbsystems.lrc.management.api.core.util.AES256Util;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.service.ProjectInfoService;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.useraccount.mapper.UserAccountMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.useraccount.model.request.UserAccountRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.useraccount.model.response.UserAccountResponse;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.foundationinfo.service.FoundationInfoDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.useraccount.service.UserAccountDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.useraccount.service.UserInfoDomainService;
 import java.util.List;
@@ -21,6 +23,7 @@ public class UserAccountService {
 
     private final UserAccountDomainService userAccountDomainService;
     private final UserInfoDomainService userInfoDomainService;
+    private final FoundationInfoDomainService foundationInfoDomainService;
 
     private final AwsProperties properties;
 
@@ -45,6 +48,31 @@ public class UserAccountService {
                                         .build());
                 })
                 .collectList();
+    }
+
+    /**
+     * 생성자 정보를 리턴한다.
+     * @param projectId
+     * @return
+     */
+    public Mono<UserAccountResponse> findCreateUserByProjectId(String projectId) {
+        return foundationInfoDomainService.findById(projectId)
+                .flatMap(result -> {
+                    return userInfoDomainService.findById(result.getCreateAccountId())
+                            .flatMap(user -> {
+                                return Mono.just(
+                                        UserAccountResponse.builder()
+                                                .id(user.getId())
+                                                .userAccountId(user.getId())
+                                                .projectId(projectId)
+                                                .userName("")
+                                                .phone("")
+                                                .email(AES256Util.decryptAES(properties.getKmsKey(), user.getEmail()))
+                                                .snsId("")
+                                                .build()
+                                );
+                            });
+                });
     }
 
     /**

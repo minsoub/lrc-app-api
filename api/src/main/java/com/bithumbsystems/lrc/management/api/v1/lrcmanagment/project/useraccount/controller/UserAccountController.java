@@ -33,7 +33,19 @@ public class UserAccountController {
                 .map(c -> new SingleResponse(c))
         );
     }
-
+    /**
+     * 생성자 정보 project id로 찾기
+     * @param projectId
+     * @return ReviewEstimateResponse Object
+     */
+    @GetMapping("/create-user-account/{projectId}")
+    @Operation(summary = "거래지원 관리 - 생성자 정보 project id로 찾기", description = "projectId를 이용하여 생성자 정보를 조회합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 생성자 정보 > 검색")
+    public ResponseEntity<Mono<?>> getCreateUserAccount(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
+                                                  @PathVariable("projectId") String projectId) {
+        return ResponseEntity.ok().body(userAccountService.findCreateUserByProjectId(projectId)
+                .map(c -> new SingleResponse(c))
+        );
+    }
     /**
      * 담당자 정보 여러개 저장 및 업데이트
      * @param userAccountRequest

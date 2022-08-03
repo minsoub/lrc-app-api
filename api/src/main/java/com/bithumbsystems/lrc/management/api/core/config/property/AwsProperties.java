@@ -25,5 +25,9 @@ public class AwsProperties {
   @Value("${cloud.aws.param-store.kms-name}")
   private String paramStoreKmsName;
 
+  @Value("${cloud.aws.param-store.message-name}")
+  private String paramStoreMessageName;
+
   private String kmsKey;
+  private String emailSender;
 }
