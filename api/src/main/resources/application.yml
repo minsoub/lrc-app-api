@@ -54,6 +54,9 @@ spring:
       host: localhost
       port: 27017
       database: test
+mail:
+  logourl: http://localhost:3000/images/maillogo.png
+  loginurl: http://localhost:3000/
 application:
   role-type: ADMIN
   site-id: 62a15f4ae4129b518b133127
@@ -70,6 +73,9 @@ spring:
       host: localhost
       port: 27017
       database: test
+mail:
+  logourl: http://localhost:3000/images/maillogo.png
+  loginurl: http://localhost:3000/
 logging:
   config: classpath:logback-spring-local.xml
 application:
@@ -81,6 +87,9 @@ spring:
     import: classpath:aws-properties-dev.yml, classpath:springdoc.yml
     activate:
       on-profile: dev
+mail:
+  logourl: http://k8s-systemsd-lrcappwe-3ba5072e02-1786558476.ap-northeast-2.elb.amazonaws.com/images/maillogo.png
+  loginurl: http://k8s-systemsd-lrcappwe-3ba5072e02-1786558476.ap-northeast-2.elb.amazonaws.com/
 logging:
   config: classpath:logback-spring-${spring.profiles.active}.xml
 application:
@@ -92,6 +101,9 @@ spring:
     import: classpath:aws-properties-eks-dev.yml, classpath:springdoc.yml
     activate:
       on-profile: eks-dev
+mail:
+  logourl: http://k8s-systemsd-lrcappwe-3ba5072e02-1786558476.ap-northeast-2.elb.amazonaws.com/images/maillogo.png
+  loginurl: http://k8s-systemsd-lrcappwe-3ba5072e02-1786558476.ap-northeast-2.elb.amazonaws.com/
 logging:
   config: classpath:logback-spring-dev.xml
 application:
@@ -103,6 +115,9 @@ spring:
     import: classpath:aws-properties.yml
     activate:
       on-profile: prod
+mail:
+  logourl: https://listing.bithumb.com/images/maillogo.png
+  loginurl: https://listing.bithumb.com/
 springdoc:
   api-docs:
     enabled: false

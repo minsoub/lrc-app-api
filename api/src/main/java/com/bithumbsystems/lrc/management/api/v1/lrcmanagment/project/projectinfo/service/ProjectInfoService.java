@@ -53,8 +53,8 @@ public class ProjectInfoService {
                                             return Mono.just(res);
                                         });
                             });
-                })
-                .switchIfEmpty(Mono.error(new ProjectInfoException(ErrorCode.NOT_FOUND_CONTENT)));
+                });
+                //.switchIfEmpty(Mono.error(new ProjectInfoException(ErrorCode.NOT_FOUND_CONTENT)));
     }
 
     /**

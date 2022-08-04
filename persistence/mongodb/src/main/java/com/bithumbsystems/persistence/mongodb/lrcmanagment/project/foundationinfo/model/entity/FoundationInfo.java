@@ -24,8 +24,8 @@ public class FoundationInfo {
     private String memo;       //관리자 메모
 
     private LocalDateTime createDate; //생성날짜
-    private String createAdminAccountId;  //생성자 id
+    private String createAccountId;  //생성자 id
 
     private LocalDateTime updateDate; //수정날짜
-    private String updateAdminAccountId; //수정자 id
+    private String updateAccountId; //수정자 id
 }
