@@ -1,6 +1,6 @@
 package com.bithumbsystems.lrc.management.api.core.config;
 
-import com.bithumbsystems.lrc.management.api.core.config.property.ApplicationProperties;
+import com.bithumbsystems.lrc.management.api.core.config.properties.ApplicationProperties;
 import com.bithumbsystems.lrc.management.api.core.config.resolver.CustomArgumentResolver;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

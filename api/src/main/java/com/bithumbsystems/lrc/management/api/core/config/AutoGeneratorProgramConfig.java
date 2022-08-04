@@ -3,7 +3,7 @@ package com.bithumbsystems.lrc.management.api.core.config;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
-import com.bithumbsystems.lrc.management.api.core.config.property.ApplicationProperties;
+import com.bithumbsystems.lrc.management.api.core.config.properties.ApplicationProperties;
 import io.swagger.v3.oas.annotations.Operation;
 import java.time.LocalDateTime;
 import java.util.Map;

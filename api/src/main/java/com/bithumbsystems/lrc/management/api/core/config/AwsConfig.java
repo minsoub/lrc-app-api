@@ -1,6 +1,6 @@
 package com.bithumbsystems.lrc.management.api.core.config;
 
-import com.bithumbsystems.lrc.management.api.core.config.property.AwsProperties;
+import com.bithumbsystems.lrc.management.api.core.config.properties.AwsProperties;
 import javax.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;

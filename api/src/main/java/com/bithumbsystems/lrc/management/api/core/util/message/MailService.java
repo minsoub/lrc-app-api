@@ -1,8 +1,8 @@
 package com.bithumbsystems.lrc.management.api.core.util.message;
 
 import com.amazonaws.util.IOUtils;
-import com.bithumbsystems.lrc.management.api.core.config.property.AwsProperties;
-import com.bithumbsystems.lrc.management.api.core.config.property.MailProperties;
+import com.bithumbsystems.lrc.management.api.core.config.properties.AwsProperties;
+import com.bithumbsystems.lrc.management.api.core.config.properties.MailProperties;
 import com.bithumbsystems.lrc.management.api.core.exception.MailException;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.core.model.enums.MailForm;
@@ -65,8 +65,8 @@ public class MailService implements MessageService {
     try {
       MailForm mailForm = type.equals("KOR") ? MailForm.KOR: MailForm.EN;
       String html = FileUtil.readResourceFile(mailForm.getPath());
-      html = html.replaceAll("[LOGOURL]", mailProperties.getLogoUrl());
-      html = html.replaceAll("[LOGINURL]", mailProperties.getLoginUrl());
+      html = html.replace("[LOGOURL]", mailProperties.getLogoUrl());
+      html = html.replace("[LOGINURL]", mailProperties.getLoginUrl());
       log.info("send mail: " + html);
       send(
               MailSenderInfo.builder()

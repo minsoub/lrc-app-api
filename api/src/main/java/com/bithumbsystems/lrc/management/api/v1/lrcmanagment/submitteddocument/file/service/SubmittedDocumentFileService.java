@@ -1,6 +1,6 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.service;
 
-import com.bithumbsystems.lrc.management.api.core.config.property.AwsProperties;
+import com.bithumbsystems.lrc.management.api.core.config.properties.AwsProperties;
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.core.util.AES256Util;

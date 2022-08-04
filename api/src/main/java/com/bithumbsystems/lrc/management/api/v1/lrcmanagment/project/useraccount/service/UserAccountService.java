@@ -1,8 +1,7 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.useraccount.service;
 
-import com.bithumbsystems.lrc.management.api.core.config.property.AwsProperties;
+import com.bithumbsystems.lrc.management.api.core.config.properties.AwsProperties;
 import com.bithumbsystems.lrc.management.api.core.util.AES256Util;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.service.ProjectInfoService;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.useraccount.mapper.UserAccountMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.useraccount.model.request.UserAccountRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.useraccount.model.response.UserAccountResponse;

@@ -1,6 +1,6 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.service;
 
-import com.bithumbsystems.lrc.management.api.core.config.property.AwsProperties;
+import com.bithumbsystems.lrc.management.api.core.config.properties.AwsProperties;
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.v1.file.service.FileService;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.listener.HistoryDto;
@@ -15,7 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;

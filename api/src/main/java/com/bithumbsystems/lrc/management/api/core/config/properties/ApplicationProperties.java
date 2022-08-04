@@ -1,4 +1,4 @@
-package com.bithumbsystems.lrc.management.api.core.config.property;
+package com.bithumbsystems.lrc.management.api.core.config.properties;
 
 import lombok.Getter;
 import lombok.Setter;
