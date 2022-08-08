@@ -34,47 +34,55 @@ public class FoundationInfoService {
     public Mono<FoundationInfoResponse> findById(String id) {
         return foundationInfoDomainService.findById(id)
                 .flatMap(result -> {
-                    return statusCodeRepository.findById(result.getContractCode())
-                            .flatMap(r1 -> {
-                                return Mono.just(FoundationInfoResponse.builder()
-                                        .id(result.getId())
-                                        .adminMemo(result.getMemo())
-                                        .symbol(result.getSymbol())
-                                        .projectName(result.getName())
-                                        .contractCode(result.getContractCode())
-                                        .contractName(r1.getName())
-                                        .processCode(result.getProcessCode())
-                                        .build());
-                            })
-                            .switchIfEmpty(
-                                    Mono.just(FoundationInfoResponse.builder()
-                                            .id(result.getId())
-                                            .adminMemo(result.getMemo())
-                                            .symbol(result.getSymbol())
-                                            .projectName("")
-                                            .contractCode(result.getContractCode())
-                                            .contractName("")
-                                            .processCode(result.getProcessCode())
-                                            .build())
-                            )
-                            .flatMap(res -> {
-                                return statusCodeRepository.findById(res.getProcessCode())
-                                        .flatMap(r2 -> {
-                                            res.setProcessName(r2.getName());
-                                            return Mono.just(res);
-                                        });
-                            })
-                            .switchIfEmpty(
-                                    Mono.just(FoundationInfoResponse.builder()
+                    if (result.getContractCode() == null) {
+                        return Mono.just(FoundationInfoResponse.builder()
+                                .id(result.getId())
+                                .adminMemo(result.getMemo())
+                                .symbol(result.getSymbol())
+                                .projectName(result.getName())
+                                .contractCode(result.getContractCode())
+                                .contractName("")
+                                .processCode(result.getProcessCode())
+                                .build());
+                    } else {
+                        return statusCodeRepository.findById(result.getContractCode())
+                                .flatMap(r1 -> {
+                                    return Mono.just(FoundationInfoResponse.builder()
                                             .id(result.getId())
                                             .adminMemo(result.getMemo())
                                             .symbol(result.getSymbol())
                                             .projectName(result.getName())
                                             .contractCode(result.getContractCode())
-                                            .contractName("")
+                                            .contractName(r1.getName())
                                             .processCode(result.getProcessCode())
-                                            .build())
-                            );
+                                            .build());
+                                })
+                                .switchIfEmpty(
+                                        Mono.just(FoundationInfoResponse.builder()
+                                                .id(result.getId())
+                                                .adminMemo(result.getMemo())
+                                                .symbol(result.getSymbol())
+                                                .projectName("")
+                                                .contractCode(result.getContractCode())
+                                                .contractName("")
+                                                .processCode(result.getProcessCode())
+                                                .build())
+                                );
+                    }
+                })
+                .flatMap(res -> {
+                    if (res.getProcessCode() == null) {
+                        return Mono.just(res);
+                    }else {
+                        return statusCodeRepository.findById(res.getProcessCode())
+                                .flatMap(r2 -> {
+                                    res.setProcessName(r2.getName());
+                                    return Mono.just(res);
+                                })
+                                .switchIfEmpty(
+                                       Mono.just(res)
+                                );
+                    }
                 });
     }
 
