@@ -469,7 +469,7 @@ public class FoundationService {
                             .map(tuple -> {
                                 tuple.getT1().setIcoDate(
                                         tuple.getT2().stream().map(t ->
-                                                t.getIcoDate().toString() + " (" + t.getMarketInfo() + ")"
+                                                t.getIcoDate() == null ? "" : t.getIcoDate().toString() + " (" + t.getMarketInfo() + ")"
                                         ).collect(Collectors.joining(", "))
                                 );
                                 return tuple.getT1();
