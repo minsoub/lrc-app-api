@@ -626,7 +626,7 @@ public class FoundationService {
                     }
                 })
                 .flatMap(res -> {
-                    if(!StringUtils.isEmpty(res.getProgressCode())) {
+                    if(!StringUtils.isEmpty(res.getContractCode())) {
                         return statusCodeDomainService.findStatusValueById(res.getContractCode())
                                 .map(progress -> {
                                     res.setContractName(progress.getName());

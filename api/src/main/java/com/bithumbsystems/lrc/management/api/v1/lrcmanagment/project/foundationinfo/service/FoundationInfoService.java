@@ -46,6 +46,17 @@ public class FoundationInfoService {
                                         .processCode(result.getProcessCode())
                                         .build());
                             })
+                            .switchIfEmpty(
+                                    Mono.just(FoundationInfoResponse.builder()
+                                            .id(result.getId())
+                                            .adminMemo(result.getMemo())
+                                            .symbol(result.getSymbol())
+                                            .projectName("")
+                                            .contractCode(result.getContractCode())
+                                            .contractName("")
+                                            .processCode(result.getProcessCode())
+                                            .build())
+                            )
                             .flatMap(res -> {
                                 return statusCodeRepository.findById(res.getProcessCode())
                                         .flatMap(r2 -> {
