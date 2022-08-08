@@ -5,6 +5,7 @@ import com.bithumbsystems.lrc.management.api.core.config.resolver.CurrentUser;
 import com.bithumbsystems.lrc.management.api.core.model.response.SingleResponse;
 import com.bithumbsystems.lrc.management.api.v1.statusmanagment.statuscode.model.request.StatusCodeRequest;
 import com.bithumbsystems.lrc.management.api.v1.statusmanagment.statuscode.model.request.StatusModifyRequest;
+import com.bithumbsystems.lrc.management.api.v1.statusmanagment.statuscode.model.response.StatusCodeResponse;
 import com.bithumbsystems.lrc.management.api.v1.statusmanagment.statuscode.service.StatusCodeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import java.util.Comparator;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -34,7 +37,7 @@ public class StatusCodeController {
     @Operation(summary = "상태값 관리 - 상태값 관리 - 상태값 관리 모두 가져오기", description = "상태값 관리 목록 정보를 조회합니다.", tags = "사이트 운영 > 상태값 관리 > 상태값 관리 > 검색")
     public ResponseEntity<Mono<?>> getStatusValue() {
         return ResponseEntity.ok().body(statusCodeService.getStatusValue()
-                .collectList()
+                .collectSortedList(Comparator.comparing(StatusCodeResponse::getCreateDate).reversed())
                 .map(c -> new SingleResponse(c))
         );
     }

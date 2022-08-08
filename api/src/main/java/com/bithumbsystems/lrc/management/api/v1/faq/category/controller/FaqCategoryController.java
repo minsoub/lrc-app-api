@@ -5,6 +5,7 @@ import com.bithumbsystems.lrc.management.api.core.config.resolver.CurrentUser;
 import com.bithumbsystems.lrc.management.api.core.model.response.MultiResponse;
 import com.bithumbsystems.lrc.management.api.core.model.response.SingleResponse;
 import com.bithumbsystems.lrc.management.api.v1.faq.category.model.request.FaqCategoryRequest;
+import com.bithumbsystems.lrc.management.api.v1.faq.category.model.response.FaqCategoryResponse;
 import com.bithumbsystems.lrc.management.api.v1.faq.category.service.FaqCategoryService;
 import com.bithumbsystems.persistence.mongodb.faq.category.model.enums.LanguageType;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,6 +18,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import java.util.Comparator;
 
 @RequiredArgsConstructor
 @RestController
@@ -35,7 +38,7 @@ public class FaqCategoryController {
     @Operation(summary = "FAQ 관리 - 카테고리 관리 - 카테고리 모든 정보", description = "카테고리 모든 정보를 조회합니다.", tags = "사이트 운영 > FAQ 관리 > 카테고리 관리 > 카테고리 검색")
     public ResponseEntity<Mono<?>> getAllCategory( @RequestParam(required = true) LanguageType language) {
         return ResponseEntity.ok().body(faqCategoryService.findAll(language)
-                .collectList()
+                .collectSortedList(Comparator.comparing(FaqCategoryResponse::getCreateDate).reversed())
                 .map(c -> new MultiResponse(c))
         );
     }

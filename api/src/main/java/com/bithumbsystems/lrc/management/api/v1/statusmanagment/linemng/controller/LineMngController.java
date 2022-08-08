@@ -5,6 +5,7 @@ import com.bithumbsystems.lrc.management.api.core.config.resolver.CurrentUser;
 import com.bithumbsystems.lrc.management.api.core.model.response.MultiResponse;
 import com.bithumbsystems.lrc.management.api.core.model.response.SingleResponse;
 import com.bithumbsystems.lrc.management.api.v1.statusmanagment.linemng.model.request.LineMngRequest;
+import com.bithumbsystems.lrc.management.api.v1.statusmanagment.linemng.model.response.LineMngResponse;
 import com.bithumbsystems.lrc.management.api.v1.statusmanagment.linemng.service.LineMngService;
 import com.bithumbsystems.persistence.mongodb.statusmanagement.linemng.model.enums.LineType;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import java.util.Comparator;
 
 @RequiredArgsConstructor
 @RestController
@@ -32,7 +35,7 @@ public class LineMngController {
     @Operation(summary = "상태값 관리 - 계열 관리 - 계열 모두 가져오기", description = "계열 목록 정보를 조회합니다.", tags = "사이트 운영 > 상태값 관리 > 계열 관리 > 검색")
     public ResponseEntity<Mono<?>> getLines(LineType type) {
         return ResponseEntity.ok().body(lineMngService.findAll(type)
-                .collectList()
+                .collectSortedList(Comparator.comparing(LineMngResponse::getCreateDate).reversed())
                 .map(c -> new MultiResponse(c))
         );
     }
