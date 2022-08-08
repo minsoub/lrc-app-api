@@ -44,7 +44,7 @@ public class AuditLogService {
                         fromDate,
                         toDate, keyword, mySiteId)
                 .map(AuditLogMapper.INSTANCE::auditLogResponse)
-                .collectSortedList(Comparator.comparing(AuditLogResponse::getCreateDate));
+                .collectSortedList(Comparator.comparing(AuditLogResponse::getCreateDate).reversed());
     }
 
     /**
@@ -83,7 +83,7 @@ public class AuditLogService {
                         fromDate,
                         toDate, keyword, account.getMySiteId())
                 .map(AuditLogMapper.INSTANCE::auditLogResponse)
-                .collectSortedList(Comparator.comparing(AuditLogResponse::getCreateDate))
+                .collectSortedList(Comparator.comparing(AuditLogResponse::getCreateDate).reversed())
                 .flatMap(this::createExcelFile);
     }
 

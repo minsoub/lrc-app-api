@@ -41,7 +41,7 @@ public class UserAccountService {
                                         .userAccountId(user.getUserAccountId())
                                         .projectId(user.getProjectId())
                                         .userName(AES256Util.decryptAES(properties.getKmsKey(), user.getName()))
-                                        .snsId(user.getSnsId())
+                                        .snsId(AES256Util.decryptAES(properties.getKmsKey(), user.getSnsId()))
                                         .email(AES256Util.decryptAES(properties.getKmsKey(), user.getContactEmail()))
                                         .phone(AES256Util.decryptAES(properties.getKmsKey(), user.getPhone()))
                                         .build());

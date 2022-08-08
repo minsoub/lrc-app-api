@@ -28,7 +28,7 @@ public class HistoryService {
     public Mono<List<HistoryResponse>> getHistory(String projectId, String keyword) {
         return historyDomainService.findBySearch(projectId, keyword)
                 .map(HistoryMapper.INSTANCE::historyResponse)
-                .collectSortedList(Comparator.comparing(HistoryResponse::getUpdateDate));
+                .collectSortedList(Comparator.comparing(HistoryResponse::getUpdateDate).reversed());
     }
 
     /**
