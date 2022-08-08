@@ -418,16 +418,18 @@ public class FoundationService {
 //                                                .build()))
 //                                );
                     }else { // 검색 조건이 없다면..
-                        return res1.zipWith(projectInfoDomainService.findByProjectInfo(res.getProjectId(), businessCode, networkCode)
+                        return res1.zipWith(projectInfoDomainService.findByProjectId(res.getProjectId()) // .findByProjectInfo(res.getProjectId(), businessCode, networkCode)
                                         .map(ProjectInfoMapper.INSTANCE::projectInfoResponse)
-                                        .collectList()
+                                       // .collectList()
                                 )
                                 .map(tuple -> {
                                     tuple.getT1().setBusinessCode(
-                                            tuple.getT2().stream().map(t -> t.getBusinessCode()).collect(Collectors.joining())
+                                            tuple.getT2().getBusinessCode()
+                                            //tuple.getT2().map(t -> t.getBusinessCode()).collect(Collectors.joining())
                                     );
                                     tuple.getT1().setNetworkCode(
-                                            tuple.getT2().stream().map(t -> t.getNetworkCode()).collect(Collectors.joining())
+                                            tuple.getT2().getNetworkCode()
+                                            //tuple.getT2().stream().map(t -> t.getNetworkCode()).collect(Collectors.joining())
                                     );
                                     return tuple.getT1();
                                 })
