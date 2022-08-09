@@ -1,5 +1,6 @@
 package com.bithumbsystems.lrc.management.api.core.util;
 
+import java.security.SecureRandom;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 
@@ -38,9 +39,11 @@ public class AES256Util {
             byte[] keyBytes = keyString.getBytes(StandardCharsets.UTF_8);
             byte[] plainTextBytes = plainText.getBytes(StandardCharsets.UTF_8);
 
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
             int bsize = cipher.getBlockSize();
-            IvParameterSpec ivspec = new IvParameterSpec(Arrays.copyOfRange(keyBytes, 0, bsize));
+            byte[] iv = Arrays.copyOfRange(keyBytes, 0, bsize);
+            new SecureRandom().nextBytes(iv);
+            IvParameterSpec ivspec = new IvParameterSpec(iv);
 
             SecretKeySpec secureKey = new SecretKeySpec(keyBytes, "AES");
             cipher.init(Cipher.ENCRYPT_MODE, secureKey, ivspec);
@@ -84,7 +87,7 @@ public class AES256Util {
             byte[] keyBytes = keyString.getBytes(StandardCharsets.UTF_8);
             byte[] cipherTextBytes = Base64.decodeBase64(cipherText.getBytes(StandardCharsets.UTF_8));
 
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
             int bsize = cipher.getBlockSize();
             IvParameterSpec ivspec = new IvParameterSpec(Arrays.copyOfRange(keyBytes, 0, bsize));
 
