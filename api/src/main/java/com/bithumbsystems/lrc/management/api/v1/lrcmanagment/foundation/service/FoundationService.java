@@ -418,16 +418,18 @@ public class FoundationService {
 //                                                .build()))
 //                                );
                     }else { // 검색 조건이 없다면..
-                        return res1.zipWith(projectInfoDomainService.findByProjectInfo(res.getProjectId(), businessCode, networkCode)
+                        return res1.zipWith(projectInfoDomainService.findByProjectId(res.getProjectId()) // .findByProjectInfo(res.getProjectId(), businessCode, networkCode)
                                         .map(ProjectInfoMapper.INSTANCE::projectInfoResponse)
-                                        .collectList()
+                                       // .collectList()
                                 )
                                 .map(tuple -> {
                                     tuple.getT1().setBusinessCode(
-                                            tuple.getT2().stream().map(t -> t.getBusinessCode()).collect(Collectors.joining())
+                                            tuple.getT2().getBusinessCode()
+                                            //tuple.getT2().map(t -> t.getBusinessCode()).collect(Collectors.joining())
                                     );
                                     tuple.getT1().setNetworkCode(
-                                            tuple.getT2().stream().map(t -> t.getNetworkCode()).collect(Collectors.joining())
+                                            tuple.getT2().getNetworkCode()
+                                            //tuple.getT2().stream().map(t -> t.getNetworkCode()).collect(Collectors.joining())
                                     );
                                     return tuple.getT1();
                                 })
@@ -469,7 +471,7 @@ public class FoundationService {
                             .map(tuple -> {
                                 tuple.getT1().setIcoDate(
                                         tuple.getT2().stream().map(t ->
-                                                t.getIcoDate().toString() + " (" + t.getMarketInfo() + ")"
+                                                t.getIcoDate() == null ? "" : t.getIcoDate().toString() + " (" + t.getMarketInfo() + ")"
                                         ).collect(Collectors.joining(", "))
                                 );
                                 return tuple.getT1();
@@ -624,7 +626,7 @@ public class FoundationService {
                     }
                 })
                 .flatMap(res -> {
-                    if(!StringUtils.isEmpty(res.getProgressCode())) {
+                    if(!StringUtils.isEmpty(res.getContractCode())) {
                         return statusCodeDomainService.findStatusValueById(res.getContractCode())
                                 .map(progress -> {
                                     res.setContractName(progress.getName());
@@ -634,7 +636,7 @@ public class FoundationService {
                         return Mono.just(res);
                     }
                 })
-                .collectSortedList(Comparator.comparing(FoundationResponse::getCreateDate));
+                .collectSortedList(Comparator.comparing(FoundationResponse::getCreateDate).reversed());
 
     }
 }

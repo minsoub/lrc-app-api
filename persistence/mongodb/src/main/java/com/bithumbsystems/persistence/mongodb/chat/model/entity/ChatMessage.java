@@ -21,6 +21,7 @@ public class ChatMessage {
     private String id;
     private String accountId;
     private String email;
+    private String name;
     private ChatRole role;
     private String content;
     private String chatRoom;
