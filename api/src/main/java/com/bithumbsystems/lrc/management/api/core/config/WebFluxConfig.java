@@ -22,7 +22,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
-import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.reactive.config.PathMatchConfigurer;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
@@ -35,7 +34,7 @@ import org.springframework.web.reactive.result.method.annotation.ArgumentResolve
 public class WebFluxConfig implements WebFluxConfigurer {
 
   private final ApplicationProperties applicationProperties;
-  private final ReactiveJwtDecoder reactiveJwtDecoder;
+  private final SecurityConfig securityConfig;
   @Override
   public void configurePathMatching(PathMatchConfigurer configurer) {
     configurer.addPathPrefix(applicationProperties.getPrefix() + applicationProperties.getVersion()
@@ -83,7 +82,7 @@ public class WebFluxConfig implements WebFluxConfigurer {
   @Override
   public void configureArgumentResolvers(ArgumentResolverConfigurer configurer) {
     WebFluxConfigurer.super.configureArgumentResolvers(configurer);
-    CustomArgumentResolver customArgumentResolver = new CustomArgumentResolver(reactiveJwtDecoder);
+    CustomArgumentResolver customArgumentResolver = new CustomArgumentResolver(securityConfig.reactiveJwtDecoder());
     configurer.addCustomResolver(customArgumentResolver);
   }
 }

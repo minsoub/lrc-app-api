@@ -20,7 +20,7 @@ import org.springframework.web.reactive.config.EnableWebFlux;
     EmbeddedMongoAutoConfiguration.class
 })
 @EnableWebFlux
-@ConfigurationPropertiesScan
+@ConfigurationPropertiesScan("com.bithumbsystems.lrc.management.api.core.config")
 @EnableReactiveMongoRepositories("com.bithumbsystems.persistence.mongodb")
 @EnableReactiveMongoAuditing
 @OpenAPIDefinition(info = @Info(title = "Listing Reception Center Management API", version = "1.0", description = "Listing Reception Center Management APIs v1.0"))
