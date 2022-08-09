@@ -148,7 +148,7 @@ public class ChatService {
                                            .fileSize(result.getFileSize())
                                            .fileType(result.getFileType())
                                            .userType(result.getUserType())
-                                           .userTypeName(r1.getEmail())
+                                           .userTypeName(AES256Util.decryptAES(awsProperties.getKmsKey(), r1.getEmail()))
                                            .createDate(result.getCreateDate())
                                            .createAccountId(result.getCreateAccountId())
                                            .build());
