@@ -34,7 +34,7 @@ public class ReviewEstimateController {
     @Operation(summary = "거래지원 관리 - 검토 평가 id로 찾기", description = "projectId를 이용하여 검토 평가 정보를 조회합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 검토 평가 > 검색")
     public ResponseEntity<Mono<?>> getReviewEstimate(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
                                                          @PathVariable("projectId") String projectId) {
-        return ResponseEntity.ok().body(reviewEstimateService.findByProjectId(projectId)
+        return ResponseEntity.ok().body(reviewEstimateService.findByUseData(projectId)
                 .map(c -> new SingleResponse(c))
         );
     }
@@ -51,5 +51,21 @@ public class ReviewEstimateController {
                                                                          @Parameter(hidden = true) @CurrentUser Account account) {
         return ResponseEntity.ok().body(reviewEstimateService.saveAll(reviewEstimateList, account)
                 .map(c -> new SingleResponse(c)));
+    }
+
+    /**
+     * 검토 평가 삭제
+     * @param projectId
+     * @param id
+     * @return ReviewEstimateResponse Object
+     */
+    @DeleteMapping("/review-estimate/{projectId}/{id}")
+    @Operation(summary = "거래지원 관리 - 검토 평가 삭제", description = "id를 이용하여 검토 평가 정보를 삭제합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 검토 평가 > 삭제")
+    public ResponseEntity<Mono<?>> getReviewEstimate(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH) @PathVariable("projectId") String projectId,
+                                                     @Parameter(name = "id", description = "검토평가 ID", in = ParameterIn.PATH) @PathVariable("id") String id,
+                                                     @Parameter(hidden = true) @CurrentUser Account account) {
+        return ResponseEntity.ok().body(reviewEstimateService.deleteById(projectId, id, account)
+                .map(c -> new SingleResponse(c))
+        );
     }
 }

@@ -22,4 +22,5 @@ public class ReviewEstimate {
     private String reference;       //평가 자료
     private String fileKey;         //평가 자료 파일
     private String fileName;        // 파일명
+    private Boolean delYn;          //삭제여부
 }

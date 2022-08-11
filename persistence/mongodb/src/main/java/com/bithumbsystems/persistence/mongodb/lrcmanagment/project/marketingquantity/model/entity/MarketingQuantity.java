@@ -18,4 +18,5 @@ public class MarketingQuantity {
     private String symbol;              //심볼
     private Double minimumQuantity;     //최소 지원 수량
     private Double actualQuantity;      //실제 상장 지원 수량
+    private Boolean delYn;              // 삭제 여부
 }

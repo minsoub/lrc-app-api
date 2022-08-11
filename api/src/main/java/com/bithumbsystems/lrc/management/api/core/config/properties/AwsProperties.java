@@ -28,6 +28,10 @@ public class AwsProperties {
   @Value("${cloud.aws.param-store.message-name}")
   private String paramStoreMessageName;
 
+  @Value("${cloud.aws.param-store.crypto-name}")
+  private String paramCryptoName;
+
   private String kmsKey;
   private String emailSender;
+  private String cryptoKey;
 }
