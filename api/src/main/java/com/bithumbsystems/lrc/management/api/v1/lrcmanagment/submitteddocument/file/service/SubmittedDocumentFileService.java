@@ -107,7 +107,7 @@ public class SubmittedDocumentFileService {
                                                                     .type(request.getType())
                                                                     .fileKey(request.getFileKey())
                                                                     .fileName(request.getFileName())
-                                                                    .email(AES256Util.encryptAES(awsProperties.getKmsKey(), account.getEmail(), false))
+                                                                    .email(AES256Util.encryptAES(awsProperties.getKmsKey(), account.getEmail()))
                                                                     .createDate(LocalDateTime.now())
                                                                     .createAdminAccountId(account.getAccountId())
                                                                     .build()
