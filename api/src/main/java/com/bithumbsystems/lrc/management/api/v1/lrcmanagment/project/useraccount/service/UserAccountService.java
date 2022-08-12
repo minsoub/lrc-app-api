@@ -133,10 +133,10 @@ public class UserAccountService {
                                 String phone = AES256Util.decryptAES(properties.getCryptoKey(), result.getPhone());
                                 String sns_id = AES256Util.decryptAES(properties.getCryptoKey(), result.getSnsId());
 
-                                res.setContactEmail(AES256Util.encryptAES(properties.getKmsKey(), email, true));
-                                res.setName(AES256Util.encryptAES(properties.getKmsKey(), name, true));
-                                res.setPhone(AES256Util.encryptAES(properties.getKmsKey(), phone, true));
-                                res.setSnsId(AES256Util.encryptAES(properties.getKmsKey(), sns_id, true));
+                                res.setContactEmail(AES256Util.encryptAES(properties.getKmsKey(), email));
+                                res.setName(AES256Util.encryptAES(properties.getKmsKey(), name));
+                                res.setPhone(AES256Util.encryptAES(properties.getKmsKey(), phone));
+                                res.setSnsId(AES256Util.encryptAES(properties.getKmsKey(), sns_id));
                                 res.setUpdateAccountId(account.getAccountId());
                                 res.setUpdateDate(LocalDateTime.now());
 
