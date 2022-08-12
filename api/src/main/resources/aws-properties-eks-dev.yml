@@ -17,8 +17,8 @@ cloud:
       doc-name: docdb
       kms-name: kms
       message-name: message
+      crypto-name: crypto
       auth-name: auth
-
 logging:
   level:
     root: ${management.api.logging.level.root:DEBUG}

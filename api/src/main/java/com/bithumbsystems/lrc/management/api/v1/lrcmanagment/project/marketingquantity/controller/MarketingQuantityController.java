@@ -51,4 +51,19 @@ public class MarketingQuantityController {
                 .map(c -> new SingleResponse(c))
         );
     }
+
+    /**
+     * 마케팅 수량 삭제
+     * @param projectId
+     * @return MarketingQuantityResponse Object
+     */
+    @DeleteMapping("/marketing-quantity/{projectId}/{id}")
+    @Operation(summary = "거래지원 관리 - 마케징 수량 삭제", description = "projectId를 이용하여 마케팅 수량 정보를 삭제합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 마케팅 수량 > 삭제")
+    public ResponseEntity<Mono<?>> deleteMarketingQuantity(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH) @PathVariable("projectId") String projectId,
+                                                           @Parameter(name = "id", description = "마케팅 수량의 ID", in = ParameterIn.PATH) @PathVariable("id") String id,
+                                                        @Parameter(hidden = true) @CurrentUser Account account){
+        return ResponseEntity.ok().body(marketingQuantityService.deleteById(projectId, id, account)
+                .map(c -> new SingleResponse(c))
+        );
+    }
 }

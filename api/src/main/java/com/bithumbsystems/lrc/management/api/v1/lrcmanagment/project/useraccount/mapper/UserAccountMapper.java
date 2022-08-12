@@ -13,5 +13,4 @@ public interface UserAccountMapper {
 
     UserAccountResponse userAccountResponse(UserAccount userAccount);
 
-    UserAccount userAccountResponseToRequest(UserAccountRequest.User userAccount);
 }

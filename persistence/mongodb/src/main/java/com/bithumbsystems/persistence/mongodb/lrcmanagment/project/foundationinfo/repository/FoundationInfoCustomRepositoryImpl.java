@@ -53,7 +53,7 @@ public class FoundationInfoCustomRepositoryImpl implements FoundationInfoCustomR
     }
 
     /**
-     * Symbol에 의해서 like 검색한다.
+     * Symbol과 프로젝트명 의해서 like 검색한다.
      * @param symbol
      * @return
      */
@@ -61,7 +61,10 @@ public class FoundationInfoCustomRepositoryImpl implements FoundationInfoCustomR
         Query query = new Query();
 
         if(StringUtils.isNotEmpty(symbol)) {
-            query.addCriteria(Criteria.where("symbol").regex(symbol));    //symbol
+            query.addCriteria(new Criteria().orOperator(
+                    Criteria.where("symbol").regex(symbol),
+                    Criteria.where("name").regex(symbol)
+            ));
         }
 
         return reactiveMongoTemplate.find(query, FoundationInfo.class);

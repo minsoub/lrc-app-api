@@ -50,6 +50,17 @@ public class ReviewEstimateService {
     }
 
     /**
+     * 사용가능한 검토 평가 리스트 조회
+     * @param projectId
+     * @return
+     */
+    public Mono<List<ReviewEstimateResponse>> findByUseData(String projectId) {
+        return reviewEstimateDomainService.findByUseData(projectId)
+                .map(ReviewEstimateMapper.INSTANCE::reviewEstimateResponse)
+                .collectList();
+    }
+
+    /**
      * 검토 평가 여러개 저장 및 업데이트
      * @param reviewEstimateRequest
      * @return ReviewEstimateResponse Object
@@ -63,6 +74,24 @@ public class ReviewEstimateService {
                 .then(this.findByProjectId(projectId));
     }*/
 
+    /**
+     * 검토 평가를 삭제한다.
+     *
+     * @param projectId
+     * @param id
+     * @param account
+     * @return
+     */
+    @Transactional
+    public Mono<ReviewEstimateResponse> deleteById(String projectId, String id, Account account) {
+        return reviewEstimateDomainService.findById(id)
+                .flatMap(result -> {
+                    historyLogSend(projectId, "프로젝트 관리>검토 평가", "검토 평가", "삭제", "", account);
+                    result.setDelYn(true);
+                    return reviewEstimateDomainService.save(result)
+                            .flatMap(res->Mono.just(ReviewEstimateMapper.INSTANCE.reviewEstimateResponse(res)));
+                });
+    }
     @Transactional
     public Mono<List<ReviewEstimateResponse>> saveAll(ReviewEstimateRequest reviewEstimateRequest, Account account) {
 
@@ -110,18 +139,18 @@ public class ReviewEstimateService {
                                                     return reviewEstimateDomainService.findById(final_id)
                                                             .flatMap(mode -> {
                                                                 if (!mode.getOrganization().equals(organization)) {
-                                                                    historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 기관", "수정", account);
+                                                                    historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 기관", "수정", organization, account);
                                                                 }
                                                                 if (!mode.getResult().equals(result)) {
-                                                                    historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 결과", "수정", account);
+                                                                    historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 결과", "수정", result,  account);
                                                                 }
                                                                 if (StringUtils.hasLength(reference)) {
                                                                     if (!mode.getReference().equals(reference)) {
-                                                                        historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 자료", "수정", account);
+                                                                        historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 자료", "수정", reference, account);
                                                                     }
                                                                 }
                                                                 // 파일은 수정이다.
-                                                                historyLogSend(projectId, "프로젝트 관리>검토 평가", "검토 평가", "수정", account);
+                                                                historyLogSend(projectId, "프로젝트 관리>검토 평가", "검토 평가", "수정", Normalizer.normalize(file_name, Normalizer.Form.NFC), account);
 
                                                                 return reviewEstimateDomainService.save(
                                                                         ReviewEstimate.builder()
@@ -142,14 +171,14 @@ public class ReviewEstimateService {
                             return reviewEstimateDomainService.findById(final_id)
                                             .flatMap(mode -> {
                                                 if (!mode.getOrganization().equals(organization)) {
-                                                    historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 기관", "수정", account);
+                                                    historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 기관", "수정", organization, account);
                                                 }
                                                 if (!mode.getResult().equals(result)) {
-                                                    historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 결과", "수정", account);
+                                                    historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 결과", "수정", result, account);
                                                 }
                                                 if (StringUtils.hasLength(reference)) {
                                                     if (!mode.getReference().equals(reference)) {
-                                                        historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 자료", "수정", account);
+                                                        historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 자료", "수정", reference, account);
                                                     }
                                                 }
                                                 // 파일은 수정이다.
@@ -182,11 +211,11 @@ public class ReviewEstimateService {
                                                     log.info("service upload res   =>       {}", res);
                                                     log.info("service upload fileName   =>       {}", fileName.toString());
 
-                                                    historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 기관", "신규등록", account);
-                                                    historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 결과", "신규등록", account);
+                                                    historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 기관", "신규등록", organization, account);
+                                                    historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 결과", "신규등록", result, account);
                                                     if (StringUtils.hasLength(reference))
-                                                        historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 자료", "신규등록", account);
-                                                    historyLogSend(projectId, "프로젝트 관리>검토 평가", "검토 평가", "신규등록", account);
+                                                        historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 자료", "신규등록", reference, account);
+                                                    historyLogSend(projectId, "프로젝트 관리>검토 평가", "검토 평가", "신규등록", Normalizer.normalize(file_name, Normalizer.Form.NFC), account);
 
                                                     return reviewEstimateDomainService.save(
                                                             ReviewEstimate.builder()
@@ -202,10 +231,10 @@ public class ReviewEstimateService {
                                                 });
                                     });
                         } else {
-                            historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 기관", "신규등록", account);
-                            historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 결과", "신규등록", account);
+                            historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 기관", "신규등록", organization, account);
+                            historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 결과", "신규등록", result, account);
                             if (StringUtils.hasLength(reference))
-                                historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 자료", "신규등록", account);
+                                historyLogSend(projectId, "프로젝트 관리>검토 평가", "평가 자료", "신규등록", reference, account);
 
                             return reviewEstimateDomainService.save(
                                     ReviewEstimate.builder()
@@ -236,13 +265,14 @@ public class ReviewEstimateService {
      * @param account
      * @return
      */
-    private void historyLogSend(String projectId, String menu, String subject, String taskHistory, Account account) {
+    private void historyLogSend(String projectId, String menu, String subject, String taskHistory, String item, Account account) {
         applicationEventPublisher.publishEvent(
                 HistoryDto.builder()
                         .projectId(projectId)
                         .menu(menu)
                         .subject(subject)
                         .taskHistory(taskHistory)
+                        .item(item)
                         .email(account.getEmail())
                         .accountId(account.getAccountId())
                         .build()

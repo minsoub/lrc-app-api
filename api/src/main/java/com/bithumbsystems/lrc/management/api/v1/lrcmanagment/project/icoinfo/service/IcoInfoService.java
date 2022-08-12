@@ -60,17 +60,17 @@ public class IcoInfoService {
               }
               if (icoInfo.getMarketInfo().equals("KRW")) {
                 if (!Objects.equals(result.getPrice(), icoInfo.getPrice())) {
-                  historyLogSend(projectId, "프로젝트 관리>상장 정보", "KRW 상장가", "수정", account);
+                  historyLogSend(projectId, "프로젝트 관리>상장 정보", "KRW 상장가", "수정", String.valueOf(icoInfo.getPrice()), account);
                 }
                 if (result.getIcoDate() != icoInfo.getIcoDate()) {
-                  historyLogSend(projectId, "프로젝트 관리>상장 정보", "KRW 상장일", "수정", account);
+                  historyLogSend(projectId, "프로젝트 관리>상장 정보", "KRW 상장일", "수정", icoInfo.getIcoDate().toString(), account);
                 }
               } else {
                 if (!Objects.equals(result.getPrice(), icoInfo.getPrice())) {
-                  historyLogSend(projectId, "프로젝트 관리>상장 정보", "BTC 상장가", "수정", account);
+                  historyLogSend(projectId, "프로젝트 관리>상장 정보", "BTC 상장가", "수정", String.valueOf(icoInfo.getPrice()), account);
                 }
                 if (result.getIcoDate() != icoInfo.getIcoDate()) {
-                  historyLogSend(projectId, "프로젝트 관리>상장 정보", "BTC 상장일", "수정", account);
+                  historyLogSend(projectId, "프로젝트 관리>상장 정보", "BTC 상장일", "수정", icoInfo.getIcoDate().toString(), account);
                 }
               }
               return icoInfoDomainService.save(
@@ -79,11 +79,11 @@ public class IcoInfoService {
             .switchIfEmpty(Mono.defer(() -> {
               log.debug("ico insert mode => ");
               if (icoInfo.getMarketInfo().equals("KRW")) {
-                historyLogSend(projectId, "프로젝트 관리>상장 정보", "KRW 상장가", "신규", account);
-                historyLogSend(projectId, "프로젝트 관리>상장 정보", "KRW 상장일", "신규", account);
+                historyLogSend(projectId, "프로젝트 관리>상장 정보", "KRW 상장가", "신규", String.valueOf(icoInfo.getPrice()), account);
+                historyLogSend(projectId, "프로젝트 관리>상장 정보", "KRW 상장일", "신규", icoInfo.getIcoDate().toString(), account);
               } else {
-                historyLogSend(projectId, "프로젝트 관리>상장 정보", "BTC 상장가", "신규", account);
-                historyLogSend(projectId, "프로젝트 관리>상장 정보", "BTC 상장일", "신규", account);
+                historyLogSend(projectId, "프로젝트 관리>상장 정보", "BTC 상장가", "신규", String.valueOf(icoInfo.getPrice()), account);
+                historyLogSend(projectId, "프로젝트 관리>상장 정보", "BTC 상장일", "신규", icoInfo.getIcoDate().toString(), account);
               }
               return icoInfoDomainService.insert(
                   IcoInfo.builder()
@@ -109,7 +109,7 @@ public class IcoInfoService {
    * @param account
    * @return
    */
-  private void historyLogSend(String projectId, String menu, String subject, String taskHistory,
+  private void historyLogSend(String projectId, String menu, String subject, String taskHistory, String item,
       Account account) {
     applicationEventPublisher.publishEvent(
         HistoryDto.builder()
@@ -117,6 +117,7 @@ public class IcoInfoService {
             .menu(menu)
             .subject(subject)
             .taskHistory(taskHistory)
+            .item(item)
             .email(account.getEmail())
             .accountId(account.getAccountId())
             .build()

@@ -22,6 +22,12 @@ public class HistoryResponse {
     @Schema(description = "항목")
     private String subject;         //항목
 
+    @Schema(description = "수정값")
+    private String item;         //수정값
+
+    @Schema(description = "구분")
+    private String type;         //항목
+
     @Schema(description = "작업 내역")
     private String taskHistory;     //작업내역
 

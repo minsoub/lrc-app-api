@@ -25,9 +25,11 @@ public class HistoryLogListener {
                 .projectId(historyDto.getProjectId())
                 .menu(historyDto.getMenu())
                 .subject(historyDto.getSubject())
+                .item(historyDto.getItem())
                 .taskHistory(historyDto.getTaskHistory())
+                .type("ADMIN")
                 .customer(historyDto.getEmail())
-                .updateAdminAccountId(historyDto.getAccountId())
+                .updateAccountId(historyDto.getAccountId())
                 .updateDate(LocalDateTime.now())
                 .build()).publishOn(Schedulers.boundedElastic()).subscribe();
     }

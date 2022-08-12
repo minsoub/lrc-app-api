@@ -61,7 +61,7 @@ public class SubmittedDocumentFileService {
                             .createAccountId(result.getCreateAccountId())
                             .build());
                 })
-                .collectSortedList(Comparator.comparing(SubmittedDocumentFileResponse::getCreateDate));
+                .collectSortedList(Comparator.comparing(SubmittedDocumentFileResponse::getCreateDate).reversed());
     }
 
     /**
@@ -98,7 +98,7 @@ public class SubmittedDocumentFileService {
                                                 })
                                                 .publishOn(Schedulers.boundedElastic())
                                                 .flatMap(file -> {
-                                                    historyLogSend(request.getProjectId(), "제출서류", request.getType(), "문서추가(관리자)", account);
+                                                    historyLogSend(request.getProjectId(), "제출서류", request.getType(), "문서추가(관리자)", Normalizer.normalize(fileName, Normalizer.Form.NFC), account);
                                                     request.setFileKey(file.getFileKey());
                                                     request.setFileName(file.getFileName());
                                                     return submittedDocumentFileDomainService.save(
@@ -140,7 +140,7 @@ public class SubmittedDocumentFileService {
      * @param account
      * @return
      */
-    private void historyLogSend(String projectId, String menu, SubmittedDocumentEnums type, String taskHistory, Account account) {
+    private void historyLogSend(String projectId, String menu, SubmittedDocumentEnums type, String taskHistory, String item, Account account) {
         String subject = "";
         if (type.equals(SubmittedDocumentEnums.IPO_APPLICATION)) {
             subject = "거래지원 신청서";
@@ -169,6 +169,7 @@ public class SubmittedDocumentFileService {
                         .menu(menu)
                         .subject(subject)
                         .taskHistory(taskHistory)
+                        .item(item)
                         .email(account.getEmail())
                         .accountId(account.getAccountId())
                         .build()

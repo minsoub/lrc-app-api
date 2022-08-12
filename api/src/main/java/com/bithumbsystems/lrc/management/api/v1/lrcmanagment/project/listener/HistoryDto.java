@@ -19,9 +19,10 @@ public class HistoryDto {
     private String projectId;
     private String menu;            //메뉴
     private String subject;         //항목
+    private String item;            // 수정값
     private String taskHistory;     //작업내역
+    private String type;            // 사용자 구분
     private String customer;        //수정자
-
     private LocalDateTime updateDate; //수정날짜
     private String updateAdminAccountId; //수정자 id
     private String email;

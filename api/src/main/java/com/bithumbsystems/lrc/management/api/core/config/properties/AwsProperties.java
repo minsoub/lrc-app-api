@@ -31,8 +31,11 @@ public class AwsProperties {
   @Value("${cloud.aws.param-store.auth-name}")
   private String paramStoreAuthName;
 
+  @Value("${cloud.aws.param-store.crypto-name}")
+  private String paramCryptoName;
+
   private String kmsKey;
   private String emailSender;
   private String jwtSecretKey;
-
+  private String cryptoKey;
 }

@@ -1,6 +1,7 @@
 package com.bithumbsystems.persistence.mongodb.lrcmanagment.project.marketingquantity.service;
 
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.marketingquantity.model.entity.MarketingQuantity;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.marketingquantity.repository.MarketingQuantityCustomRepository;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.marketingquantity.repository.MarketingQuantityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.util.UUID;
 public class MarketingQuantityDomainService {
 
     private final MarketingQuantityRepository marketingQuantityRepository;
+    private final MarketingQuantityCustomRepository marketingQuantityCustomRepository;
 
     /**
      * 마케팅 수량 id로 찾기
@@ -22,6 +24,15 @@ public class MarketingQuantityDomainService {
      */
     public Flux<MarketingQuantity> findByProjectId(String projectId) {
         return marketingQuantityRepository.findByProjectId(projectId);
+    }
+
+    /**
+     * 사용가능한 마케팅 수량을 조회한다.
+     * @param projectId
+     * @return
+     */
+    public Flux<MarketingQuantity> findByUseData(String projectId) {
+        return marketingQuantityCustomRepository.findByUseData(projectId);
     }
 
     /**

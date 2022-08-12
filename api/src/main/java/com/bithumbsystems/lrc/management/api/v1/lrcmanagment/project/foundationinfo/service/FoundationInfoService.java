@@ -97,19 +97,19 @@ public class FoundationInfoService {
                 .flatMap(c -> {
                     // 변경 히스토리 추가
                     if (!c.getName().equals(foundationInfoRequest.getProjectName())) {
-                        historyLogSend(id, "프로젝트 관리>재단정보", "프로젝트명", "수정", account);
+                        historyLogSend(id, "프로젝트 관리>재단정보", "프로젝트명", "수정", foundationInfoRequest.getProjectName(), account);
                     }
                     if (!c.getSymbol().equals(foundationInfoRequest.getSymbol())) {
-                        historyLogSend(id, "프로젝트 관리>재단정보", "심볼", "수정", account);
+                        historyLogSend(id, "프로젝트 관리>재단정보", "심볼", "수정", foundationInfoRequest.getSymbol(), account);
                     }
                     if ((c.getContractCode() == null && foundationInfoRequest.getContractCode() != null) || !c.getContractCode().equals(foundationInfoRequest.getContractCode())) {
-                        historyLogSend(id, "프로젝트 관리>재단정보", "계약상태", "상태변경", account);
+                        historyLogSend(id, "프로젝트 관리>재단정보", "계약상태", "상태변경", foundationInfoRequest.getContractCode(), account);
                     }
                     if ((c.getProcessCode() == null && foundationInfoRequest.getProcessCode() != null) ||  !c.getProcessCode().equals(foundationInfoRequest.getProcessCode())) {
-                        historyLogSend(id, "프로젝트 관리>재단정보", "진행상태", "상태변경", account);
+                        historyLogSend(id, "프로젝트 관리>재단정보", "진행상태", "상태변경",foundationInfoRequest.getProcessCode(),  account);
                     }
                     if ((c.getMemo() == null && foundationInfoRequest.getAdminMemo() != null) || !c.getMemo().equals(foundationInfoRequest.getAdminMemo())) {
-                        historyLogSend(id, "프로젝트 관리>재단정보", "관리자 메모", "수정", account);
+                        historyLogSend(id, "프로젝트 관리>재단정보", "관리자 메모", "수정", foundationInfoRequest.getAdminMemo(), account);
                     }
                     c.setName(foundationInfoRequest.getProjectName());
                     c.setSymbol(foundationInfoRequest.getSymbol());
@@ -140,13 +140,14 @@ public class FoundationInfoService {
      * @param account
      * @return
      */
-    private void historyLogSend(String projectId, String menu, String subject, String taskHistory, Account account) {
+    private void historyLogSend(String projectId, String menu, String subject, String taskHistory, String item, Account account) {
         applicationEventPublisher.publishEvent(
                 HistoryDto.builder()
                         .projectId(projectId)
                         .menu(menu)
                         .subject(subject)
                         .taskHistory(taskHistory)
+                        .item(item)
                         .email(account.getEmail())
                         .accountId(account.getAccountId())
                         .build()

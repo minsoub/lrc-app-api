@@ -5,6 +5,7 @@ import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.core.util.AES256Util;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.listener.HistoryDto;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.model.response.SubmittedDocumentFileResponse;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.mapper.SubmittedDocumentUrlMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.model.request.SubmittedDocumentUrlRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.model.response.SubmittedDocumentUrlResponse;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,7 +52,7 @@ public class SubmittedDocumentUrlService {
                             .createAccountId(result.getCreateAccountId())
                             .build());
                 })
-                .collectList();
+                .collectSortedList(Comparator.comparing(SubmittedDocumentUrlResponse::getCreateDate).reversed());
     }
 
     /**
@@ -61,7 +63,7 @@ public class SubmittedDocumentUrlService {
      */
     @Transactional
     public Mono<List<SubmittedDocumentUrlResponse>> saveAll(SubmittedDocumentUrlRequest submittedDocumentUrlRequest, Account account) {
-        historyLogSend(submittedDocumentUrlRequest.getProjectId(), "제출서류", submittedDocumentUrlRequest.getType(), "URL추가(관리자)", account);
+        historyLogSend(submittedDocumentUrlRequest.getProjectId(), "제출서류", submittedDocumentUrlRequest.getType(), "URL추가(관리자)", submittedDocumentUrlRequest.getUrl(), account);
         return submittedDocumentUrlDomainService.save(
                         SubmittedDocumentUrl.builder()
                                 .id(UUID.randomUUID().toString())
@@ -102,7 +104,7 @@ public class SubmittedDocumentUrlService {
      * @param account
      * @return
      */
-    private void historyLogSend(String projectId, String menu, SubmittedDocumentEnums type, String taskHistory, Account account) {
+    private void historyLogSend(String projectId, String menu, SubmittedDocumentEnums type, String taskHistory, String item, Account account) {
         String subject = "";
         if (type.equals(SubmittedDocumentEnums.IPO_APPLICATION)) {
             subject = "거래지원 신청서";
@@ -131,6 +133,7 @@ public class SubmittedDocumentUrlService {
                         .menu(menu)
                         .subject(subject)
                         .taskHistory(taskHistory)
+                        .item(item)
                         .email(account.getEmail())
                         .accountId(account.getAccountId())
                         .build()

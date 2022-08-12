@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class MarketResponse {
 
-    private Double MinimumQuantity;
+    private Double minimumQuantity;
     private Double actualQuantity;
     private String symbol;
 }

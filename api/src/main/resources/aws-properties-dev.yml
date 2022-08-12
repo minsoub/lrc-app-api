@@ -17,4 +17,5 @@ cloud:
       doc-name: docdb
       kms-name: kms
       message-name: message
+      crypto-name: crypto
       auth-name: auth

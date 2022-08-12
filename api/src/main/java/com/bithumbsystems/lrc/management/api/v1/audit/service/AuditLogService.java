@@ -96,7 +96,7 @@ public class AuditLogService {
 
                     CreationHelper creationHelper = workbook.getCreationHelper();
 
-                    Sheet sheet = workbook.createSheet("사기신고");
+                    Sheet sheet = workbook.createSheet("서비스로그");
 
                     Font headerFont = workbook.createFont();
                     headerFont.setFontName("맑은 고딕");
