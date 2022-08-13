@@ -92,12 +92,12 @@ public class ChangeEncryptController {
         .flatMap(chatMessage -> {
           if(chatMessage.getEmail() != null) {
             var email = AES256Util.decryptAESLegacy(awsProperties.getKmsKey(), chatMessage.getEmail());
-            chatMessage.setEmail(AES256Util.encryptAES(awsProperties.getKmsKey(), email));
+            chatMessage.setEmail(AES256Util.encryptAES(awsProperties.getKmsKey(), email, awsProperties.getSaltKey(), awsProperties.getIvKey()));
           }
 
           if(chatMessage.getContent() != null) {
             var contents = AES256Util.decryptAESLegacy(awsProperties.getKmsKey(), chatMessage.getContent());
-            chatMessage.setContent(AES256Util.encryptAES(awsProperties.getKmsKey(), contents));
+            chatMessage.setContent(AES256Util.encryptAES(awsProperties.getKmsKey(), contents, awsProperties.getSaltKey(), awsProperties.getIvKey()));
           }
           return chatMessageRepository.save(chatMessage);
         });
@@ -109,7 +109,7 @@ public class ChangeEncryptController {
         .filter(submittedDocumentUrl -> submittedDocumentUrl.getEmail() != null)
         .flatMap(submittedDocumentUrl -> {
           var email = AES256Util.decryptAESLegacy(awsProperties.getKmsKey(), submittedDocumentUrl.getEmail());
-          submittedDocumentUrl.setEmail(AES256Util.encryptAES(awsProperties.getKmsKey(), email));
+          submittedDocumentUrl.setEmail(AES256Util.encryptAES(awsProperties.getKmsKey(), email, awsProperties.getSaltKey(), awsProperties.getIvKey()));
           return submittedDocumentUrlRepository.save(submittedDocumentUrl);
         });
   }
@@ -120,7 +120,7 @@ public class ChangeEncryptController {
         .filter(submittedDocumentFile -> submittedDocumentFile.getEmail() != null)
         .flatMap(submittedDocumentFile -> {
           var email = AES256Util.decryptAESLegacy(awsProperties.getKmsKey(), submittedDocumentFile.getEmail());
-          submittedDocumentFile.setEmail(AES256Util.encryptAES(awsProperties.getKmsKey(), email));
+          submittedDocumentFile.setEmail(AES256Util.encryptAES(awsProperties.getKmsKey(), email, awsProperties.getSaltKey(), awsProperties.getIvKey()));
           return submittedDocumentFileRepository.save(submittedDocumentFile);
         });
   }
@@ -130,22 +130,22 @@ public class ChangeEncryptController {
     return lrcProjectUserAccountRepository.findAll().flatMap(lrcProjectUserAccount -> {
       if(lrcProjectUserAccount.getContactEmail() != null) {
         var contactEmail = AES256Util.decryptAESLegacy(awsProperties.getKmsKey(), lrcProjectUserAccount.getContactEmail());
-        lrcProjectUserAccount.setContactEmail(AES256Util.encryptAES(awsProperties.getKmsKey(), contactEmail));
+        lrcProjectUserAccount.setContactEmail(AES256Util.encryptAES(awsProperties.getKmsKey(), contactEmail, awsProperties.getSaltKey(), awsProperties.getIvKey()));
       }
 
       if(lrcProjectUserAccount.getName() != null) {
         var name = AES256Util.decryptAESLegacy(awsProperties.getKmsKey(), lrcProjectUserAccount.getName());
-        lrcProjectUserAccount.setName(AES256Util.encryptAES(awsProperties.getKmsKey(), name));
+        lrcProjectUserAccount.setName(AES256Util.encryptAES(awsProperties.getKmsKey(), name, awsProperties.getSaltKey(), awsProperties.getIvKey()));
       }
 
       if(lrcProjectUserAccount.getPhone() != null) {
         var phone = AES256Util.decryptAESLegacy(awsProperties.getKmsKey(), lrcProjectUserAccount.getPhone());
-        lrcProjectUserAccount.setPhone(AES256Util.encryptAES(awsProperties.getKmsKey(), phone));
+        lrcProjectUserAccount.setPhone(AES256Util.encryptAES(awsProperties.getKmsKey(), phone, awsProperties.getSaltKey(), awsProperties.getIvKey()));
       }
 
       if(lrcProjectUserAccount.getSnsId() != null) {
         var snsId = AES256Util.decryptAESLegacy(awsProperties.getKmsKey(), lrcProjectUserAccount.getSnsId());
-        lrcProjectUserAccount.setSnsId(AES256Util.encryptAES(awsProperties.getKmsKey(), snsId));
+        lrcProjectUserAccount.setSnsId(AES256Util.encryptAES(awsProperties.getKmsKey(), snsId, awsProperties.getSaltKey(), awsProperties.getIvKey()));
       }
       return lrcProjectUserAccountRepository.save(lrcProjectUserAccount);
     });
@@ -156,7 +156,7 @@ public class ChangeEncryptController {
     return lrcUserAccountRepository.findAll().flatMap(lrcUserAccount -> {
       var email = AES256Util.decryptAESLegacy(awsProperties.getKmsKey(), lrcUserAccount.getEmail());
       log.info(email);
-      lrcUserAccount.setEmail(AES256Util.encryptAES(awsProperties.getKmsKey(), email));
+      lrcUserAccount.setEmail(AES256Util.encryptAES(awsProperties.getKmsKey(), email, awsProperties.getSaltKey(), awsProperties.getIvKey()));
       var saveEmail = AES256Util.decryptAES(awsProperties.getKmsKey(), lrcUserAccount.getEmail());
       if(!email.equals(saveEmail)) throw new RuntimeException("fail");
       return lrcUserAccountRepository.save(lrcUserAccount);

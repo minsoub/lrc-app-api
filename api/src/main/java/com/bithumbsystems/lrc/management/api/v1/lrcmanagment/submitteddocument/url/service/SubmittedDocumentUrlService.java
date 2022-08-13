@@ -72,7 +72,7 @@ public class SubmittedDocumentUrlService {
                                 .url(submittedDocumentUrlRequest.getUrl())
                                 .createDate(LocalDateTime.now())
                                 .createAdminAccountId(account.getAccountId())
-                                .email(AES256Util.encryptAES(awsProperties.getKmsKey(),account.getEmail()))
+                                .email(AES256Util.encryptAES(awsProperties.getKmsKey(),account.getEmail(), awsProperties.getSaltKey(), awsProperties.getIvKey()))
                                 .build()
                 )
                 .switchIfEmpty(Mono.error(new SubmittedDocumentUrlException(ErrorCode.FAIL_CREATE_CONTENT)))
