@@ -19,6 +19,8 @@ cloud:
       message-name: message
       crypto-name: crypto
       auth-name: auth
+      salt-name: salt
+      iv-name: iv
 logging:
   level:
     root: ${management.api.logging.level.root:DEBUG}

@@ -18,3 +18,5 @@ cloud:
       message-name: message
       crypto-name: crypto
       auth-name: auth
+      salt-name: salt
+      iv-name: iv
