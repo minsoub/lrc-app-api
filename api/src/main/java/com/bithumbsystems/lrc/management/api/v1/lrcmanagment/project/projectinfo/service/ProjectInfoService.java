@@ -46,15 +46,26 @@ public class ProjectInfoService {
                                         .contractAddress(result.getContractAddress())
                                         .build());
                             })
-                            .flatMap(res -> {
+                            .switchIfEmpty(Mono.just(ProjectInfoResponse.builder()
+                                    .id(result.getId())
+                                    .projectId(result.getProjectId())
+                                    .whitepaperLink(result.getWhitepaperLink())
+                                    .businessCode(result.getBusinessCode())
+                                    .businessName("")
+                                    .networkCode(result.getNetworkCode())
+                                    .createDate(result.getCreateDate())
+                                    .contractAddress(result.getContractAddress())
+                                    .build()));
+
+                })
+                .flatMap(res -> {
                                 return lineMngDomainService.findById(res.getNetworkCode())
                                         .flatMap(c -> {
                                             res.setNetworkName(c.getName());
                                             return Mono.just(res);
-                                        });
-                            });
+                                        })
+                                        .switchIfEmpty(Mono.just(res));
                 });
-                //.switchIfEmpty(Mono.error(new ProjectInfoException(ErrorCode.NOT_FOUND_CONTENT)));
     }
 
     /**
