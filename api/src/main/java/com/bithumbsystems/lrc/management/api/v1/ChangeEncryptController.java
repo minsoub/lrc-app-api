@@ -76,7 +76,6 @@ public class ChangeEncryptController {
   }
 
   @GetMapping("/chat")
-  @Transactional
   public Flux<ChatMessage> chatMessage() {
     try {
       return getChatMessageFlux();
@@ -86,7 +85,6 @@ public class ChangeEncryptController {
     }
   }
 
-  @Transactional
   public Flux<ChatMessage> getChatMessageFlux() {
     return chatMessageRepository.findAll()
         .flatMap(chatMessage -> {
