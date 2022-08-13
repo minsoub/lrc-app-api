@@ -29,7 +29,7 @@ public class UserAccountController {
      * @return ReviewEstimateResponse Object
      */
     @GetMapping("/user-account/{projectId}")
-    @Operation(summary = "거래지원 관리 - 담당자 정보 리스트 project id로 찾기", description = "projectId를 이용하여 담장자 정보 리스트를 조회합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 담당자 정보 > 검색")
+    @Operation(summary = "거래지원 관리 - 담당자 정보 리스트 project id로 찾기", description = "projectId를 이용하여 담당자 정보 리스트를 조회합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 담당자 정보 > 검색")
     public ResponseEntity<Mono<?>> getUserAccount(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
                                                       @PathVariable("projectId") String projectId) {
         return ResponseEntity.ok().body(userAccountService.findByProjectId(projectId)
@@ -55,7 +55,7 @@ public class UserAccountController {
      * @return ReviewEstimateResponse Object
      */
     @PostMapping("/user-account/{projectId}")
-    @Operation(summary = "거래지원 관리 - 담당자 정보 신규 저장", description = "projectId를 이용하여 담장자 정보를 저장합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 담당자 정보 > 신규 저장")
+    @Operation(summary = "거래지원 관리 - 담당자 정보 신규 저장", description = "projectId를 이용하여 담당자 정보를 저장합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 담당자 정보 > 신규 저장")
     public ResponseEntity<Mono<?>> createUserAccount(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
                                                          @PathVariable("projectId") String projectId,
                                                      @Parameter(name = "user Object", description = "사용자 정보", in = ParameterIn.PATH)
@@ -73,7 +73,7 @@ public class UserAccountController {
      * @return
      */
     @PostMapping("/user-accounts/{projectId}")
-    @Operation(summary = "거래지원 관리 - 담당자 정보 수정", description = "projectId를 이용하여 담장자 정보를 수정합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 담당자 정보 > 수정")
+    @Operation(summary = "거래지원 관리 - 담당자 정보 수정", description = "projectId를 이용하여 담당자 정보를 수정합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 담당자 정보 > 수정")
     public ResponseEntity<Mono<?>> saveUserAccounts(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
                                                      @PathVariable("projectId") String projectId,
                                                     @Parameter(name = "user Object", description = "사용자 정보", in = ParameterIn.PATH)
