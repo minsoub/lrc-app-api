@@ -64,12 +64,28 @@ public class MarketingQuantityService {
 //                      if(!checkDecimalPoint(marketing.getMinimumQuantity()) || !checkDecimalPoint(marketing.getActualQuantity())) {
 //                        return Mono.error(new MarketingQuantityException(ErrorCode.INVALID_NUMBER_FORMAT));
 //                      }
-                      if (!result.getMinimumQuantity().equals(marketing.getMinimumQuantity())) {
-                        historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "최소 지원 수량", "수정", String.valueOf(marketing.getMinimumQuantity()), account);
-                      }
-                      if (!result.getActualQuantity().equals(marketing.getActualQuantity())) {
-                        historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "실제 상장 지원 수량", "수정", String.valueOf(marketing.getActualQuantity()), account);
-                      }
+                        if (result.getMinimumQuantity() == null && marketing.getMinimumQuantity() != null) {
+                            historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "최소 지원 수량", "수정", String.valueOf(marketing.getMinimumQuantity()), account);
+                        } else if(result.getMinimumQuantity() != null && marketing.getMinimumQuantity() == null) {
+                            historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "최소 지원 수량", "수정", "", account);
+                        }else {
+                            if (result.getMinimumQuantity() == null && marketing.getMinimumQuantity() == null) {
+                                // nothing
+                            }else if (!result.getMinimumQuantity().equals(marketing.getMinimumQuantity())) {
+                                historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "최소 지원 수량", "수정", String.valueOf(marketing.getMinimumQuantity()), account);
+                            }
+                        }
+                        if (result.getActualQuantity() == null && marketing.getActualQuantity() != null) {
+                            historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "실제 상장 지원 수량", "수정", String.valueOf(marketing.getActualQuantity()), account);
+                        } else if(result.getActualQuantity() != null && marketing.getActualQuantity() == null) {
+                            historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "실제 상장 지원 수량", "수정", "", account);
+                        } else if(result.getActualQuantity() == null && marketing.getActualQuantity() == null) {
+                            // nothing
+                        } else {
+                            if (!result.getActualQuantity().equals(marketing.getActualQuantity())) {
+                                historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "실제 상장 지원 수량", "수정", String.valueOf(marketing.getActualQuantity()), account);
+                            }
+                        }
                       return Mono.just(result);
                     })
                     .flatMap(r -> marketingQuantityDomainService.save(

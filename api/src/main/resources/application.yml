@@ -109,6 +109,20 @@ application:
 ---
 spring:
   config:
+    import: classpath:aws-properties-qa.yml, classpath:springdoc.yml
+    activate:
+      on-profile: qa
+mail:
+  logo-url: http://k8s-systemsd-lrcappwe-3ba5072e02-1786558476.ap-northeast-2.elb.amazonaws.com/images/maillogo.png
+  login-url: http://k8s-systemsd-lrcappwe-3ba5072e02-1786558476.ap-northeast-2.elb.amazonaws.com/
+logging:
+  config: classpath:logback-spring-dev.xml
+application:
+  role-type: ADMIN
+  site-id: 62a15f4ae4129b518b133127
+---
+spring:
+  config:
     import: classpath:aws-properties.yml
     activate:
       on-profile: prod

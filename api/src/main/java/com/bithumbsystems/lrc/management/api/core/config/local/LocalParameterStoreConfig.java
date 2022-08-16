@@ -13,6 +13,8 @@ import software.amazon.awssdk.services.ssm.SsmClient;
 import software.amazon.awssdk.services.ssm.model.GetParameterRequest;
 import software.amazon.awssdk.services.ssm.model.GetParameterResponse;
 
+import java.net.URI;
+
 import static com.bithumbsystems.lrc.management.api.core.config.constant.ParameterStoreConstant.*;
 
 @Log4j2
@@ -37,6 +39,8 @@ public class LocalParameterStoreConfig {
         log.debug("config store [kms name] => {}", awsProperties.getParamStoreKmsName());
 
         this.ssmClient = SsmClient.builder()
+                .endpointOverride(URI.create(awsProperties.getSsmEndPoint()))
+                //.endpointOverride(URI.create("https://ssm.ap-northeast-2.amazonaws.com"))
                 .credentialsProvider(credentialsProvider.getProvider()) // 로컬에서 개발로 붙을때 사용
                 .region(Region.of(awsProperties.getRegion()))
                 .build();

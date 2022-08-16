@@ -16,6 +16,8 @@ import software.amazon.awssdk.services.kms.KmsAsyncClient;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.ses.SesClient;
 
+import java.net.URI;
+
 @Slf4j
 @Getter
 @Setter
@@ -37,6 +39,7 @@ public class LocalAwsConfig {
   public S3AsyncClient s3client() {
     return S3AsyncClient.builder()
         .region(Region.of(awsProperties.getRegion()))
+         //   .endpointOverride(URI.create("https://s3.ap-northeast-2.amazonaws.com"))
         .credentialsProvider(ProfileCredentialsProvider.create(profileName))
         .build();
   }
@@ -45,6 +48,7 @@ public class LocalAwsConfig {
   public SesClient sesClient() {
     return SesClient.builder()
             .region(Region.of(awsProperties.getRegion()))
+            .endpointOverride(URI.create(awsProperties.getSesEndPoint())) //"https://ses.ap-northeast-2.amazonaws.com"))
             .credentialsProvider(ProfileCredentialsProvider.create(profileName))
             .build();
   }
@@ -53,6 +57,7 @@ public class LocalAwsConfig {
   public void init() {
     kmsAsyncClient = KmsAsyncClient.builder()
         .region(Region.of(awsProperties.getRegion()))
+            .endpointOverride(URI.create(awsProperties.getKmsEndPoint())) // "https://kms.ap-northeast-2.amazonaws.com"))
         .credentialsProvider(ProfileCredentialsProvider.create(profileName))
         .build();
 

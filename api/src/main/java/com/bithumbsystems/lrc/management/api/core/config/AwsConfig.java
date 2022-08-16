@@ -14,11 +14,13 @@ import software.amazon.awssdk.services.kms.KmsAsyncClient;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.ses.SesClient;
 
+import java.net.URI;
+
 @Slf4j
 @Getter
 @Setter
 @Configuration
-@Profile("dev|prod|eks-dev")
+@Profile("dev|prod|eks-dev|qa")
 public class AwsConfig {
 
   private final AwsProperties awsProperties;
@@ -35,6 +37,7 @@ public class AwsConfig {
   @Bean
   public S3AsyncClient s3client() {
     return S3AsyncClient.builder()
+            //.endpointOverride(URI.create("https://s3.ap-northeast-2.amazonaws.com"))
         .region(Region.of(awsProperties.getRegion()))
         .build();
   }
@@ -42,6 +45,7 @@ public class AwsConfig {
   @Bean
   public SesClient sesClient() {
     return SesClient.builder()
+            .endpointOverride(URI.create(awsProperties.getSesEndPoint())) // "https://ses.ap-northeast-2.amazonaws.com"))
             .region(Region.of(awsProperties.getRegion()))
             .build();
   }
@@ -49,6 +53,7 @@ public class AwsConfig {
   @PostConstruct
   public void init() {
     kmsAsyncClient = KmsAsyncClient.builder()
+            .endpointOverride(URI.create(awsProperties.getKmsEndPoint())) // "https://kms.ap-northeast-2.amazonaws.com"))
         .region(Region.of(awsProperties.getRegion()))
         .build();
   }

@@ -112,11 +112,11 @@ public class ReviewEstimateService {
                         _id = reviewEstimateRequest.getId().get(index);
                     }
                     String projectId = reviewEstimateRequest.getProjectId().get(index);
-                    String organization = reviewEstimateRequest.getOrganization().get(index);
-                    String result  = reviewEstimateRequest.getResult().get(index);
-                    String reference = reviewEstimateRequest.getReference().get(index);
+                    String organization = reviewEstimateRequest.getOrganization().size() == 0? "" : reviewEstimateRequest.getOrganization().get(index);
+                    String result  = reviewEstimateRequest.getResult().size() == 0 ? "" : reviewEstimateRequest.getResult().get(index);
+                    String reference = reviewEstimateRequest.getReference().size() == 0 ? "" : reviewEstimateRequest.getReference().get(index);
                     String fileKey = reviewEstimateRequest.getFileKey().size() == 0 ? "" : reviewEstimateRequest.getFileKey().get(index);
-                    Boolean isFile = reviewEstimateRequest.getIsFile().get(index);
+                    Boolean isFile = reviewEstimateRequest.getIsFile().size() == 0 ? false : reviewEstimateRequest.getIsFile().get(index);
                     String fileName = reviewEstimateRequest.getFileName().size()  == 0 ? "": reviewEstimateRequest.getFileName().get(index);
 
                     // file part
