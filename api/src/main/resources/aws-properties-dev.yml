@@ -6,16 +6,16 @@ cloud:
     stack:
       auto: ${management.aws.stack.auto:false}
     s3:
-      bucket: ${management.aws.s3.bucket:lrc-dev-bucket}
+      bucket: ${management.aws.s3.bucket:bithumb-bs-dev-lrc-bucket}
     region:
       static: ${management.aws.region:ap-northeast-2}
       auto: ${management.aws.region.auto:false}
     ssm:
-      endpoint: https://ssm.ap-northeast-2.amazonaws.com
+      endpoint: https://vpce-070145c4242d28466-s63o0xw2.ssm.ap-northeast-2.vpce.amazonaws.com
     ses:
       endpoint: https://ses.ap-northeast-2.amazonaws.com
     kms:
-      endpoint: https://kms.ap-northeast-2.amazonaws.com
+      endpoint: https://vpce-0d2252033d361bfff-9zm8y5uq.kms.ap-northeast-2.vpce.amazonaws.com
     param-store:
       enabled: true
       fail-fast: true
