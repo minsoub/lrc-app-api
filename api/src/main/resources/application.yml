@@ -102,7 +102,7 @@ mail:
   logo-url: http://k8s-systemsd-lrcappwe-3ba5072e02-1786558476.ap-northeast-2.elb.amazonaws.com/images/maillogo.png
   login-url: http://k8s-systemsd-lrcappwe-3ba5072e02-1786558476.ap-northeast-2.elb.amazonaws.com/
 logging:
-  config: classpath:logback-spring-dev.xml
+  config: classpath:logback-spring-${spring.profiles.active}.xml
 application:
   role-type: ADMIN
   site-id: 62a15f4ae4129b518b133127
@@ -116,7 +116,7 @@ mail:
   logo-url: http://k8s-systemsd-lrcappwe-3ba5072e02-1786558476.ap-northeast-2.elb.amazonaws.com/images/maillogo.png
   login-url: http://k8s-systemsd-lrcappwe-3ba5072e02-1786558476.ap-northeast-2.elb.amazonaws.com/
 logging:
-  config: classpath:logback-spring-dev.xml
+  config: classpath:logback-spring-${spring.profiles.active}.xml
 application:
   role-type: ADMIN
   site-id: 62a15f4ae4129b518b133127
