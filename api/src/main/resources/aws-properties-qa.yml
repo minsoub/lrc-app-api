@@ -13,7 +13,7 @@ cloud:
     ssm:
       endpoint: https://ssm.ap-northeast-2.amazonaws.com
     ses:
-      endpoint: https://ses.ap-northeast-2.amazonaws.com
+      endpoint: https://vpce-0bf60f241bc6a2e72-qojbj6s0.email-smtp.ap-northeast-2.vpce.amazonaws.com
     kms:
       endpoint: https://kms.ap-northeast-2.amazonaws.com
     param-store:
