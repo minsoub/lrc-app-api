@@ -7,13 +7,11 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
-import java.util.Arrays;
 import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import lombok.extern.slf4j.Slf4j;
@@ -121,44 +119,44 @@ public class AES256Util {
 
 
 
-  /**
-   * Decrypt (AES)
-   *
-   * @param keyString  the key string
-   * @param cipherText the cipher text
-   * @return string
-   */
-  public static String decryptAESLegacy(String keyString, String cipherText) {
-    String plainText = "";
-    if ((keyString == null) || keyString.length() == 0 || (cipherText == null) || cipherText.length() == 0) {
-      return plainText;
-    }
-
-    if ((keyString.length() != 16) && (keyString.length() != 24) && (keyString.length() != 32)) {
-      return plainText;
-    }
-
-    try {
-      byte[] keyBytes = keyString.getBytes(StandardCharsets.UTF_8);
-      byte[] cipherTextBytes = org.apache.commons.codec.binary.Base64.decodeBase64(cipherText.getBytes(StandardCharsets.UTF_8));
-
-      Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-      int bsize = cipher.getBlockSize();
-      IvParameterSpec ivspec = new IvParameterSpec(Arrays.copyOfRange(keyBytes, 0, bsize));
-
-      SecretKeySpec secureKey = new SecretKeySpec(keyBytes, "AES");
-      cipher.init(Cipher.DECRYPT_MODE, secureKey, ivspec);
-      byte[] decrypted = cipher.doFinal(cipherTextBytes);
-
-      plainText = new String(decrypted, StandardCharsets.UTF_8);
-
-    } catch (Exception e) {
-      plainText = "";
-      e.printStackTrace();
-    }
-
-    return plainText;
-  }
+//  /**
+//   * Decrypt (AES)
+//   *
+//   * @param keyString  the key string
+//   * @param cipherText the cipher text
+//   * @return string
+//   */
+//  public static String decryptAESLegacy(String keyString, String cipherText) {
+//    String plainText = "";
+//    if ((keyString == null) || keyString.length() == 0 || (cipherText == null) || cipherText.length() == 0) {
+//      return plainText;
+//    }
+//
+//    if ((keyString.length() != 16) && (keyString.length() != 24) && (keyString.length() != 32)) {
+//      return plainText;
+//    }
+//
+//    try {
+//      byte[] keyBytes = keyString.getBytes(StandardCharsets.UTF_8);
+//      byte[] cipherTextBytes = org.apache.commons.codec.binary.Base64.decodeBase64(cipherText.getBytes(StandardCharsets.UTF_8));
+//
+//      Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+//      int bsize = cipher.getBlockSize();
+//      IvParameterSpec ivspec = new IvParameterSpec(Arrays.copyOfRange(keyBytes, 0, bsize));
+//
+//      SecretKeySpec secureKey = new SecretKeySpec(keyBytes, "AES");
+//      cipher.init(Cipher.DECRYPT_MODE, secureKey, ivspec);
+//      byte[] decrypted = cipher.doFinal(cipherTextBytes);
+//
+//      plainText = new String(decrypted, StandardCharsets.UTF_8);
+//
+//    } catch (Exception e) {
+//      plainText = "";
+//      e.printStackTrace();
+//    }
+//
+//    return plainText;
+//  }
 
   public static String encryptAES(String password, String plainMessage, String saltKey, String ivKey) {
     var cipherMessage = "";
