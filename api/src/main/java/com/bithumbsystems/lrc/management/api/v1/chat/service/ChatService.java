@@ -172,6 +172,61 @@ public class ChatService {
                     return null;
                 });
     }
+
+    public Mono<ChatFileResponse> findByFileInfo(String projectId, String fileKey) {
+        return chatDomainService.findByFileId(fileKey)
+                .flatMap(result -> {
+                    if (result.getUserType() == null) {
+                        return Mono.just(ChatFileResponse.builder()
+                                .id(result.getId())
+                                .projectId(result.getProjectId())
+                                .fileName(result.getFileName())
+                                .fileSize(result.getFileSize())
+                                .fileType(result.getFileType())
+                                .userType(result.getUserType())
+                                .userTypeName(null)
+                                .createDate(result.getCreateDate())
+                                .createAccountId(result.getCreateAccountId())
+                                .build());
+                    } else if (result.getUserType().equals(UserType.USER)) {
+                        return userAccountDomainService.findById(result.getCreateAccountId())
+                                .flatMap(r1 -> {
+                                    return  Mono.just(ChatFileResponse.builder()
+                                            .id(result.getId())
+                                            .projectId(result.getProjectId())
+                                            .fileName(result.getFileName())
+                                            .fileSize(result.getFileSize())
+                                            .fileType(result.getFileType())
+                                            .userType(result.getUserType())
+                                            .userTypeName(AES256Util.decryptAES(awsProperties.getKmsKey(), r1.getEmail()))
+                                            .createDate(result.getCreateDate())
+                                            .createAccountId(result.getCreateAccountId())
+                                            .build());
+                                });
+                    }else if (result.getUserType().equals(UserType.ADMIN)) {
+                        return accountDomainService.findByAdminId(result.getCreateAccountId())
+                                .flatMap(r2 -> {
+                                    return  Mono.just(ChatFileResponse.builder()
+                                            .id(result.getId())
+                                            .projectId(result.getProjectId())
+                                            .fileName(result.getFileName())
+                                            .fileSize(result.getFileSize())
+                                            .fileType(result.getFileType())
+                                            .userType(result.getUserType())
+                                            .userTypeName(r2.getEmail())
+                                            .createDate(result.getCreateDate())
+                                            .createAccountId(result.getCreateAccountId())
+                                            .build());
+                                });
+                    }
+                    return null;
+                });
+    }
+    /**
+     * 파일 상세 정보 조회
+     * @param fileKey
+     * @return
+     */
     public Mono<ChatFile> findById(String fileKey) {
         return chatDomainService.findByChatFileId(fileKey);
     }

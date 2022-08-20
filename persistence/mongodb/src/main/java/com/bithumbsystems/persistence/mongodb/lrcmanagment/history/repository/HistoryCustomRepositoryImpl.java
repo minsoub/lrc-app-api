@@ -36,11 +36,11 @@ public class HistoryCustomRepositoryImpl implements HistoryCustomRepository {
                 .andOperator(
                         where("project_id").is(projectId)
                 )
-                .orOperator(
-                        where("menu").regex(keyword),
-                        where("subject").regex(keyword),
-                        where("task_history").regex(keyword)
-                )
+//                .orOperator(
+//                        where("menu").regex(keyword),
+//                        where("subject").regex(keyword),
+//                        where("task_history").regex(keyword)
+//                )
         );
 
         return reactiveMongoTemplate.find(condition,  History.class);

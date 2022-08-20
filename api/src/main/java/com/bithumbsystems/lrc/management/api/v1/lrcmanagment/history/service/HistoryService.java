@@ -11,6 +11,7 @@ import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.useraccount.s
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.Comparator;
@@ -50,6 +51,22 @@ public class HistoryService {
                         }
                     }
                 })
+                .filter((matchResult) -> {
+                    if (!StringUtils.hasLength(keyword)) return true;
+                    else {
+                        if (matchResult.getMenu().indexOf(keyword) != -1 || matchResult.getSubject().indexOf(keyword) != -1
+                                || matchResult.getTaskHistory().indexOf(keyword) != -1 || matchResult.getCustomer().indexOf(keyword) != -1) {
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }
+                    }
+                })
+//                .filter(r -> StringUtils.hasLength(keyword) ? (r.getMenu().indexOf(keyword) == -1 ? false : true) : true)
+//                .filter(r -> StringUtils.hasLength(keyword) ? (r.getSubject().indexOf(keyword) == -1 ? false : true) : true)
+//                .filter(r -> StringUtils.hasLength(keyword) ? (r.getTaskHistory().indexOf(keyword) == -1 ? false : true) : true)
+//                .filter(r -> StringUtils.hasLength(keyword) ? (r.getCustomer().indexOf(keyword) == -1 ? false : true) : true)
                 .map(HistoryMapper.INSTANCE::historyResponse)
                 .collectSortedList(Comparator.comparing(HistoryResponse::getUpdateDate).reversed());
     }
