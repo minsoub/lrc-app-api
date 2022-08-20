@@ -1,5 +1,7 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectlink.service;
 
+import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.listener.HistoryLog;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectlink.mapper.ProjectLinkMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectlink.model.request.ProjectLinkRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectlink.model.response.FoundationLinkResponse;
@@ -8,6 +10,7 @@ import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.foundationinf
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectlink.service.ProjectLinkDomainService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -18,6 +21,9 @@ public class ProjectLinkService {
     private final ProjectLinkDomainService projectLinkDomainService;
 
     private final FoundationInfoDomainService foundationDomainService;
+
+    // History 저장 Event
+    private final HistoryLog historyLog;
 
     /**
      * 프로젝트 링크 가져오기
@@ -79,7 +85,7 @@ public class ProjectLinkService {
      * @param projectLinkRequest
      * @return FoundationResponse
      */
-    public Mono<List<ProjectLinkResponse>> create(ProjectLinkRequest projectLinkRequest) {
+    public Mono<List<ProjectLinkResponse>> create(ProjectLinkRequest projectLinkRequest, Account account) {
         return projectLinkDomainService.save(ProjectLinkMapper.INSTANCE.projectLinkRequestToProjectLink(projectLinkRequest))
                 .flatMap(projectLink -> {
                     ProjectLinkRequest projectLinkRequest1 = new ProjectLinkRequest();
@@ -88,7 +94,14 @@ public class ProjectLinkService {
                     projectLinkRequest1.setLinkProjectId(projectLink.getProjectId());
                     projectLinkRequest1.setLinkProjectSymbol(projectLinkRequest.getSymbol());
 
-                    return projectLinkDomainService.save(ProjectLinkMapper.INSTANCE.projectLinkRequestToProjectLink(projectLinkRequest1));
+                    return projectLinkDomainService.save(ProjectLinkMapper.INSTANCE.projectLinkRequestToProjectLink(projectLinkRequest1))
+                            .flatMap(result -> {
+                                return foundationDomainService.findById(projectLink.getLinkProjectId())
+                                        .flatMap(res -> {
+                                            historyLog.send(projectLinkRequest.getProjectId(), "프로젝트 관리>프로젝트 연결", "프로젝트 연결", "연결", res.getName()+"("+res.getSymbol()+")", account);
+                                            return Mono.just(res);
+                                        });
+                            });
                 })
                 .then(this.findByProjectLinkList(projectLinkRequest.getProjectId()));
     }
@@ -99,9 +112,16 @@ public class ProjectLinkService {
      * @param linkId
      * @return FoundationResponse
      */
-    public Mono<ProjectLinkResponse> deleteLinkProject(String linkId) {
+    public Mono<ProjectLinkResponse> deleteLinkProject(String linkId, Account account) {
         return projectLinkDomainService.findById(linkId)
                 .flatMap(projectLinkDomainService::deleteLinkProject)
+                .flatMap(res -> {
+                    return foundationDomainService.findById(res.getLinkProjectId())
+                            .flatMap(r -> {
+                                historyLog.send(res.getProjectId(), "프로젝트 관리>프로젝트 연결", "프로젝트 연결", "연결 해제", r.getName()+"("+r.getSymbol()+")", account);
+                                return Mono.just(res);
+                            });
+                })
                 .map(r1 -> {
                     return projectLinkDomainService.findByLinkProject(r1.getLinkProjectId(), r1.getProjectId())
                             .flatMap(projectLinkDomainService::deleteLinkProject);

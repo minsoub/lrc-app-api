@@ -1,4 +1,4 @@
-package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.listener;
+package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.listener;
 
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.history.model.entity.History;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.history.service.HistoryDomainService;

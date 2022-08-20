@@ -1,15 +1,11 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.marketingquantity.service;
 
-import static com.bithumbsystems.lrc.management.api.core.util.NumberUtil.checkDecimalPoint;
-
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
-import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.listener.HistoryDto;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.marketingquantity.exception.MarketingQuantityException;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.listener.HistoryDto;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.listener.HistoryLog;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.marketingquantity.mapper.MarketingQuantityMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.marketingquantity.model.request.MarketingQuantityRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.marketingquantity.model.response.MarketingQuantityResponse;
-import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.marketingquantity.model.entity.MarketingQuantity;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.marketingquantity.service.MarketingQuantityDomainService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +23,7 @@ import reactor.core.publisher.Mono;
 public class MarketingQuantityService {
 
   private final MarketingQuantityDomainService marketingQuantityDomainService;
-  private final ApplicationEventPublisher applicationEventPublisher;
+    private final HistoryLog historyLog;
 
   /**
    * 마케팅 수량 id로 찾기
@@ -64,26 +60,37 @@ public class MarketingQuantityService {
 //                      if(!checkDecimalPoint(marketing.getMinimumQuantity()) || !checkDecimalPoint(marketing.getActualQuantity())) {
 //                        return Mono.error(new MarketingQuantityException(ErrorCode.INVALID_NUMBER_FORMAT));
 //                      }
+                        if (!StringUtils.hasLength(result.getSymbol()) && StringUtils.hasLength(marketing.getSymbol())) {
+                            historyLog.send(projectId, "프로젝트 관리>마케팅 수량", "심볼", "수정", marketing.getSymbol(), account);
+                        } else if(StringUtils.hasLength(result.getSymbol()) && !StringUtils.hasLength(marketing.getSymbol())) {
+                            historyLog.send(projectId, "프로젝트 관리>마케팅 수량", "심볼", "수정", "", account);
+                        } else {
+                            if(!StringUtils.hasLength(result.getSymbol()) && !StringUtils.hasLength(marketing.getSymbol())) {
+                                // nothing
+                            } else {
+                                historyLog.send(projectId, "프로젝트 관리>마케팅 수량", "심볼", "수정", marketing.getSymbol(), account);
+                            }
+                        }
                         if (result.getMinimumQuantity() == null && marketing.getMinimumQuantity() != null) {
-                            historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "최소 지원 수량", "수정", String.valueOf(marketing.getMinimumQuantity()), account);
+                            historyLog.send(projectId, "프로젝트 관리>마케팅 수량", "제안받은 수량", "수정", String.valueOf(marketing.getMinimumQuantity()), account);
                         } else if(result.getMinimumQuantity() != null && marketing.getMinimumQuantity() == null) {
-                            historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "최소 지원 수량", "수정", "", account);
+                            historyLog.send(projectId, "프로젝트 관리>마케팅 수량", "제안받은 수량", "수정", "", account);
                         }else {
                             if (result.getMinimumQuantity() == null && marketing.getMinimumQuantity() == null) {
                                 // nothing
                             }else if (!result.getMinimumQuantity().equals(marketing.getMinimumQuantity())) {
-                                historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "최소 지원 수량", "수정", String.valueOf(marketing.getMinimumQuantity()), account);
+                                historyLog.send(projectId, "프로젝트 관리>마케팅 수량", "제안받은수량", "수정", String.valueOf(marketing.getMinimumQuantity()), account);
                             }
                         }
                         if (result.getActualQuantity() == null && marketing.getActualQuantity() != null) {
-                            historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "실제 상장 지원 수량", "수정", String.valueOf(marketing.getActualQuantity()), account);
+                            historyLog.send(projectId, "프로젝트 관리>마케팅 수량", "입금받은 수량", "수정", String.valueOf(marketing.getActualQuantity()), account);
                         } else if(result.getActualQuantity() != null && marketing.getActualQuantity() == null) {
-                            historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "실제 상장 지원 수량", "수정", "", account);
+                            historyLog.send(projectId, "프로젝트 관리>마케팅 수량", "입금받은 수량", "수정", "", account);
                         } else if(result.getActualQuantity() == null && marketing.getActualQuantity() == null) {
                             // nothing
                         } else {
                             if (!result.getActualQuantity().equals(marketing.getActualQuantity())) {
-                                historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "실제 상장 지원 수량", "수정", String.valueOf(marketing.getActualQuantity()), account);
+                                historyLog.send(projectId, "프로젝트 관리>마케팅 수량", "입금받은 수량", "수정", String.valueOf(marketing.getActualQuantity()), account);
                             }
                         }
                       return Mono.just(result);
@@ -92,11 +99,12 @@ public class MarketingQuantityService {
                         MarketingQuantityMapper.INSTANCE.marketingQuantityResponseToMarketingQuantity(
                             marketing)));
               } else { // 신규 등록...
-                historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "최소 지원 수량", "등록", String.valueOf(marketing.getMinimumQuantity()), account);
-                historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "실제 상장 지원 수량", "등록", String.valueOf(marketing.getActualQuantity()), account);
-                return marketingQuantityDomainService.insert(
-                    MarketingQuantityMapper.INSTANCE.marketingQuantityResponseToMarketingQuantity(
-                        marketing));
+                  historyLog.send(projectId, "프로젝트 관리>마케팅 수량", "심볼", "항목 추가", marketing.getSymbol(), account);
+                  historyLog.send(projectId, "프로젝트 관리>마케팅 수량", "제안받은 수량", "항목 추가", String.valueOf(marketing.getMinimumQuantity()), account);
+                  historyLog.send(projectId, "프로젝트 관리>마케팅 수량", "입금받은 수량", "항목 추가", String.valueOf(marketing.getActualQuantity()), account);
+                  return marketingQuantityDomainService.insert(
+                          MarketingQuantityMapper.INSTANCE.marketingQuantityResponseToMarketingQuantity(marketing)
+                  );
               }
             }
         )
@@ -115,35 +123,10 @@ public class MarketingQuantityService {
   public Mono<MarketingQuantityResponse> deleteById(String projectId, String id, Account account) {
       return marketingQuantityDomainService.findById(id)
               .flatMap(result -> {
-                  historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "마켓팅 수량", "삭제", "", account);
+                  historyLog.send(projectId, "프로젝트 관리>프로젝트 정보", "마켓팅 수량", "항목 삭제", "", account);
                   result.setDelYn(true);
                   return marketingQuantityDomainService.save(result)
                           .flatMap(res -> Mono.just(MarketingQuantityMapper.INSTANCE.marketingQuantityResponse(res)));
               });
-  }
-
-  /**
-   * 변경 히스토리 저장.
-   *
-   * @param projectId
-   * @param menu
-   * @param subject
-   * @param taskHistory
-   * @param account
-   * @return
-   */
-  private void historyLogSend(String projectId, String menu, String subject, String taskHistory, String item,
-      Account account) {
-    applicationEventPublisher.publishEvent(
-        HistoryDto.builder()
-            .projectId(projectId)
-            .menu(menu)
-            .subject(subject)
-            .taskHistory(taskHistory)
-            .item(item)
-            .email(account.getEmail())
-            .accountId(account.getAccountId())
-            .build()
-    );
   }
 }
