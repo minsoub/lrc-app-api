@@ -1,6 +1,8 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.service;
 
+import com.bithumbsystems.lrc.management.api.core.config.properties.AwsProperties;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
+import com.bithumbsystems.lrc.management.api.core.util.AES256Util;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContentException;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.mapper.HistoryMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.model.request.HistoryRequest;
@@ -25,6 +27,7 @@ public class HistoryService {
     private final HistoryDomainService historyDomainService;
     private final UserAccountDomainService userAccountDomainService;
     private final AccountDomainService  adminAccountDomainService;
+    private final AwsProperties awsProperties;
 
     /**
      * 히스토리 모두 가져오기
@@ -45,7 +48,7 @@ public class HistoryService {
                         } else {
                             return userAccountDomainService.findByProjectIdAndUserAccountId(projectId, result.getUpdateAccountId())
                                     .flatMap(r1 -> {
-                                        String customer = (StringUtils.hasLength(r1.getName()))? r1.getName()+"("+result.getCustomer()+")" : result.getCustomer();
+                                        String customer = (StringUtils.hasLength(r1.getName()))? AES256Util.decryptAES(awsProperties.getKmsKey(), r1.getName())+"("+result.getCustomer()+")" : result.getCustomer();
                                         result.setCustomer(customer);
                                         return Mono.just(result);
                                     });
