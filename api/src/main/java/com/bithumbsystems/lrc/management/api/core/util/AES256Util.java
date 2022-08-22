@@ -7,13 +7,11 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
-import java.util.Arrays;
 import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +41,7 @@ public class AES256Util {
     SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
     // iterationCount = 65536
     // keyLength = 128
-    KeySpec spec = new PBEKeySpec(password, salt, 65536, 128);
+    KeySpec spec = new PBEKeySpec(password, salt, 1024, 128);
     return new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
   }
 
@@ -79,7 +77,6 @@ public class AES256Util {
       cipherMessage = java.util.Base64.getEncoder().encodeToString(cipherTextWithIvSalt);
     } catch(Exception e) {
       log.error(e.getMessage());
-      e.printStackTrace();
     }
 
     return cipherMessage;
@@ -119,45 +116,54 @@ public class AES256Util {
     return plainMessage;
   }
 
+  // AES 128 bits secret key derived from a password
+  public static SecretKey getAESKeyFromPasswordLegacy(char[] password, byte[] salt)
+      throws NoSuchAlgorithmException, InvalidKeySpecException {
 
+    SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+    // iterationCount = 65536
+    // keyLength = 128
+    KeySpec spec = new PBEKeySpec(password, salt, 65536, 128);
+    return new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
+  }
 
   /**
    * Decrypt (AES)
    *
    * @param keyString  the key string
-   * @param cipherText the cipher text
+   * @param cipherMessage the cipher text
    * @return string
    */
-  public static String decryptAESLegacy(String keyString, String cipherText) {
-    String plainText = "";
-    if ((keyString == null) || keyString.length() == 0 || (cipherText == null) || cipherText.length() == 0) {
-      return plainText;
-    }
-
-    if ((keyString.length() != 16) && (keyString.length() != 24) && (keyString.length() != 32)) {
-      return plainText;
-    }
+  public static String decryptAESLegacy(String keyString, String cipherMessage) {
+    var plainMessage = "";
 
     try {
-      byte[] keyBytes = keyString.getBytes(StandardCharsets.UTF_8);
-      byte[] cipherTextBytes = org.apache.commons.codec.binary.Base64.decodeBase64(cipherText.getBytes(StandardCharsets.UTF_8));
+      byte[] decode = Base64.getDecoder().decode(cipherMessage.getBytes(UTF_8));
 
-      Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-      int bsize = cipher.getBlockSize();
-      IvParameterSpec ivspec = new IvParameterSpec(Arrays.copyOfRange(keyBytes, 0, bsize));
+      // get back the iv and salt from the cipher text
+      ByteBuffer bb = ByteBuffer.wrap(decode);
 
-      SecretKeySpec secureKey = new SecretKeySpec(keyBytes, "AES");
-      cipher.init(Cipher.DECRYPT_MODE, secureKey, ivspec);
-      byte[] decrypted = cipher.doFinal(cipherTextBytes);
+      byte[] iv = new byte[IV_LENGTH_BYTE];
+      bb.get(iv);
 
-      plainText = new String(decrypted, StandardCharsets.UTF_8);
+      byte[] salt = new byte[SALT_LENGTH_BYTE];
+      bb.get(salt);
 
+      byte[] cipherText = new byte[bb.remaining()];
+      bb.get(cipherText);
+
+      // get back the aes key from the same password and salt
+      SecretKey aesKeyFromPassword = getAESKeyFromPasswordLegacy(keyString.toCharArray(), salt);
+      Cipher cipher = Cipher.getInstance(ALGORITHM);
+      cipher.init(Cipher.DECRYPT_MODE, aesKeyFromPassword, new GCMParameterSpec(TAG_LENGTH_BIT, iv));
+
+      byte[] plainText = cipher.doFinal(cipherText);
+
+      plainMessage = new String(plainText, UTF_8);
     } catch (Exception e) {
-      plainText = "";
-      e.printStackTrace();
+      log.error(e.getMessage());
     }
-
-    return plainText;
+    return plainMessage;
   }
 
   public static String encryptAES(String password, String plainMessage, String saltKey, String ivKey) {
@@ -188,7 +194,6 @@ public class AES256Util {
       cipherMessage = java.util.Base64.getEncoder().encodeToString(cipherTextWithIvSalt);
     } catch(Exception e) {
       log.error(e.getMessage());
-      e.printStackTrace();
     }
 
     return cipherMessage;
