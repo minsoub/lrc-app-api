@@ -139,7 +139,7 @@ public class AuditLogService {
                         row.createCell(4).setCellValue(res.getMethod());
                         row.createCell(5).setCellValue(res.getUri());
                         row.createCell(6).setCellValue(res.getQueryParams());
-                        row.createCell(7).setCellValue(res.getCreateDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                        row.createCell(7).setCellValue(res.getCreateDate().plusHours(9).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
                     }
                     workbook.write(out);
 
