@@ -45,7 +45,8 @@ public class HistoryService {
                         } else {
                             return userAccountDomainService.findByProjectIdAndUserAccountId(projectId, result.getUpdateAccountId())
                                     .flatMap(r1 -> {
-                                        result.setCustomer(r1.getName()+"("+result.getCustomer()+")");
+                                        String customer = (StringUtils.hasLength(r1.getName()))? r1.getName()+"("+result.getCustomer()+")" : result.getCustomer();
+                                        result.setCustomer(customer);
                                         return Mono.just(result);
                                     });
                         }
