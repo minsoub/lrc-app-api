@@ -670,7 +670,7 @@ public class FoundationService {
                                 .symbol(foundationInfo.getSymbol())
                                 .contractCode(foundationInfo.getContractCode())
                                 .progressCode(foundationInfo.getProcessCode())
-                                .createDate(foundationInfo.getCreateDate())
+                                .createDate(foundationInfo.getCreateDate().plusHours(9))
                                 .build()
                         )
                 )

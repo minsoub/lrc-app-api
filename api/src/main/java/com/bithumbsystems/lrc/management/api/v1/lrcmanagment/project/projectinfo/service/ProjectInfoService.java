@@ -1,9 +1,8 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.service;
 
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
-import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.listener.HistoryDto;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.exception.ProjectInfoException;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.listener.HistoryDto;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.listener.HistoryLog;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.mapper.ProjectInfoMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.model.request.ProjectInfoRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.model.response.ProjectInfoResponse;
@@ -24,7 +23,7 @@ public class ProjectInfoService {
 
     private final ProjectInfoDomainService projectInfoDomainService;
     private final LineMngDomainService lineMngDomainService;
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private final HistoryLog historyLog;
     /**
      * 프로젝트 정보 1개 id 찾기
      * @param projectId
@@ -90,21 +89,21 @@ public class ProjectInfoService {
                 .flatMap(c -> {
                     // 변경 히스토리 추가
                     if ((c.getBusinessCode() == null && projectInfoRequest.getBusinessCode() != null) || !c.getBusinessCode().equals(projectInfoRequest.getBusinessCode())) {
-                        historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "사업 계열", "수정", projectInfoRequest.getBusinessCode(), account);
+                        historyLog.send(projectId, "프로젝트 관리>프로젝트 정보", "사업 계열", "수정", projectInfoRequest.getBusinessCode(), account);
                     }
                     if ((c.getNetworkCode() == null && projectInfoRequest.getNetworkCode() != null) || !c.getNetworkCode().equals(projectInfoRequest.getNetworkCode())) {
-                        historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "네트워크 계열", "수정", projectInfoRequest.getNetworkCode(), account);
+                        historyLog.send(projectId, "프로젝트 관리>프로젝트 정보", "네트워크 계열", "수정", projectInfoRequest.getNetworkCode(), account);
                     }
                     if ((c.getWhitepaperLink() == null && projectInfoRequest.getWhitepaperLink() != null) || !c.getWhitepaperLink().equals(projectInfoRequest.getWhitepaperLink())) {
-                        historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "백서 링크", "수정", projectInfoRequest.getWhitepaperLink(), account);
+                        historyLog.send(projectId, "프로젝트 관리>프로젝트 정보", "Jira 번호", "수정", projectInfoRequest.getWhitepaperLink(), account);
                     }
                     if (c.getCreateDate() == null && projectInfoRequest.getCreateDate() == null) {
                         // no job
                     } else if ((c.getCreateDate() == null && projectInfoRequest.getCreateDate() != null) || !c.getCreateDate().equals(projectInfoRequest.getCreateDate())) {
-                        historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "최초 발행일", "수정", projectInfoRequest.getCreateDate() == null ? "" : projectInfoRequest.getCreateDate().toString(), account);
+                        historyLog.send(projectId, "프로젝트 관리>프로젝트 정보", "최초 발행일", "수정", projectInfoRequest.getCreateDate() == null ? "" : projectInfoRequest.getCreateDate().toString(), account);
                     }
                     if ((c.getContractAddress() == null && projectInfoRequest.getContractAddress() != null) || !c.getContractAddress().equals(projectInfoRequest.getContractAddress())) {
-                        historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "컨트렉트 주소", "수정", projectInfoRequest.getContractAddress(), account);
+                        historyLog.send(projectId, "프로젝트 관리>프로젝트 정보", "컨트렉트 주소", "수정", projectInfoRequest.getContractAddress(), account);
                     }
                     c.setBusinessCode(projectInfoRequest.getBusinessCode());
                     c.setNetworkCode(projectInfoRequest.getNetworkCode());
@@ -116,19 +115,19 @@ public class ProjectInfoService {
                 })
                 .switchIfEmpty(Mono.defer(() -> {
                         if (StringUtils.hasLength(projectInfoRequest.getBusinessCode())) {
-                            historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "사업 계열", "등록", projectInfoRequest.getBusinessCode(), account);
+                            historyLog.send(projectId, "프로젝트 관리>프로젝트 정보", "사업 계열", "등록", projectInfoRequest.getBusinessCode(), account);
                         }
                         if (StringUtils.hasLength(projectInfoRequest.getNetworkCode())) {
-                             historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "네트워크 계열", "등록", projectInfoRequest.getNetworkCode(), account);
+                            historyLog.send(projectId, "프로젝트 관리>프로젝트 정보", "네트워크 계열", "등록", projectInfoRequest.getNetworkCode(), account);
                         }
                         if (StringUtils.hasLength(projectInfoRequest.getWhitepaperLink())) {
-                            historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "백서 링크", "등록", projectInfoRequest.getWhitepaperLink(), account);
+                            historyLog.send(projectId, "프로젝트 관리>프로젝트 정보", "Jira 번호", "등록", projectInfoRequest.getWhitepaperLink(), account);
                         }
                         if (StringUtils.hasLength(projectInfoRequest.getContractAddress())) {
-                            historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "최초 발행일", "등록", projectInfoRequest.getContractAddress(), account);
+                            historyLog.send(projectId, "프로젝트 관리>프로젝트 정보", "최초 발행일", "등록", projectInfoRequest.getContractAddress(), account);
                         }
                         if (!StringUtils.isEmpty(projectInfoRequest.getCreateDate())) {
-                            historyLogSend(projectId, "프로젝트 관리>프로젝트 정보", "컨트렉트 주소", "등록", projectInfoRequest.getCreateDate().toString(), account);
+                            historyLog.send(projectId, "프로젝트 관리>프로젝트 정보", "컨트렉트 주소", "등록", projectInfoRequest.getCreateDate().toString(), account);
                         }
                        return  projectInfoDomainService.save(ProjectInfo.builder()
                                         .id(UUID.randomUUID().toString())
@@ -143,29 +142,5 @@ public class ProjectInfoService {
 
                     })
                 );
-    }
-
-    /**
-     * 변경 히스토리 저장.
-     *
-     * @param projectId
-     * @param menu
-     * @param subject
-     * @param taskHistory
-     * @param account
-     * @return
-     */
-    private void historyLogSend(String projectId, String menu, String subject, String taskHistory, String item, Account account) {
-        applicationEventPublisher.publishEvent(
-                HistoryDto.builder()
-                        .projectId(projectId)
-                        .menu(menu)
-                        .subject(subject)
-                        .taskHistory(taskHistory)
-                        .item(item)
-                        .email(account.getEmail())
-                        .accountId(account.getAccountId())
-                        .build()
-        );
     }
 }

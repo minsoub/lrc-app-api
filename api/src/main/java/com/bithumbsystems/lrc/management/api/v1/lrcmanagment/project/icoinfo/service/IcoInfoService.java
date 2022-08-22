@@ -1,14 +1,11 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.icoinfo.service;
 
-import static com.bithumbsystems.lrc.management.api.core.util.NumberUtil.checkDecimalPoint;
-
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
-import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.icoinfo.exception.IcoInfoException;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.listener.HistoryLog;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.icoinfo.mapper.IcoInfoMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.icoinfo.model.request.IcoInfoRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.icoinfo.model.response.IcoInfoResponse;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.listener.HistoryDto;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.listener.HistoryDto;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.icoinfo.model.entity.IcoInfo;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.icoinfo.service.IcoInfoDomainService;
 import java.util.List;
@@ -28,7 +25,7 @@ import reactor.core.publisher.Mono;
 public class IcoInfoService {
 
   private final IcoInfoDomainService icoInfoDomainService;
-  private final ApplicationEventPublisher applicationEventPublisher;
+  private final HistoryLog historyLog;
 
   /**
    * 상장 정보 1개 id 찾기
@@ -62,19 +59,19 @@ public class IcoInfoService {
 
 
                 if (!Objects.equals(result.getPrice(), icoInfo.getPrice())) {
-                  historyLogSend(projectId, "프로젝트 관리>상장 정보", "KRW 상장가", "수정", String.valueOf(icoInfo.getPrice()), account);
+                  historyLog.send(projectId, "프로젝트 관리>상장 정보", "KRW 상장가", "수정", String.valueOf(icoInfo.getPrice()), account);
                 }
 
 
                 if (result.getIcoDate() == null && icoInfo.getIcoDate() != null) {
-                  historyLogSend(projectId, "프로젝트 관리>상장 정보", "KRW 상장일", "수정", icoInfo.getIcoDate().toString(), account);
+                  historyLog.send(projectId, "프로젝트 관리>상장 정보", "KRW 상장일", "수정", icoInfo.getIcoDate().toString(), account);
                 } else if(result.getIcoDate() != null && icoInfo.getIcoDate() == null) {
-                  historyLogSend(projectId, "프로젝트 관리>상장 정보", "KRW 상장일", "수정", "", account);
+                  historyLog.send(projectId, "프로젝트 관리>상장 정보", "KRW 상장일", "수정", "", account);
                 } else {
                   if (result.getIcoDate() ==  null && icoInfo.getIcoDate() == null) {
                     // nothing..
                   } else if (result.getIcoDate() != icoInfo.getIcoDate()) {
-                    historyLogSend(projectId, "프로젝트 관리>상장 정보", "KRW 상장일", "수정", icoInfo.getIcoDate().toString(), account);
+                    historyLog.send(projectId, "프로젝트 관리>상장 정보", "KRW 상장일", "수정", icoInfo.getIcoDate().toString(), account);
                   }
                 }
 
@@ -83,19 +80,19 @@ public class IcoInfoService {
 //                }
               } else {
                 if (!Objects.equals(result.getPrice(), icoInfo.getPrice())) {
-                  historyLogSend(projectId, "프로젝트 관리>상장 정보", "BTC 상장가", "수정", String.valueOf(icoInfo.getPrice()), account);
+                  historyLog.send(projectId, "프로젝트 관리>상장 정보", "BTC 상장가", "수정", String.valueOf(icoInfo.getPrice()), account);
                 }
 
 
                 if (result.getIcoDate() == null && icoInfo.getIcoDate() != null) {
-                  historyLogSend(projectId, "프로젝트 관리>상장 정보", "BTC 상장일", "수정", icoInfo.getIcoDate().toString(), account);
+                  historyLog.send(projectId, "프로젝트 관리>상장 정보", "BTC 상장일", "수정", icoInfo.getIcoDate().toString(), account);
                 } else if(result.getIcoDate() != null && icoInfo.getIcoDate() == null) {
-                  historyLogSend(projectId, "프로젝트 관리>상장 정보", "BTC 상장일", "수정", "", account);
+                  historyLog.send(projectId, "프로젝트 관리>상장 정보", "BTC 상장일", "수정", "", account);
                 } else {
                   if (result.getIcoDate() ==  null && icoInfo.getIcoDate() == null) {
                     // nothing..
                   } else if (result.getIcoDate() != icoInfo.getIcoDate()) {
-                    historyLogSend(projectId, "프로젝트 관리>상장 정보", "BTC 상장일", "수정", icoInfo.getIcoDate().toString(), account);
+                    historyLog.send(projectId, "프로젝트 관리>상장 정보", "BTC 상장일", "수정", icoInfo.getIcoDate().toString(), account);
                   }
                 }
               }
@@ -105,11 +102,11 @@ public class IcoInfoService {
             .switchIfEmpty(Mono.defer(() -> {
               log.debug("ico insert mode => ");
               if (icoInfo.getMarketInfo().equals("KRW")) {
-                historyLogSend(projectId, "프로젝트 관리>상장 정보", "KRW 상장가", "신규", String.valueOf(icoInfo.getPrice()), account);
-                historyLogSend(projectId, "프로젝트 관리>상장 정보", "KRW 상장일", "신규", icoInfo.getIcoDate().toString(), account);
+                historyLog.send(projectId, "프로젝트 관리>상장 정보", "KRW 상장가", "등록", String.valueOf(icoInfo.getPrice()), account);
+                historyLog.send(projectId, "프로젝트 관리>상장 정보", "KRW 상장일", "등록", icoInfo.getIcoDate().toString(), account);
               } else {
-                historyLogSend(projectId, "프로젝트 관리>상장 정보", "BTC 상장가", "신규", String.valueOf(icoInfo.getPrice()), account);
-                historyLogSend(projectId, "프로젝트 관리>상장 정보", "BTC 상장일", "신규", icoInfo.getIcoDate().toString(), account);
+                historyLog.send(projectId, "프로젝트 관리>상장 정보", "BTC 상장가", "등록", String.valueOf(icoInfo.getPrice()), account);
+                historyLog.send(projectId, "프로젝트 관리>상장 정보", "BTC 상장일", "등록", icoInfo.getIcoDate().toString(), account);
               }
               return icoInfoDomainService.insert(
                   IcoInfo.builder()
@@ -123,30 +120,5 @@ public class IcoInfoService {
             }))
         )
         .then(this.findByProjectId(projectId));
-  }
-
-  /**
-   * 변경 히스토리 저장.
-   *
-   * @param projectId
-   * @param menu
-   * @param subject
-   * @param taskHistory
-   * @param account
-   * @return
-   */
-  private void historyLogSend(String projectId, String menu, String subject, String taskHistory, String item,
-      Account account) {
-    applicationEventPublisher.publishEvent(
-        HistoryDto.builder()
-            .projectId(projectId)
-            .menu(menu)
-            .subject(subject)
-            .taskHistory(taskHistory)
-            .item(item)
-            .email(account.getEmail())
-            .accountId(account.getAccountId())
-            .build()
-    );
   }
 }

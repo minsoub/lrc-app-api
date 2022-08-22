@@ -3,6 +3,7 @@ package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.useraccoun
 import com.bithumbsystems.lrc.management.api.core.config.properties.AwsProperties;
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.util.AES256Util;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.listener.HistoryLog;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.useraccount.mapper.UserAccountMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.useraccount.model.request.UserAccountRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.useraccount.model.request.UserSaveRequest;
@@ -33,12 +34,13 @@ public class UserAccountService {
     private final FoundationInfoDomainService foundationInfoDomainService;
 
     private final AwsProperties properties;
+    private final HistoryLog historyLog;
 
     /**
-     * 마케팅 수량 id로 찾기
+     *  프로젝트 아이디로 사용자 라스트 찾기
      *
      * @param projectId
-     * @return MarketingQuantityResponse Object
+     * @return UserAccountResponse Object
      */
     public Mono<List<UserAccountResponse>> findByProjectId(String projectId) {
         return userAccountDomainService.findByProjectId(projectId)
@@ -110,6 +112,7 @@ public class UserAccountService {
                               .createDate(LocalDateTime.now())
                               .build()
                     ).flatMap(res -> {
+                        historyLog.send(projectId, "프로젝트 관리>담당자 정보", "담당자", "담당자 추가", AES256Util.decryptAES( properties.getCryptoKey(), result.getEmail()), account);
                         return Mono.just(UserAccountMapper.INSTANCE.userAccountResponse(res));
                     });
                 });
@@ -142,6 +145,11 @@ public class UserAccountService {
 
                                 return userAccountDomainService.save(res)
                                         .flatMap(r -> {
+                                            historyLog.send(projectId, "프로젝트 관리>담당자 정보", "이름", "수정", name, account);
+                                            historyLog.send(projectId, "프로젝트 관리>담당자 정보", "연락처", "수정", phone, account);
+                                            historyLog.send(projectId, "프로젝트 관리>담당자 정보", "SNS ID", "수정", sns_id, account);
+                                            historyLog.send(projectId, "프로젝트 관리>담당자 정보", "이메일 주소", "수정", email, account);
+
                                             return Mono.just(UserAccountMapper.INSTANCE.userAccountResponse(r));
                                         });
                             });
@@ -159,6 +167,7 @@ public class UserAccountService {
     public Mono<UserAccountResponse> deleteUser(String projectId, String userId, Account account) {
         return userAccountDomainService.findById(userId)
                 .flatMap(result -> {
+                    historyLog.send(projectId, "프로젝트 관리>담당자 정보", "담당자", "담당자 탈퇴", AES256Util.decryptAES( properties.getCryptoKey(), result.getName()), account);
                     return userAccountDomainService.delete(result)
                             .then(Mono.just(UserAccountMapper.INSTANCE.userAccountResponse(result)));
                 });

@@ -59,6 +59,15 @@ public class ChatDomainService {
     }
 
     /**
+     * 파일 상세 정보 조회
+     * @param fileKey
+     * @return
+     */
+    public Mono<ChatFile> findByFileId(String fileKey) {
+        return chatFileRepository.findById(fileKey);
+    }
+
+    /**
      * 채팅 파일을 저장한다.
      *
      * @param chatFile

@@ -61,12 +61,28 @@ public class ChatController {
      * @return
      */
     @GetMapping("/chat/files/{id}")
-    @Operation(summary = "파일 리스트 정보 조회", description = "projectId를 이용하여 파일리스트를 조회합니다.", tags = "chat > chat 파일 리스트 정보 보회")
+    @Operation(summary = "파일 리스트 정보 조회", description = "projectId를 이용하여 파일리스트를 조회합니다.", tags = "chat > chat 파일 리스트 정보 조회")
     public ResponseEntity<Mono<?>> getFileList(@Parameter(name = "id", description = "project 의 id", in = ParameterIn.PATH)
                                                      @PathVariable("id") String id) {
         return ResponseEntity.ok().body(chatService.findByFileList(id)
                         .collectSortedList(Comparator.comparing(ChatFileResponse::getCreateDate).reversed())
                 .map(c -> new MultiResponse(c))
+        );
+    }
+
+    /**
+     * 파일 상세 세부 조회
+     * @param id
+     * @return
+     */
+    @GetMapping("/chat/files/{id}/{fileKey}")
+    @Operation(summary = "파일 상제 정보 조회", description = "projectId 및 파일키를 이용하여 파일정보를 조회합니다.", tags = "chat > chat 파일 정보 조회")
+    public ResponseEntity<Mono<?>> getFileInfo(@Parameter(name = "id", description = "project 의 id", in = ParameterIn.PATH)
+                                               @PathVariable("id") String id,
+                                               @Parameter(name = "fileKey", description = "file 의 id", in = ParameterIn.PATH)
+                                               @PathVariable("fileKey") String fileKey) {
+        return ResponseEntity.ok().body(chatService.findByFileInfo(id, fileKey)
+                .map(c -> new SingleResponse(c))
         );
     }
 

@@ -4,8 +4,7 @@ import com.bithumbsystems.lrc.management.api.core.config.properties.AwsPropertie
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.core.util.AES256Util;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.listener.HistoryDto;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.model.response.SubmittedDocumentFileResponse;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.listener.HistoryDto;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.mapper.SubmittedDocumentUrlMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.model.request.SubmittedDocumentUrlRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.model.response.SubmittedDocumentUrlResponse;
