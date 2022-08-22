@@ -367,7 +367,7 @@ public class ChatService {
                         row.createCell(1).setCellValue(AES256Util.decryptAES(awsProperties.getKmsKey(), res.getEmail()));
                         row.createCell(2).setCellValue(AES256Util.decryptAES(awsProperties.getKmsKey(), res.getContent()));
                         row.createCell(3).setCellValue(res.getIsDelete());
-                        row.createCell(4).setCellValue(res.getCreateDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                        row.createCell(4).setCellValue(res.getCreateDate().plusHours(9).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
                     }
                     workbook.write(out);
 

@@ -62,8 +62,8 @@ public class FoundationInfoCustomRepositoryImpl implements FoundationInfoCustomR
 
         if(StringUtils.isNotEmpty(symbol)) {
             query.addCriteria(new Criteria().orOperator(
-                    Criteria.where("symbol").regex(symbol),
-                    Criteria.where("name").regex(symbol)
+                    Criteria.where("symbol").regex(symbol, "i"),
+                    Criteria.where("name").regex(symbol, "i")
             ));
         }
 
