@@ -25,11 +25,26 @@ public class LrcMailController {
      * 알림 메일 전송
      * @return FoundationResponse
      */
+    /*
     @GetMapping("/send")
     @Operation(summary = "거래지원 관리 - 알림 메일 발송하기", description = "알림 메일을 발송한다.", tags = "사이트 운영  > 거래지원 관리 > 알림메일 전송색")
     public ResponseEntity<Mono<?>> sendEmail(@Parameter(name = "email", description = "이메일", in = ParameterIn.QUERY) @RequestParam(required = true) String email,
                                              @Parameter(name = "type", description = "구분", in = ParameterIn.QUERY) @RequestParam(required = true) String type) {
         return ResponseEntity.ok().body(mailService.sendEmail(email, type)
+                .map(c -> new SingleResponse(c))
+        );
+    }
+    */
+
+    /**
+     * 알림 메일 전송(프로젝트 참여자 대상)
+     * @return FoundationResponse
+     */
+    @GetMapping("/send")
+    @Operation(summary = "거래지원 관리 - 알림 메일 발송하기", description = "프로젝트 참여자에게 알림 메일을 발송한다.", tags = "사이트 운영  > 거래지원 관리 > 알림메일 전송색")
+    public ResponseEntity<Mono<?>> sendEmailToProjectUser(@Parameter(name = "projectId", description = "프로젝트 아이디", in = ParameterIn.QUERY) @RequestParam(required = true) String projectId,
+                                             @Parameter(name = "type", description = "구분", in = ParameterIn.QUERY) @RequestParam(required = true) String type) {
+        return ResponseEntity.ok().body(mailService.sendEmailToProjectUser(projectId, type)
                 .map(c -> new SingleResponse(c))
         );
     }
