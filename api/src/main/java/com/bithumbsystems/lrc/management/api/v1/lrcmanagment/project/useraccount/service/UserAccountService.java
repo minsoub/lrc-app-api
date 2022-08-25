@@ -113,7 +113,7 @@ public class UserAccountService {
                               .createDate(LocalDateTime.now())
                               .build()
                     ).flatMap(res -> {
-                        historyLog.send(projectId, "프로젝트 관리>담당자 정보", "담당자", "담당자 추가", AES256Util.decryptAES( properties.getCryptoKey(), result.getEmail()), account);
+                        historyLog.send(projectId, "프로젝트 관리>담당자 정보", "담당자", "담당자 추가", AES256Util.decryptAES( properties.getKmsKey(), result.getEmail()), account);
                         return Mono.just(UserAccountMapper.INSTANCE.userAccountResponse(res));
                     });
                 });
@@ -172,7 +172,7 @@ public class UserAccountService {
     public Mono<UserAccountResponse> deleteUser(String projectId, String userId, Account account) {
         return userAccountDomainService.findById(userId)
                 .flatMap(result -> {
-                    historyLog.send(projectId, "프로젝트 관리>담당자 정보", "담당자", "담당자 탈퇴", AES256Util.decryptAES( properties.getCryptoKey(), result.getName()), account);
+                    historyLog.send(projectId, "프로젝트 관리>담당자 정보", "담당자", "담당자 탈퇴", AES256Util.decryptAES( properties.getKmsKey(), result.getContactEmail()), account);
                     return userAccountDomainService.delete(result)
                             .then(Mono.just(UserAccountMapper.INSTANCE.userAccountResponse(result)));
                 });
