@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -45,79 +46,75 @@ public class IcoInfoService {
    * @param icoInfoRequest
    * @return IcoInfoResponse Object
    */
-  @Transactional
-  public Mono<List<IcoInfoResponse>> create(String projectId, IcoInfoRequest icoInfoRequest,
-      Account account) {
-    return Mono.just(icoInfoRequest.getIcoInfoList())
-        .flatMapMany(Flux::fromIterable)
-        .flatMap(icoInfo -> icoInfoDomainService.findById(icoInfo.getId())
-            .flatMap(result -> {
-//              if(!checkDecimalPoint(result.getPrice())) {
-//                return Mono.error(new IcoInfoException(ErrorCode.INVALID_NUMBER_FORMAT));
-//              }
-              if (icoInfo.getMarketInfo().equals("KRW")) {
+  //@Transactional
+  public Mono<List<IcoInfoResponse>> create(String projectId, IcoInfoRequest icoInfoRequest, Account account) {
 
+    return Flux.fromIterable(icoInfoRequest.getIcoInfoList())
+            .flatMap(icoInfo -> {
 
-                if (!Objects.equals(result.getPrice(), icoInfo.getPrice())) {
-                  historyLog.send(projectId, "프로젝트 관리>상장 정보", "KRW 상장가", "수정", String.valueOf(icoInfo.getPrice()), account);
-                }
+              if (StringUtils.hasLength(icoInfo.getId())) {
+                return icoInfoDomainService.findById(icoInfo.getId())
+                        .flatMap(result -> {
+                          if (icoInfo.getMarketInfo().equals("KRW")) {
+                            if (!Objects.equals(result.getPrice(), icoInfo.getPrice())) {
+                              historyLog.send(projectId, "프로젝트 관리>상장 정보", "KRW 상장가", "수정", String.format("%.0f", icoInfo.getPrice()), account);
+                            }
+                            if (result.getIcoDate() == null && icoInfo.getIcoDate() != null) {
+                              historyLog.send(projectId, "프로젝트 관리>상장 정보", "KRW 상장일", "수정", icoInfo.getIcoDate().toString(), account);
+                            } else if (result.getIcoDate() != null && icoInfo.getIcoDate() == null) {
+                              historyLog.send(projectId, "프로젝트 관리>상장 정보", "KRW 상장일", "수정", "", account);
+                            } else {
+                              if (result.getIcoDate() == null && icoInfo.getIcoDate() == null) {
+                                // nothing..
+                              } else if (!result.getIcoDate().equals(icoInfo.getIcoDate())) {
+                                historyLog.send(projectId, "프로젝트 관리>상장 정보", "KRW 상장일", "수정", icoInfo.getIcoDate().toString(), account);
+                              }
+                            }
 
-
-                if (result.getIcoDate() == null && icoInfo.getIcoDate() != null) {
-                  historyLog.send(projectId, "프로젝트 관리>상장 정보", "KRW 상장일", "수정", icoInfo.getIcoDate().toString(), account);
-                } else if(result.getIcoDate() != null && icoInfo.getIcoDate() == null) {
-                  historyLog.send(projectId, "프로젝트 관리>상장 정보", "KRW 상장일", "수정", "", account);
-                } else {
-                  if (result.getIcoDate() ==  null && icoInfo.getIcoDate() == null) {
-                    // nothing..
-                  } else if (result.getIcoDate() != icoInfo.getIcoDate()) {
-                    historyLog.send(projectId, "프로젝트 관리>상장 정보", "KRW 상장일", "수정", icoInfo.getIcoDate().toString(), account);
+                          } else {
+                            if (!Objects.equals(result.getPrice(), icoInfo.getPrice())) {
+                              historyLog.send(projectId, "프로젝트 관리>상장 정보", "BTC 상장가", "수정", String.valueOf(icoInfo.getPrice()), account);
+                            }
+                            if (result.getIcoDate() == null && icoInfo.getIcoDate() != null) {
+                              historyLog.send(projectId, "프로젝트 관리>상장 정보", "BTC 상장일", "수정", icoInfo.getIcoDate().toString(), account);
+                            } else if (result.getIcoDate() != null && icoInfo.getIcoDate() == null) {
+                              historyLog.send(projectId, "프로젝트 관리>상장 정보", "BTC 상장일", "수정", "", account);
+                            } else {
+                              if (result.getIcoDate() == null && icoInfo.getIcoDate() == null) {
+                                // nothing..
+                              } else if (!result.getIcoDate().equals(icoInfo.getIcoDate())) {
+                                historyLog.send(projectId, "프로젝트 관리>상장 정보", "BTC 상장일", "수정", icoInfo.getIcoDate().toString(), account);
+                              }
+                            }
+                          }
+                          return icoInfoDomainService.save(IcoInfoMapper.INSTANCE.icoInfoRequestToIcoInfo(icoInfo));
+                        });
+              }else {
+                log.debug("ico insert mode => ");
+                return icoInfoDomainService.insert(
+                        IcoInfo.builder()
+                                .id(UUID.randomUUID().toString())
+                                .projectId(icoInfo.getProjectId())
+                                .marketInfo(icoInfo.getMarketInfo())
+                                .price(icoInfo.getPrice())
+                                .icoDate(icoInfo.getIcoDate())
+                                .build()
+                ).flatMap(res -> {
+                  if (icoInfo.getMarketInfo().equals("KRW")) {
+                    if (icoInfo.getPrice() != null)
+                      historyLog.send(projectId, "프로젝트 관리>상장 정보", "KRW 상장가", "등록", String.format("%d", icoInfo.getPrice()), account);
+                    if (icoInfo.getIcoDate() != null)
+                      historyLog.send(projectId, "프로젝트 관리>상장 정보", "KRW 상장일", "등록", icoInfo.getIcoDate().toString(), account);
+                  } else {
+                    if (icoInfo.getPrice() != null)
+                      historyLog.send(projectId, "프로젝트 관리>상장 정보", "BTC 상장가", "등록", String.valueOf(icoInfo.getPrice()), account);
+                    if (icoInfo.getIcoDate() != null)
+                      historyLog.send(projectId, "프로젝트 관리>상장 정보", "BTC 상장일", "등록", icoInfo.getIcoDate().toString(), account);
                   }
-                }
-
-//                if (result.getIcoDate() != icoInfo.getIcoDate()) {
-//                  historyLogSend(projectId, "프로젝트 관리>상장 정보", "KRW 상장일", "수정", icoInfo.getIcoDate().toString(), account);
-//                }
-              } else {
-                if (!Objects.equals(result.getPrice(), icoInfo.getPrice())) {
-                  historyLog.send(projectId, "프로젝트 관리>상장 정보", "BTC 상장가", "수정", String.valueOf(icoInfo.getPrice()), account);
-                }
-
-
-                if (result.getIcoDate() == null && icoInfo.getIcoDate() != null) {
-                  historyLog.send(projectId, "프로젝트 관리>상장 정보", "BTC 상장일", "수정", icoInfo.getIcoDate().toString(), account);
-                } else if(result.getIcoDate() != null && icoInfo.getIcoDate() == null) {
-                  historyLog.send(projectId, "프로젝트 관리>상장 정보", "BTC 상장일", "수정", "", account);
-                } else {
-                  if (result.getIcoDate() ==  null && icoInfo.getIcoDate() == null) {
-                    // nothing..
-                  } else if (result.getIcoDate() != icoInfo.getIcoDate()) {
-                    historyLog.send(projectId, "프로젝트 관리>상장 정보", "BTC 상장일", "수정", icoInfo.getIcoDate().toString(), account);
-                  }
-                }
+                  return Mono.just(res);
+                });
               }
-              return icoInfoDomainService.save(
-                  IcoInfoMapper.INSTANCE.icoInfoRequestToIcoInfo(icoInfo));
-            })
-            .switchIfEmpty(Mono.defer(() -> {
-              log.debug("ico insert mode => ");
-              if (icoInfo.getMarketInfo().equals("KRW")) {
-                historyLog.send(projectId, "프로젝트 관리>상장 정보", "KRW 상장가", "등록", String.valueOf(icoInfo.getPrice()), account);
-                historyLog.send(projectId, "프로젝트 관리>상장 정보", "KRW 상장일", "등록", icoInfo.getIcoDate().toString(), account);
-              } else {
-                historyLog.send(projectId, "프로젝트 관리>상장 정보", "BTC 상장가", "등록", String.valueOf(icoInfo.getPrice()), account);
-                historyLog.send(projectId, "프로젝트 관리>상장 정보", "BTC 상장일", "등록", icoInfo.getIcoDate().toString(), account);
-              }
-              return icoInfoDomainService.insert(
-                  IcoInfo.builder()
-                      .id(UUID.randomUUID().toString())
-                      .projectId(icoInfo.getProjectId())
-                      .marketInfo(icoInfo.getMarketInfo())
-                      .price(icoInfo.getPrice())
-                      .icoDate(icoInfo.getIcoDate())
-                      .build()
-              );
-            }))
+            }
         )
         .then(this.findByProjectId(projectId));
   }

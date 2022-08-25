@@ -21,6 +21,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -145,10 +146,14 @@ public class UserAccountService {
 
                                 return userAccountDomainService.save(res)
                                         .flatMap(r -> {
-                                            historyLog.send(projectId, "프로젝트 관리>담당자 정보", "이름", "수정", name, account);
-                                            historyLog.send(projectId, "프로젝트 관리>담당자 정보", "연락처", "수정", phone, account);
-                                            historyLog.send(projectId, "프로젝트 관리>담당자 정보", "SNS ID", "수정", sns_id, account);
-                                            historyLog.send(projectId, "프로젝트 관리>담당자 정보", "이메일 주소", "수정", email, account);
+                                            if (StringUtils.hasLength(result.getUserName()))
+                                                historyLog.send(projectId, "프로젝트 관리>담당자 정보", "이름", "수정", name, account);
+                                            if (StringUtils.hasLength(result.getPhone()))
+                                                historyLog.send(projectId, "프로젝트 관리>담당자 정보", "연락처", "수정", phone, account);
+                                            if (StringUtils.hasLength(result.getSnsId()))
+                                                historyLog.send(projectId, "프로젝트 관리>담당자 정보", "SNS ID", "수정", sns_id, account);
+                                            if (StringUtils.hasLength(result.getEmail()))
+                                                historyLog.send(projectId, "프로젝트 관리>담당자 정보", "이메일 주소", "수정", email, account);
 
                                             return Mono.just(UserAccountMapper.INSTANCE.userAccountResponse(r));
                                         });
