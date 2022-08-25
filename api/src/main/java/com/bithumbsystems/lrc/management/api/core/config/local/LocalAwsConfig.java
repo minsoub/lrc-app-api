@@ -1,6 +1,7 @@
 package com.bithumbsystems.lrc.management.api.core.config.local;
 
 import com.bithumbsystems.lrc.management.api.core.config.properties.AwsProperties;
+import java.net.URI;
 import javax.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -14,9 +15,6 @@ import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.kms.KmsAsyncClient;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
-import software.amazon.awssdk.services.ses.SesClient;
-
-import java.net.URI;
 
 @Slf4j
 @Getter
@@ -42,15 +40,6 @@ public class LocalAwsConfig {
          //   .endpointOverride(URI.create("https://s3.ap-northeast-2.amazonaws.com"))
         .credentialsProvider(ProfileCredentialsProvider.create(profileName))
         .build();
-  }
-
-  @Bean
-  public SesClient sesClient() {
-    return SesClient.builder()
-            .region(Region.of(awsProperties.getRegion()))
-            .endpointOverride(URI.create(awsProperties.getSesEndPoint())) //"https://ses.ap-northeast-2.amazonaws.com"))
-            .credentialsProvider(ProfileCredentialsProvider.create(profileName))
-            .build();
   }
 
   @PostConstruct

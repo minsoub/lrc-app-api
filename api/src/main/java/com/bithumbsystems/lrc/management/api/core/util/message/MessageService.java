@@ -9,12 +9,7 @@ import java.io.IOException;
 @Service
 public interface MessageService {
 
-  void sendWithFile(MailSenderInfo mailSenderInfo) throws IOException;
-
   void send(final MailSenderInfo mailSenderInfo) throws MessagingException, IOException;
 
   void sendMail(String emailAddress, MailForm mailForm);
-  void sendMail(String emailAddress, String tempPassword, MailForm mailForm);
-
-  void sendMail(String emailAddress, String type);
 }
