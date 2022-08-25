@@ -27,14 +27,15 @@ public class LrcMailService {
     }
 
     public Mono<Boolean> sendEmailToProjectUser(String projectId, String type) {
-        return userAccountDomainService.findByProjectId(projectId).flatMap(projectUser -> {
-            return userInfoDomainService.findById(projectUser.getUserAccountId()).flatMap(userAccount -> {
-                String email = (StringUtils.hasLength(projectUser.getContactEmail()))? AES256Util.decryptAES(awsProperties.getKmsKey(), projectUser.getContactEmail()) : AES256Util.decryptAES(awsProperties.getKmsKey(), userAccount.getEmail());
-                log.debug("sendEmailToProjectUser:{}:{}", email, type);
-                sendMail(email, type);
-                return Mono.just(true);
-            });
-        }).then(Mono.just(true));
+        return userAccountDomainService.findByProjectId(projectId)
+            .flatMap(projectUser -> userInfoDomainService.findById(projectUser.getUserAccountId())
+                .flatMap(userAccount -> {
+            String email = (StringUtils.hasLength(projectUser.getContactEmail())) ?
+                AES256Util.decryptAES(awsProperties.getKmsKey(), projectUser.getContactEmail()) :
+                AES256Util.decryptAES(awsProperties.getKmsKey(), userAccount.getEmail());
+            log.debug("sendEmailToProjectUser:{}:{}", email, type);
+            return sendEmail(email, type);
+        })).then(Mono.just(true));
     }
 
 }
