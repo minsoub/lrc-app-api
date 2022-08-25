@@ -89,10 +89,20 @@ public class ProjectInfoService {
                 .flatMap(c -> {
                     // 변경 히스토리 추가
                     if ((c.getBusinessCode() == null && projectInfoRequest.getBusinessCode() != null) || !c.getBusinessCode().equals(projectInfoRequest.getBusinessCode())) {
-                        historyLog.send(projectId, "프로젝트 관리>프로젝트 정보", "사업 계열", "수정", projectInfoRequest.getBusinessCode(), account);
+                        lineMngDomainService.findById(projectInfoRequest.getBusinessCode())
+                                        .flatMap(res -> {
+                                            historyLog.send(projectId, "프로젝트 관리>프로젝트 정보", "사업 계열", "수정", res.getName(), account); // projectInfoRequest.getBusinessCode(), account);
+                                            return Mono.just(res);
+                                        }).subscribe();
+
                     }
                     if ((c.getNetworkCode() == null && projectInfoRequest.getNetworkCode() != null) || !c.getNetworkCode().equals(projectInfoRequest.getNetworkCode())) {
-                        historyLog.send(projectId, "프로젝트 관리>프로젝트 정보", "네트워크 계열", "수정", projectInfoRequest.getNetworkCode(), account);
+                        lineMngDomainService.findById(projectInfoRequest.getNetworkCode())
+                                        .flatMap(res -> {
+                                            historyLog.send(projectId, "프로젝트 관리>프로젝트 정보", "네트워크 계열", "수정", res.getName(), account); // projectInfoRequest.getNetworkCode(), account);
+                                            return Mono.just(res);
+                                        }).subscribe();
+
                     }
                     if ((c.getWhitepaperLink() == null && projectInfoRequest.getWhitepaperLink() != null) || !c.getWhitepaperLink().equals(projectInfoRequest.getWhitepaperLink())) {
                         historyLog.send(projectId, "프로젝트 관리>프로젝트 정보", "Jira 번호", "수정", projectInfoRequest.getWhitepaperLink(), account);
@@ -115,10 +125,20 @@ public class ProjectInfoService {
                 })
                 .switchIfEmpty(Mono.defer(() -> {
                         if (StringUtils.hasLength(projectInfoRequest.getBusinessCode())) {
-                            historyLog.send(projectId, "프로젝트 관리>프로젝트 정보", "사업 계열", "등록", projectInfoRequest.getBusinessCode(), account);
+                            lineMngDomainService.findById(projectInfoRequest.getBusinessCode())
+                                    .flatMap(res -> {
+                                        historyLog.send(projectId, "프로젝트 관리>프로젝트 정보", "사업 계열", "등록", res.getName(), account); // projectInfoRequest.getBusinessCode(), account);
+                                        return Mono.just(res);
+                                    }).subscribe();
+                            //historyLog.send(projectId, "프로젝트 관리>프로젝트 정보", "사업 계열", "등록", projectInfoRequest.getBusinessCode(), account);
                         }
                         if (StringUtils.hasLength(projectInfoRequest.getNetworkCode())) {
-                            historyLog.send(projectId, "프로젝트 관리>프로젝트 정보", "네트워크 계열", "등록", projectInfoRequest.getNetworkCode(), account);
+                            lineMngDomainService.findById(projectInfoRequest.getNetworkCode())
+                                    .flatMap(res -> {
+                                        historyLog.send(projectId, "프로젝트 관리>프로젝트 정보", "네트워크 계열", "등록", res.getName(), account); // projectInfoRequest.getNetworkCode(), account);
+                                        return Mono.just(res);
+                                    }).subscribe();
+                            //historyLog.send(projectId, "프로젝트 관리>프로젝트 정보", "네트워크 계열", "등록", projectInfoRequest.getNetworkCode(), account);
                         }
                         if (StringUtils.hasLength(projectInfoRequest.getWhitepaperLink())) {
                             historyLog.send(projectId, "프로젝트 관리>프로젝트 정보", "Jira 번호", "등록", projectInfoRequest.getWhitepaperLink(), account);

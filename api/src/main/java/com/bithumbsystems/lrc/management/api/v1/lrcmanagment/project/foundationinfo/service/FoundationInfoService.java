@@ -61,7 +61,7 @@ public class FoundationInfoService {
                                                 .id(result.getId())
                                                 .adminMemo(result.getMemo())
                                                 .symbol(result.getSymbol())
-                                                .projectName("")
+                                                .projectName(result.getName())
                                                 .contractCode(result.getContractCode())
                                                 .contractName("")
                                                 .processCode(result.getProcessCode())
@@ -102,10 +102,20 @@ public class FoundationInfoService {
                         historyLog.send(id, "프로젝트 관리>재단정보", "심볼", "수정", foundationInfoRequest.getSymbol(), account);
                     }
                     if ((c.getContractCode() == null && foundationInfoRequest.getContractCode() != null) || !c.getContractCode().equals(foundationInfoRequest.getContractCode())) {
-                        historyLog.send(id, "프로젝트 관리>재단정보", "계약상태", "상태변경", foundationInfoRequest.getContractCode(), account);
+                        statusCodeRepository.findById(foundationInfoRequest.getContractCode())
+                                        .flatMap(res -> {
+                                            historyLog.send(id, "프로젝트 관리>재단정보", "계약상태", "상태변경", res.getName(), account); // foundationInfoRequest.getContractCode(), account);
+                                            return Mono.just(res);
+                                        }).subscribe();
+
                     }
                     if ((c.getProcessCode() == null && foundationInfoRequest.getProcessCode() != null) ||  !c.getProcessCode().equals(foundationInfoRequest.getProcessCode())) {
-                        historyLog.send(id, "프로젝트 관리>재단정보", "진행상태", "상태변경",foundationInfoRequest.getProcessCode(),  account);
+                        statusCodeRepository.findById(foundationInfoRequest.getProcessCode())
+                                        .flatMap(res -> {
+                                            historyLog.send(id, "프로젝트 관리>재단정보", "진행상태", "상태변경", res.getName(), account); // foundationInfoRequest.getProcessCode(),  account);
+                                            return Mono.just(res);
+                                        }).subscribe();
+
                     }
                     if ((c.getMemo() == null && foundationInfoRequest.getAdminMemo() != null) || !c.getMemo().equals(foundationInfoRequest.getAdminMemo())) {
                         historyLog.send(id, "프로젝트 관리>재단정보", "관리자 메모", "수정", foundationInfoRequest.getAdminMemo(), account);

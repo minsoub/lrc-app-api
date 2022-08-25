@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ public class AccessLogListener {
     private final AccessLogDomainService accessLogDomainService;
 
     @EventListener
+    @Transactional
     public void accessLog(AccessLogRequest accessLogRequest) {
         accessLogDomainService.insert(AccessLog.builder()
                 .id(UUID.randomUUID().toString())
@@ -29,6 +31,6 @@ public class AccessLogListener {
                 .description(accessLogRequest.getDescription())
                 .siteId(accessLogRequest.getSiteId())
                 .createDate(LocalDateTime.now())
-                .build()).publishOn(Schedulers.boundedElastic()).subscribe();
+                .build()).publishOn(Schedulers.single()).subscribe(); // .boundedElastic()).subscribe();
     }
 }
