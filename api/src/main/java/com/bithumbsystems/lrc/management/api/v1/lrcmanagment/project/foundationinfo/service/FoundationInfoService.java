@@ -117,7 +117,9 @@ public class FoundationInfoService {
                                         }).subscribe();
 
                     }
-                    if ((c.getMemo() == null && foundationInfoRequest.getAdminMemo() != null) || !c.getMemo().equals(foundationInfoRequest.getAdminMemo())) {
+                    if (c.getMemo() == null && foundationInfoRequest.getAdminMemo() == null) {
+                        // NOT
+                    } else if ((c.getMemo() == null && foundationInfoRequest.getAdminMemo() != null) || !c.getMemo().equals(foundationInfoRequest.getAdminMemo())) {
                         historyLog.send(id, "프로젝트 관리>재단정보", "관리자 메모", "수정", foundationInfoRequest.getAdminMemo(), account);
                     }
                     c.setName(foundationInfoRequest.getProjectName());

@@ -100,8 +100,10 @@ public class MarketingQuantityService {
                             marketing)));
               } else { // 신규 등록...
                   historyLog.send(projectId, "프로젝트 관리>마케팅 수량", "심볼", "항목 추가", marketing.getSymbol(), account);
-                  historyLog.send(projectId, "프로젝트 관리>마케팅 수량", "제안받은 수량", "항목 추가", String.valueOf(marketing.getMinimumQuantity()), account);
-                  historyLog.send(projectId, "프로젝트 관리>마케팅 수량", "입금받은 수량", "항목 추가", String.valueOf(marketing.getActualQuantity()), account);
+                  if (marketing.getMinimumQuantity() != null)
+                    historyLog.send(projectId, "프로젝트 관리>마케팅 수량", "제안받은 수량", "항목 추가", String.valueOf(marketing.getMinimumQuantity()), account);
+                  if (marketing.getActualQuantity() != null)
+                    historyLog.send(projectId, "프로젝트 관리>마케팅 수량", "입금받은 수량", "항목 추가", String.valueOf(marketing.getActualQuantity()), account);
                   return marketingQuantityDomainService.insert(
                           MarketingQuantityMapper.INSTANCE.marketingQuantityResponseToMarketingQuantity(marketing)
                   );
