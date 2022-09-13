@@ -22,3 +22,22 @@ spec:
           ports:
             - containerPort: 8080
           resources: {}
+          volumeMounts:
+            - name: varlog
+              mountPath: /app/logs
+        - name: fluentd-agent
+          image: k8s.gcr.io/fluentd-gcp:1.30
+          env:
+            - name: FLUENTD_ARGS
+              value: -c /etc/fluentd-config/fluentd.conf -c /etc/fluentd-config/kubernetes.conf
+            volumeMounts:
+              - name: varlog
+                mountPath: /app/logs
+              - name: config-volume
+                mountPath: /etc/fluentd-config
+      volumes:
+        - name: varlog
+          emptyDir: {}
+        - name: config-volume
+          configMap:
+            name: fluentd-config
