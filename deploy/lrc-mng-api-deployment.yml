@@ -16,6 +16,22 @@ spec:
       labels:
         app: lrc-mng-api
     spec:
+      serviceAccount: fluentd
+      serviceAccountName: fluentd
+      initContainers:
+        - name: config-fluentd
+          image: busybox
+          imagePullPolicy: Always
+          command: ["/bin/sh", "-c"]
+          args:
+            -
+              cp /etc2/fluentd-config/kubernetes.conf /fluentd/etc/kubernetes.conf;
+              cp /etc2/fluentd-config/fluent.conf /fluentd/etc/fluent.conf;
+          volumeMounts:
+            - name: config-source
+              mountPath: /etc2/fluentd-config
+            - name: config-path
+              mountPath: /fluentd/etc
       containers:
         - name: lrc-mng-api
           image: AWS_ECR_URI
@@ -23,21 +39,36 @@ spec:
             - containerPort: 8080
           resources: {}
           volumeMounts:
-            - name: varlog
+            - name: applog
               mountPath: /app/logs
         - name: fluentd-agent
-          image: k8s.gcr.io/fluentd-gcp:1.30
+          image: fluent/fluentd-kubernetes-daemonset:v1.7.1-debian-elasticsearch7-1.1
           env:
-            - name: FLUENTD_ARGS
-              value: -c /etc/fluentd-config/fluentd.conf -c /etc/fluentd-config/kubernetes.conf
-            volumeMounts:
-              - name: varlog
-                mountPath: /app/logs
-              - name: config-volume
-                mountPath: /etc/fluentd-config
+            - name: FLUENT_ELASTICSEARCH_HOST
+              value: "elasticsearch-node.systems-dev-ns.svc.cluster.local"
+            - name: FLUENT_ELASTICSEARCH_PORT
+              value: "9200"
+            - name: FLUENT_ELASTICSEARCH_SCHEME
+              value: "http"
+            - name: FLUENT_UID
+              value: "0"
+          resources:
+            limits:
+              memory: 200Mi
+            requests:
+              cpu: 100m
+              memory: 200Mi
+          volumeMounts:
+            - name: applog
+              mountPath: /app/logs
+            - name: config-path
+              mountPath: /fluentd/etc
       volumes:
-        - name: varlog
+        - name: applog
+          hostPath:
+            path: /app/logs
+        - name: config-path
           emptyDir: {}
-        - name: config-volume
+        - name: config-source
           configMap:
             name: fluentd-config
