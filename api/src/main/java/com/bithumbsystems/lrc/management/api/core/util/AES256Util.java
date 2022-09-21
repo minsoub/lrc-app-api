@@ -41,7 +41,7 @@ public class AES256Util {
     SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
     // iterationCount = 65536
     // keyLength = 128
-    KeySpec spec = new PBEKeySpec(password, salt, 1024, 128);
+    KeySpec spec = new PBEKeySpec(password, salt, 1024, 256);
     return new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
   }
 
@@ -123,7 +123,7 @@ public class AES256Util {
     SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
     // iterationCount = 65536
     // keyLength = 128
-    KeySpec spec = new PBEKeySpec(password, salt, 65536, 128);
+    KeySpec spec = new PBEKeySpec(password, salt, 1024, 128);
     return new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
   }
 
@@ -153,7 +153,7 @@ public class AES256Util {
       bb.get(cipherText);
 
       // get back the aes key from the same password and salt
-      SecretKey aesKeyFromPassword = getAESKeyFromPasswordLegacy(keyString.toCharArray(), salt);
+      SecretKey aesKeyFromPassword = getAESKeyFromPassword(keyString.toCharArray(), salt);
       Cipher cipher = Cipher.getInstance(ALGORITHM);
       cipher.init(Cipher.DECRYPT_MODE, aesKeyFromPassword, new GCMParameterSpec(TAG_LENGTH_BIT, iv));
 
@@ -162,6 +162,7 @@ public class AES256Util {
       plainMessage = new String(plainText, UTF_8);
     } catch (Exception e) {
       log.error(e.getMessage());
+      e.printStackTrace();
     }
     return plainMessage;
   }
