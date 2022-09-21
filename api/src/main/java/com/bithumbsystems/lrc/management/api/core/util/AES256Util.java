@@ -153,7 +153,7 @@ public class AES256Util {
       bb.get(cipherText);
 
       // get back the aes key from the same password and salt
-      SecretKey aesKeyFromPassword = getAESKeyFromPassword(keyString.toCharArray(), salt);
+      SecretKey aesKeyFromPassword = getAESKeyFromPasswordLegacy(keyString.toCharArray(), salt);
       Cipher cipher = Cipher.getInstance(ALGORITHM);
       cipher.init(Cipher.DECRYPT_MODE, aesKeyFromPassword, new GCMParameterSpec(TAG_LENGTH_BIT, iv));
 
