@@ -96,6 +96,8 @@ public class FileService {
      */
     public Mono<PutObjectResponse> upload(String fileKey, String fileName, Long fileSize, String bucketName, ByteBuffer content) {  // Mono<ByteBuffer> content) {
         // String fileName = part.filename();
+        // Validation check.
+
         log.debug("save => fileKey : " + fileKey);
         Map<String, String> metadata = new HashMap<String, String>();
         metadata.put("filename", URLEncoder.encode(fileName, StandardCharsets.UTF_8));

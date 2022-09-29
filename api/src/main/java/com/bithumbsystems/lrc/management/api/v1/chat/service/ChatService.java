@@ -2,11 +2,14 @@ package com.bithumbsystems.lrc.management.api.v1.chat.service;
 
 import com.bithumbsystems.lrc.management.api.core.config.properties.AwsProperties;
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
+import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.core.util.AES256Util;
+import com.bithumbsystems.lrc.management.api.core.util.FileUtil;
 import com.bithumbsystems.lrc.management.api.v1.chat.model.request.ChatFileRequest;
 import com.bithumbsystems.lrc.management.api.v1.chat.model.request.ChatRequest;
 import com.bithumbsystems.lrc.management.api.v1.chat.model.response.ChatFileResponse;
 import com.bithumbsystems.lrc.management.api.v1.chat.model.response.ChatResponse;
+import com.bithumbsystems.lrc.management.api.v1.file.exception.FileException;
 import com.bithumbsystems.lrc.management.api.v1.file.service.FileService;
 import com.bithumbsystems.persistence.mongodb.account.service.AccountDomainService;
 import com.bithumbsystems.persistence.mongodb.chat.model.entity.ChatChannel;
@@ -238,6 +241,14 @@ public class ChatService {
     public Mono<ChatFileResponse> fileSave(Mono<ChatFileRequest> fileRequest, Account account) {
         return fileRequest
                 .flatMap(request -> {
+                    String mimeType = request.getFileType();
+                    log.debug("application upload mimeType check => {}", mimeType);
+                    // mimeType check
+                    if(Arrays.asList(FileUtil.ALLOW_MIME_TYPE_DEFAULT).contains(mimeType.toUpperCase()) == false){
+                        return Mono.error(new FileException(ErrorCode.INVALID_FILE_EXT));
+                    }
+
+
                             return DataBufferUtils.join(request.getFile().content())
                                     .flatMap(dataBuffer -> {
                                         ByteBuffer buf = dataBuffer.asByteBuffer();
@@ -245,6 +256,21 @@ public class ChatService {
                                         String fileName = request.getFile().filename();
                                         Long fileSize = (long) buf.array().length;
                                         log.info("byte size ===>  {}   :   {}   :   {} : ", fileKey, fileName, fileSize);
+
+                                        String strExt = FileUtil.getFileExt(FileUtil.ALLOW_FILE_EXT_DEFAULT, fileName);
+                                        log.info("service file ext => {}", strExt);
+                                        String strFileSize = FileUtil.getFileSize(FileUtil.ALLOW_FILE_MAX_SIZE_DEFAULT, fileSize);
+                                        log.info("service upload file size => {}", strFileSize);
+
+                                        // Mime-type과 확장자 비교.
+                                        if (FileUtil.allowContentType.containsKey(mimeType)) {
+                                            List<String> extList = FileUtil.allowContentType.get(mimeType);
+                                            if (!extList.contains(strExt)) {
+                                                return Mono.error(new FileException(ErrorCode.INVALID_FILE_EXT));
+                                            }
+                                        } else {
+                                            return Mono.error(new FileException(ErrorCode.INVALID_FILE_EXT));
+                                        }
 
                                         return fileService.upload(fileKey, fileName, fileSize, awsProperties.getBucket(), buf)
                                                 .publishOn(Schedulers.boundedElastic())
@@ -266,8 +292,7 @@ public class ChatService {
                                                 });
 
                                     });
-                        }
-                )
+                })
                 .map(res -> ChatFileResponse.builder()
                         .id(res.getId())
                         .projectId(res.getProjectId())

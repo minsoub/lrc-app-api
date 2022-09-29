@@ -2,6 +2,9 @@ package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewesti
 
 import com.bithumbsystems.lrc.management.api.core.config.properties.AwsProperties;
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
+import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
+import com.bithumbsystems.lrc.management.api.core.util.FileUtil;
+import com.bithumbsystems.lrc.management.api.v1.file.exception.FileException;
 import com.bithumbsystems.lrc.management.api.v1.file.service.FileService;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.listener.HistoryDto;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.listener.HistoryLog;
@@ -12,10 +15,8 @@ import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.reviewestimat
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.reviewestimate.service.ReviewEstimateDomainService;
 import java.nio.ByteBuffer;
 import java.text.Normalizer;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.UUID;
+import java.util.*;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -23,6 +24,7 @@ import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MimeType;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -124,14 +126,37 @@ public class ReviewEstimateService {
                     if (StringUtils.hasLength(_id)) {   // 수정 모드
                         if(isFile) {  //첨부파일 확인
                             String final_id = _id;
-                            return DataBufferUtils.join(fileList.poll().content())
+                            // File 확장자 check.
+                            String strExt = FileUtil.getFileExt(FileUtil.ALLOW_FILE_EXT_DEFAULT, fileName);
+                            log.info("service file ext => {}", strExt);
+                            FilePart filePart = fileList.poll();
+                            MimeType contentType = filePart.headers().getContentType();
+
+                            log.debug("content type => {}", contentType.getType());
+                            // MimeType check.
+                            if(Arrays.asList(FileUtil.ALLOW_MIME_TYPE_DEFAULT).contains(contentType.getType().toUpperCase()) == false){
+                                return Mono.error(new FileException(ErrorCode.INVALID_FILE_EXT));
+                            }
+
+                            return DataBufferUtils.join(filePart.content()) // fileList.poll().content())
                                     .flatMap(dataBuffer -> {
                                         ByteBuffer buf = dataBuffer.asByteBuffer();
                                         String file_key = UUID.randomUUID().toString();
                                         String file_name = fileName;
                                         Long fileSize = (long) buf.array().length;
                                         log.info("byte size ===>  {}   :   {}   :   {} : ", file_key, file_name, fileSize);
+                                        String strFileSize = FileUtil.getFileSize(FileUtil.ALLOW_FILE_MAX_SIZE_DEFAULT, fileSize);
+                                        log.info("service upload file size => {}", strFileSize);
 
+                                        // Mime-type과 확장자 비교.
+                                        if (FileUtil.allowContentType.containsKey(contentType.getType())) {
+                                            List<String> extList = FileUtil.allowContentType.get(contentType.getType());
+                                            if (!extList.contains(strExt)) {
+                                                return Mono.error(new FileException(ErrorCode.INVALID_FILE_EXT));
+                                            }
+                                        } else {
+                                            return Mono.error(new FileException(ErrorCode.INVALID_FILE_EXT));
+                                        }
                                         return fileService.upload(file_key, file_name, fileSize, awsProperties.getBucket(), buf)
                                                 .flatMap(res -> {
                                                     log.info("service upload res   =>       {}", res);
@@ -203,7 +228,10 @@ public class ReviewEstimateService {
                                         String file_name = fileName;
                                         Long fileSize = (long) buf.array().length;
                                         log.info("byte size ===>  {}   :   {}   :   {} : ", file_key, file_name, fileSize);
-
+                                        String strExt = FileUtil.getFileExt(FileUtil.ALLOW_FILE_EXT_DEFAULT, fileName);
+                                        log.info("service file ext => {}", strExt);
+                                        String strFileSize = FileUtil.getFileSize(FileUtil.ALLOW_FILE_MAX_SIZE_DEFAULT, fileSize);
+                                        log.info("service upload file size => {}", strFileSize);
                                         return fileService.upload(file_key, file_name, fileSize, awsProperties.getBucket(), buf)
                                                 .flatMap(res -> {
                                                     log.info("service upload res   =>       {}", res);

@@ -38,63 +38,63 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/lrc/files")
 @RequiredArgsConstructor
-@Tag(name = "File Test APIs", description = "File Test APIs for demo purpose")
+@Tag(name = "File Common APIs", description = "File Common APIs for demo purpose")
 public class FileController {
 
     private final FileService fileService;
     private final AwsProperties awsProperties;
 
-    @PostMapping(value = "/upload/s3", consumes = MULTIPART_FORM_DATA_VALUE)
-    public Mono<ResponseEntity<?>> s3upload(@RequestHeader HttpHeaders headers,  @RequestPart("files") Mono<FilePart> filePart) {
-
-        String fileKey = UUID.randomUUID().toString();
-
-        MediaType mediaType = headers.getContentType();
-
-        if (mediaType == null) {
-            mediaType = MediaType.APPLICATION_OCTET_STREAM;
-        }
-
-        AtomicReference<String> fileName = new AtomicReference<>();
-        AtomicReference<Long> fileSize = new AtomicReference<>();
-
-        return filePart.doOnNext(part -> {
-                    log.debug("file name => " + part.filename());
-                    fileName.set(part.filename());
-                })
-                //        .map(part ->part.content().concatMap(dataBuffer->{ return dataBuffer.asByteBuffer();}))
-               .map(Part::content)
-               .log()
-               .flatMap(data -> {
-                   log.debug("Here is ....");
-                   return DataBufferUtils.join(data)
-                                    .flatMap(dataBuffer -> {
-                                        log.debug("dataBuffer join...");
-                                        ByteBuffer buf = dataBuffer.asByteBuffer();
-                                        log.debug("byte size ===> " + buf.array().length);
-
-                                        fileSize.set((long) buf.array().length); // dataBuffer.readableByteCount());
-
-                                        return fileService.upload(fileKey, fileName.toString(), fileSize.get(), awsProperties.getBucket(), buf)
-                                                .flatMap(res -> {
-                                                    log.debug("service upload res => {}", res);
-                                                    File info = File.builder()
-                                                            .fileKey(fileKey)
-                                                            .fileName(fileName.toString())
-                                                            .createdAt(new Date())
-                                                            .createdId("test")
-                                                            .delYn(false)
-                                                            .build();
-                                                    return fileService.save(info);
-                                                });
-                                    });
-                   })
-               .log()
-               .map(res -> {
-                   log.debug("=========res => {}", res);
-                   return ResponseEntity.ok().body(new SingleResponse(res));
-               });
-    }
+//    @PostMapping(value = "/upload/s3", consumes = MULTIPART_FORM_DATA_VALUE)
+//    public Mono<ResponseEntity<?>> s3upload(@RequestHeader HttpHeaders headers,  @RequestPart("files") Mono<FilePart> filePart) {
+//
+//        String fileKey = UUID.randomUUID().toString();
+//
+//        MediaType mediaType = headers.getContentType();
+//
+//        if (mediaType == null) {
+//            mediaType = MediaType.APPLICATION_OCTET_STREAM;
+//        }
+//
+//        AtomicReference<String> fileName = new AtomicReference<>();
+//        AtomicReference<Long> fileSize = new AtomicReference<>();
+//
+//        return filePart.doOnNext(part -> {
+//                    log.debug("file name => " + part.filename());
+//                    fileName.set(part.filename());
+//                })
+//                //        .map(part ->part.content().concatMap(dataBuffer->{ return dataBuffer.asByteBuffer();}))
+//               .map(Part::content)
+//               .log()
+//               .flatMap(data -> {
+//                   log.debug("Here is ....");
+//                   return DataBufferUtils.join(data)
+//                                    .flatMap(dataBuffer -> {
+//                                        log.debug("dataBuffer join...");
+//                                        ByteBuffer buf = dataBuffer.asByteBuffer();
+//                                        log.debug("byte size ===> " + buf.array().length);
+//
+//                                        fileSize.set((long) buf.array().length); // dataBuffer.readableByteCount());
+//
+//                                        return fileService.upload(fileKey, fileName.toString(), fileSize.get(), awsProperties.getBucket(), buf)
+//                                                .flatMap(res -> {
+//                                                    log.debug("service upload res => {}", res);
+//                                                    File info = File.builder()
+//                                                            .fileKey(fileKey)
+//                                                            .fileName(fileName.toString())
+//                                                            .createdAt(new Date())
+//                                                            .createdId("test")
+//                                                            .delYn(false)
+//                                                            .build();
+//                                                    return fileService.save(info);
+//                                                });
+//                                    });
+//                   })
+//               .log()
+//               .map(res -> {
+//                   log.debug("=========res => {}", res);
+//                   return ResponseEntity.ok().body(new SingleResponse(res));
+//               });
+//    }
 
     @GetMapping(value = "/download/s3/{fileKey}", produces = APPLICATION_OCTET_STREAM_VALUE)
     public Mono<ResponseEntity<?>> s3download(@PathVariable String fileKey) {

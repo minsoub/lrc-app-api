@@ -56,13 +56,13 @@ public class SubmittedDocumentFileController {
      * @param submittedDocumentRequest
      * @return SubmittedDocumentResponse Object
      */
-    @PostMapping(value = "/submitted-document/file", consumes = MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "거래지원 관리 - 제출 서류 관리 file 저장", description = "제출 서류 관리 file 정보를 저장 합니다.", tags = "사이트 운영 > 거래지원 관리 > 제출 서류 관리 > 파일 저장")
-    public ResponseEntity<Mono<?>> createSubmittedDocumentFile(@ModelAttribute(value = "submittedDocumentRequest") SubmittedDocumentFileRequest submittedDocumentRequest,
-                                                               @Parameter(hidden = true) @CurrentUser Account account) {
-        return ResponseEntity.ok().body(submittedDocumentService.saveAll(Mono.just(submittedDocumentRequest), account)
-                .map(c -> new SingleResponse(c)));
-    }
+//    @PostMapping(value = "/submitted-document/file", consumes = MULTIPART_FORM_DATA_VALUE)
+//    @Operation(summary = "거래지원 관리 - 제출 서류 관리 file 저장", description = "제출 서류 관리 file 정보를 저장 합니다.", tags = "사이트 운영 > 거래지원 관리 > 제출 서류 관리 > 파일 저장")
+//    public ResponseEntity<Mono<?>> createSubmittedDocumentFile(@ModelAttribute(value = "submittedDocumentRequest") SubmittedDocumentFileRequest submittedDocumentRequest,
+//                                                               @Parameter(hidden = true) @CurrentUser Account account) {
+//        return ResponseEntity.ok().body(submittedDocumentService.saveAll(Mono.just(submittedDocumentRequest), account)
+//                .map(c -> new SingleResponse(c)));
+//    }
 
     /**
      * 제출 서류 관리 file 삭제
