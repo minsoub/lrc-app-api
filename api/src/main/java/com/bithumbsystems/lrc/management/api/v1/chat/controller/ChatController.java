@@ -1,5 +1,6 @@
 package com.bithumbsystems.lrc.management.api.v1.chat.controller;
 
+import static com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode.INVALID_FILE;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
@@ -12,6 +13,7 @@ import com.bithumbsystems.lrc.management.api.v1.chat.model.request.ChatFileReque
 import com.bithumbsystems.lrc.management.api.v1.chat.model.request.ChatRequest;
 import com.bithumbsystems.lrc.management.api.v1.chat.model.response.ChatFileResponse;
 import com.bithumbsystems.lrc.management.api.v1.chat.service.ChatService;
+import com.bithumbsystems.lrc.management.api.v1.exception.LrcException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -105,12 +107,15 @@ public class ChatController {
      * @return
      */
     @GetMapping(value = "/chat/file/{fileKey}", produces = APPLICATION_OCTET_STREAM_VALUE)
-    public Mono<ResponseEntity<?>> s3download(@PathVariable String fileKey) {
+    public Mono<ResponseEntity<?>> s3download(@PathVariable String fileKey, @Parameter(hidden = true) @CurrentUser Account account) {
 
         AtomicReference<String> fileName = new AtomicReference<>();
 
         return chatService.findById(fileKey)
                 .flatMap(res -> {
+                    if (res.getCreateAccountId() == account.getAccountId()) {
+                        return Mono.error(new LrcException(INVALID_FILE));
+                    }
                     log.debug("find file => {}", res);
                     fileName.set(res.getFileName());
                     // s3에서 파일을 다운로드 받는다.

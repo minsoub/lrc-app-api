@@ -1,12 +1,17 @@
 package com.bithumbsystems.lrc.management.api.v1.file.controller;
 
+import static com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode.INVALID_FILE;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 import com.bithumbsystems.lrc.management.api.core.config.properties.AwsProperties;
+import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
+import com.bithumbsystems.lrc.management.api.core.config.resolver.CurrentUser;
 import com.bithumbsystems.lrc.management.api.core.model.response.SingleResponse;
+import com.bithumbsystems.lrc.management.api.v1.exception.LrcException;
 import com.bithumbsystems.lrc.management.api.v1.file.service.FileService;
 import com.bithumbsystems.persistence.mongodb.file.model.entity.File;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.nio.ByteBuffer;
 import java.util.Date;
@@ -97,12 +102,15 @@ public class FileController {
 //    }
 
     @GetMapping(value = "/download/s3/{fileKey}", produces = APPLICATION_OCTET_STREAM_VALUE)
-    public Mono<ResponseEntity<?>> s3download(@PathVariable String fileKey) {
+    public Mono<ResponseEntity<?>> s3download(@PathVariable String fileKey, @Parameter(hidden = true) @CurrentUser Account account) {
 
         AtomicReference<String> fileName = new AtomicReference<>();
 
         return fileService.findById(fileKey)
                  .flatMap(res -> {
+                     if (res.getCreatedId() == account.getAccountId()) {
+                         return Mono.error(new LrcException(INVALID_FILE));
+                     }
                                 log.debug("find file => {}", res);
                                 fileName.set(res.getFileName());
                                 // s3에서 파일을 다운로드 받는다.

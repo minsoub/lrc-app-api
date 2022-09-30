@@ -9,6 +9,7 @@ import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.fil
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.repository.SubmittedDocumentUrlRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,7 @@ import reactor.core.publisher.Flux;
 @RestController("change")
 @Slf4j
 @RequiredArgsConstructor
+@Profile("dev|prod|eks-dev|qa")
 public class ChangeEncryptController {
 
   private final UserInfoRepository lrcUserAccountRepository;

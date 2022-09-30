@@ -25,7 +25,7 @@ public class AuditLogResponse {
   private String uri;
   private String path;
   private String queryParams;
-  //private String parameter;
+  private String parameter;
   private String siteId;
   private String siteName;
   private RoleType roleType;

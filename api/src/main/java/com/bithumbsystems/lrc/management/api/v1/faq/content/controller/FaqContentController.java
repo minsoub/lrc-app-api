@@ -40,17 +40,17 @@ public class FaqContentController {
                 .map((faqContentFlux) -> new MultiResponse(faqContentFlux)));
     }
 
-    /**
-     * 콘텐츠 모든 정보 테스트
-     *
-     * @return FaqContentResponse object
-     */
-    @GetMapping(value = "/contenttest")
-    public ResponseEntity<Mono<?>> getAllContent1111() {
-        return ResponseEntity.ok().body(faqContentService.findAll()
-            .collectList()
-            .map((faqContentFlux) -> new MultiResponse(faqContentFlux)));
-    }
+//    /**
+//     * 콘텐츠 모든 정보 테스트
+//     *
+//     * @return FaqContentResponse object
+//     */
+//    @GetMapping(value = "/contenttest")
+//    public ResponseEntity<Mono<?>> getAllContent1111() {
+//        return ResponseEntity.ok().body(faqContentService.findAll()
+//            .collectList()
+//            .map((faqContentFlux) -> new MultiResponse(faqContentFlux)));
+//    }
 
     /**
      * 콘텐츠 페이징 데이터 만들기
