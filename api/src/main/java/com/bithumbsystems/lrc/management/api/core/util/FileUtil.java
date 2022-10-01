@@ -46,23 +46,23 @@ public class FileUtil {
   // content-type과 허용가능한 파일 확장자 맵핑
   // 빠진 항목 : MP4, MKV, DOCX, XLSX, PPTX
   public static final Map<String, List<String>> allowContentType = Map.ofEntries(
-        entry("application/msword", new ArrayList<String>(Arrays.asList("doc"))),
-        entry("application/vnd.openxmlformats-officedocument.wordprocessingml.document", new ArrayList<String>(Arrays.asList("docx"))),
-        entry("application/pdf", new ArrayList<String>(Arrays.asList("pdf"))),
-        entry("application/postscript", new ArrayList<String>(Arrays.asList("ai", "ps"))),
-        entry("application/vnd.ms-excel", new ArrayList<String>(Arrays.asList("xls"))),
-        entry("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", new ArrayList<String>(Arrays.asList("xlsx"))),
-        entry("application/vnd.ms-powerpoint", new ArrayList<String>(Arrays.asList("ppt"))),
-        entry("application/vnd.openxmlformats-officedocument.presentationml.presentation", new ArrayList<String>(Arrays.asList("pptx"))),
-        entry("image/gif", new ArrayList<String>(Arrays.asList("gif"))),
-        entry("image/jpeg", new ArrayList<String>(Arrays.asList("jpeg", "jpg"))),
-        entry("text/plain", new ArrayList<String>(Arrays.asList("txt"))),
-        entry("text/csv", new ArrayList<String>(Arrays.asList("csv"))),
-        entry("video/quicktime", new ArrayList<String>(Arrays.asList("mov"))),
-        entry("video/x-msvideo", new ArrayList<String>(Arrays.asList("avi"))),
-        entry("video/mp4", new ArrayList<String>(Arrays.asList("mp4"))),
-        entry("video/x-matroska", new ArrayList<String>(Arrays.asList("mkv"))),
-        entry("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", new ArrayList<String>(Arrays.asList("avi")))
+        entry("application/msword", new ArrayList<String>(Arrays.asList("DOC"))),
+        entry("application/vnd.openxmlformats-officedocument.wordprocessingml.document", new ArrayList<String>(Arrays.asList("DOCX"))),
+        entry("application/pdf", new ArrayList<String>(Arrays.asList("PDF"))),
+        entry("application/postscript", new ArrayList<String>(Arrays.asList("AI", "PS"))),
+        entry("application/vnd.ms-excel", new ArrayList<String>(Arrays.asList("XLS"))),
+        entry("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", new ArrayList<String>(Arrays.asList("XLSX"))),
+        entry("application/vnd.ms-powerpoint", new ArrayList<String>(Arrays.asList("PPT"))),
+        entry("application/vnd.openxmlformats-officedocument.presentationml.presentation", new ArrayList<String>(Arrays.asList("PPTX"))),
+        entry("image/gif", new ArrayList<String>(Arrays.asList("GIF"))),
+        entry("image/jpeg", new ArrayList<String>(Arrays.asList("JPEG", "JPG"))),
+        entry("text/plain", new ArrayList<String>(Arrays.asList("TXT"))),
+        entry("text/csv", new ArrayList<String>(Arrays.asList("CSV"))),
+        entry("video/quicktime", new ArrayList<String>(Arrays.asList("MOV"))),
+        entry("video/x-msvideo", new ArrayList<String>(Arrays.asList("AVI"))),
+        entry("video/mp4", new ArrayList<String>(Arrays.asList("MP4"))),
+        entry("video/x-matroska", new ArrayList<String>(Arrays.asList("MKV")))
+        //entry("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", new ArrayList<String>(Arrays.asList("avi")))
   );
 
 

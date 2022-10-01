@@ -39,13 +39,15 @@ public class UserAccountController {
     /**
      * 담당자 정보 리스트 project id로 찾기 (UnMasking)
      * @param projectId
+     * @param reason
      * @return ReviewEstimateResponse Object
      */
     @GetMapping("/user-account/unmasking/{projectId}")
     @Operation(summary = "거래지원 관리 - 담당자 정보 리스트 project id로 찾기", description = "projectId를 이용하여 담당자 정보 리스트를 조회합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 담당자 정보 > 검색")
-    public ResponseEntity<Mono<?>> getUserAccountUnMask(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
-                                                  @PathVariable("projectId") String projectId) {
-        return ResponseEntity.ok().body(userAccountService.unMaskfindByProjectId(projectId)
+    public ResponseEntity<Mono<?>> getUserAccountUnMask(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH) @PathVariable("projectId") String projectId,
+                                                        @Parameter(name = "reason", description = "개인정보 열람 사유", required = true) @RequestParam(required = true) String reason,
+                                                        @Parameter(hidden = true) @CurrentUser Account account) {
+        return ResponseEntity.ok().body(userAccountService.unMaskfindByProjectId(projectId, reason, account)
                 .map(c -> new SingleResponse(c))
         );
     }

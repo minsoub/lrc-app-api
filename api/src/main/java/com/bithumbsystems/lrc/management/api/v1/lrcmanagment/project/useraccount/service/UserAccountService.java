@@ -4,12 +4,14 @@ import com.bithumbsystems.lrc.management.api.core.config.properties.AwsPropertie
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.util.AES256Util;
 import com.bithumbsystems.lrc.management.api.core.util.MaskingUtil;
+import com.bithumbsystems.lrc.management.api.v1.accesslog.request.AccessLogRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.listener.HistoryLog;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.useraccount.mapper.UserAccountMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.useraccount.model.request.UserAccountRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.useraccount.model.request.UserSaveRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.useraccount.model.response.UserAccountResponse;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.useraccount.model.response.UserInfoResponse;
+import com.bithumbsystems.persistence.mongodb.accesslog.model.enums.ActionType;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.foundationinfo.service.FoundationInfoDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.useraccount.model.entity.UserAccount;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.useraccount.service.UserAccountDomainService;
@@ -21,6 +23,7 @@ import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
@@ -34,6 +37,8 @@ public class UserAccountService {
     private final UserAccountDomainService userAccountDomainService;
     private final UserInfoDomainService userInfoDomainService;
     private final FoundationInfoDomainService foundationInfoDomainService;
+
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     private final AwsProperties properties;
     private final HistoryLog historyLog;
@@ -69,9 +74,25 @@ public class UserAccountService {
      * 마스킹 해재 정보를 조회한다.
      *
      * @param projectId
+     * @param reason
+     * @param account
      * @return
      */
-    public Mono<List<UserAccountResponse>> unMaskfindByProjectId(String projectId) {
+    public Mono<List<UserAccountResponse>> unMaskfindByProjectId(String projectId, String reason, Account account) {
+        // 개인정보 열람 사유를 남겨야 한다.
+        // log 전송
+        String title = "거래지원 담당자 정보 열람";
+        applicationEventPublisher.publishEvent(
+                AccessLogRequest.builder()
+                        .accountId(account.getAccountId())
+                        .actionType(ActionType.VIEW)
+                        .reason(reason)
+                        .email(account.getEmail())
+                        .description(title)
+                        .siteId(account.getMySiteId())
+                        .ip(account.getUserIp())
+                        .build()
+        );
         return userAccountDomainService.findByProjectId(projectId)
                 .flatMap(user -> {
                     return userInfoDomainService.findById(user.getUserAccountId())

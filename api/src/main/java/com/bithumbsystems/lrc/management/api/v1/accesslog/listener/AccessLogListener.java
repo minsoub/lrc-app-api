@@ -20,7 +20,7 @@ public class AccessLogListener {
     private final AccessLogDomainService accessLogDomainService;
 
     @EventListener
-    @Transactional
+    //@Transactional
     public void accessLog(AccessLogRequest accessLogRequest) {
         accessLogDomainService.insert(AccessLog.builder()
                 .id(UUID.randomUUID().toString())
@@ -29,6 +29,7 @@ public class AccessLogListener {
                 .actionType(accessLogRequest.getActionType())
                 .reason(accessLogRequest.getReason())
                 .description(accessLogRequest.getDescription())
+                .ip(accessLogRequest.getIp())
                 .siteId(accessLogRequest.getSiteId())
                 .createDate(LocalDateTime.now())
                 .build()).publishOn(Schedulers.single()).subscribe(); // .boundedElastic()).subscribe();
