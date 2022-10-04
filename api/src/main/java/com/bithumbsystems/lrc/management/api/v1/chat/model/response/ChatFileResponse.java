@@ -1,5 +1,6 @@
 package com.bithumbsystems.lrc.management.api.v1.chat.model.response;
 
+import com.bithumbsystems.persistence.mongodb.chat.model.enums.FileStatus;
 import com.bithumbsystems.persistence.mongodb.chat.model.enums.UserType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +17,7 @@ public class ChatFileResponse {
     private String fileName;
     private String fileSize;
     private String fileType;
+    private FileStatus fileStatus;
     private UserType userType;
     private String userTypeName;
     private LocalDateTime createDate;

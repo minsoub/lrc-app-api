@@ -3,7 +3,9 @@ package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewesti
 import com.bithumbsystems.lrc.management.api.core.config.properties.AwsProperties;
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
+import com.bithumbsystems.lrc.management.api.core.model.request.BucketUploadRequest;
 import com.bithumbsystems.lrc.management.api.core.util.FileUtil;
+import com.bithumbsystems.lrc.management.api.core.util.sender.AwsSQSSender;
 import com.bithumbsystems.lrc.management.api.v1.file.exception.FileException;
 import com.bithumbsystems.lrc.management.api.v1.file.service.FileService;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.listener.HistoryDto;
@@ -11,10 +13,13 @@ import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.listener.Hi
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.mapper.ReviewEstimateMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.model.request.ReviewEstimateRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.model.response.ReviewEstimateResponse;
+import com.bithumbsystems.persistence.mongodb.audit.model.enums.RoleType;
+import com.bithumbsystems.persistence.mongodb.chat.model.enums.FileStatus;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.reviewestimate.model.entity.ReviewEstimate;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.reviewestimate.service.ReviewEstimateDomainService;
 import java.nio.ByteBuffer;
 import java.text.Normalizer;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import lombok.RequiredArgsConstructor;
@@ -40,9 +45,11 @@ public class ReviewEstimateService {
     private final AwsProperties awsProperties;
     private final FileService fileService;
 
+    private final AwsSQSSender<BucketUploadRequest> awsSQSSender;
+
 
     /**
-     * 검토 평가 id로 찾기
+     * 검토 평가 project id로 찾기
      * @param projectId
      * @return ReviewEstimateResponse Object
      */
@@ -50,6 +57,16 @@ public class ReviewEstimateService {
         return reviewEstimateDomainService.findByProjectId(projectId)
                 .map(ReviewEstimateMapper.INSTANCE::reviewEstimateResponse)
                 .collectList();
+    }
+
+    /**
+     * 검토 평가 ID로 상세 내역 찾기
+     * @param id
+     * @return
+     */
+    public Mono<ReviewEstimateResponse> findById(String id) {
+        return reviewEstimateDomainService.findById(id)
+                .map(ReviewEstimateMapper.INSTANCE::reviewEstimateResponse);
     }
 
     /**
@@ -91,6 +108,8 @@ public class ReviewEstimateService {
                 .flatMap(result -> {
                     historyLog.send(projectId, "프로젝트 관리>검토 평가", "검토 평가", "항목 삭제", "", account);
                     result.setDelYn(true);
+                    result.setUpdateAdminAccountId(account.getAccountId());
+                    result.setUpdateDate(LocalDateTime.now());
                     return reviewEstimateDomainService.save(result)
                             .flatMap(res->Mono.just(ReviewEstimateMapper.INSTANCE.reviewEstimateResponse(res)));
                 });
@@ -185,14 +204,23 @@ public class ReviewEstimateService {
                                                                                 .organization(organization)
                                                                                 .result(result)
                                                                                 .reference(reference)
+                                                                                .fileStatus(FileStatus.ING)
                                                                                 .fileKey(file_key)
                                                                                 .fileName(Normalizer.normalize(file_name, Normalizer.Form.NFC))
+                                                                                .createDate(mode.getCreateDate())
+                                                                                .createAdminAccountId(mode.getCreateAdminAccountId())
+                                                                                .updateAdminAccountId(account.getAccountId())
+                                                                                .updateDate(LocalDateTime.now())
                                                                                 .build());
+                                                            }).flatMap(r1 -> {
+                                                                // 파일 업로드 했으므로 s3 상태를 조회할 수 있도록 SQS에 파일 정보를 전송한다.
+                                                                awsSQSSender.sendMessage(makeReviewSqsData(r1), UUID.randomUUID().toString());
+                                                                return Mono.just(r1);
                                                             });
 
                                                 });
                                     });
-                        } else {
+                        } else { // 수정 모드이지만 파일 업로드가 없다.
                             String final_id = _id;
                             return reviewEstimateDomainService.findById(final_id)
                                             .flatMap(mode -> {
@@ -216,6 +244,10 @@ public class ReviewEstimateService {
                                                                 .reference(reference)
                                                                 .fileKey(fileKey)
                                                                 .fileName(fileName)
+                                                                .createDate(mode.getCreateDate())
+                                                                .createAdminAccountId(mode.getCreateAdminAccountId())
+                                                                .updateAdminAccountId(account.getAccountId())
+                                                                .updateDate(LocalDateTime.now())
                                                                 .build());
                                             });
                         }
@@ -251,13 +283,20 @@ public class ReviewEstimateService {
                                                                     .organization(organization)
                                                                     .result(result)
                                                                     .reference(reference)
+                                                                    .fileStatus(FileStatus.ING)
                                                                     .fileKey(file_key)
                                                                     .fileName(Normalizer.normalize(file_name, Normalizer.Form.NFC))
+                                                                    .createDate(LocalDateTime.now())
+                                                                    .createAdminAccountId(account.getAccountId())
                                                                     .build()
-                                                    );
+                                                    ).flatMap(r1 -> {
+                                                        // 파일 업로드 했으므로 s3 상태를 조회할 수 있도록 SQS에 파일 정보를 전송한다.
+                                                        awsSQSSender.sendMessage(makeReviewSqsData(r1), UUID.randomUUID().toString());
+                                                        return Mono.just(r1);
+                                                    });
                                                 });
                                     });
-                        } else {
+                        } else { // 신규 등록이지만 파일 업로드가 없다.
                             if (StringUtils.hasLength(organization))
                                 historyLog.send(projectId, "프로젝트 관리>검토 평가", "검토 평가", "항목 추가", organization, account);
                             if (StringUtils.hasLength(result))
@@ -265,6 +304,7 @@ public class ReviewEstimateService {
                             if (StringUtils.hasLength(reference))
                                 historyLog.send(projectId, "프로젝트 관리>검토 평가", "평가 자료", "등록", reference, account);
 
+                            // 파일 업로드가 없다.
                             return reviewEstimateDomainService.save(
                                     ReviewEstimate.builder()
                                             .id(UUID.randomUUID().toString())
@@ -272,8 +312,11 @@ public class ReviewEstimateService {
                                             .organization(organization)
                                             .result(result)
                                             .reference(reference)
+                                            .fileStatus(FileStatus.NO)
                                             .fileKey(fileKey)
                                             .fileName(fileName)
+                                            .createDate(LocalDateTime.now())
+                                            .createAdminAccountId(account.getAccountId())
                                             .build()
                             );
                         }
@@ -282,5 +325,23 @@ public class ReviewEstimateService {
 
                 }).collectList()
                 .then(this.findByProjectId(reviewEstimateRequest.getProjectId().get(0)));  //프로젝트 명은 바꾸어야 함
+    }
+
+    /**
+     * SQS 전송 데이터 생성
+     *
+     * @param reviewEstimate
+     * @return
+     */
+    private BucketUploadRequest makeReviewSqsData(ReviewEstimate reviewEstimate) {
+        return BucketUploadRequest.builder()
+                .bucketName(awsProperties.getBucket())
+                .accountId(reviewEstimate.getCreateAdminAccountId())
+                .roleType(RoleType.ADMIN)
+                .sysType("LRC")
+                .fileKey(reviewEstimate.getFileKey())
+                .fileStatus(reviewEstimate.getFileStatus())
+                .tableName("lrc_project_review_estimate")
+                .build();
     }
 }

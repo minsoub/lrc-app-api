@@ -16,4 +16,6 @@ public final class ParameterStoreConstant {
   public static final String JWT_SECRET_KEY = "jwt_secret_key";
 
   public static final String CRYPTO_KEY = "key";
+
+  public static final String SQS_BUCKETAV_URL = "sqs_bucketav_url";
 }

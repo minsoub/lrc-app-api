@@ -89,7 +89,7 @@ public class ChatController {
     }
 
     /**
-     * file 저장
+     * Chat file 저장
      * @param chattFileRequest
      * @return ChatFileResponse Object
      */
