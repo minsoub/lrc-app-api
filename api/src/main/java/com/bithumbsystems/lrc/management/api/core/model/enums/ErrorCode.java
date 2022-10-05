@@ -17,6 +17,7 @@ public enum ErrorCode {
   INVALID_DATE_DAY_PREVIOUS("F008", "It's bigger than the previous date"),
   INVALID_MAX_FILE_SIZE("F016","INVALID_MAX_FILE_SIZE"),
   INVALID_FILE_EXT("F017","INVALID_FILE_EXT"),
+  INVALID_PROJECT("F017","INVALID_PROJECT"),
   INVALID_NUMBER_FORMAT("N004","You can enter up to 4 decimal places."),
   FAIL_SEND_MAIL("M411","FAIL_SEND_MAIL");
 
