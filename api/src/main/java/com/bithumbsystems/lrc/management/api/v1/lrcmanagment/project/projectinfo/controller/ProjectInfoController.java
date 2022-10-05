@@ -66,18 +66,4 @@ public class ProjectInfoController {
                 .map(c -> new SingleResponse(c))
         );
     }
-
-    /**
-     * 프로젝트 링크 시 프로젝트 존재 여부 체크
-     * @param projectId
-     * @return ProjectInfoResponse Object
-     */
-    @GetMapping("/project-check/{projectId}")
-    @Operation(summary = "거래지원 관리 - 프로젝트 존재 여부", description = "메신저 링크로 이동시 프로젝트 존재여부 체크", tags = "메신저 프로젝트 링크")
-    public ResponseEntity<Mono<?>> checkProject(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH)
-                                                  @PathVariable("projectId") String projectId) {
-        return ResponseEntity.ok().body(projectInfoService.checkProject(projectId)
-                .map(c -> new SingleResponse(c))
-        );
-    }
 }

@@ -6,7 +6,9 @@ import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.listener.Hi
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.foundationinfo.exception.FoundationInfoException;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.foundationinfo.mapper.FoundationInfoMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.foundationinfo.model.request.FoundationInfoRequest;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.foundationinfo.model.response.CheckProjectResponse;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.foundationinfo.model.response.FoundationInfoResponse;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.exception.ProjectInfoException;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.foundationinfo.service.FoundationInfoDomainService;
 import com.bithumbsystems.persistence.mongodb.statusmanagement.statuscode.repository.StatusCodeRepository;
 import lombok.RequiredArgsConstructor;
@@ -139,5 +141,17 @@ public class FoundationInfoService {
                                 .switchIfEmpty(Mono.error(new FoundationInfoException(ErrorCode.FAIL_UPDATE_CONTENT)))
                         //
                 );
+    }
+    /**
+     * 프로젝트 링크 시 프로젝트 존재여부 체크
+     * @param projectId 프로젝트 아이디
+     * @return CheckProjectResponse 성공여부
+     */
+    public Mono<CheckProjectResponse> checkProject(String projectId) {
+        return foundationInfoDomainService.findById(projectId)
+                .switchIfEmpty(Mono.error(new ProjectInfoException(ErrorCode.INVALID_PROJECT)))
+                .flatMap(projectInfo -> {
+                    return Mono.just(CheckProjectResponse.builder().result(true).build());
+                });
     }
 }

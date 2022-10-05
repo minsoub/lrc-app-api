@@ -1,13 +1,10 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.service;
 
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
-import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.listener.HistoryDto;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.listener.HistoryLog;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.exception.ProjectInfoException;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.mapper.ProjectInfoMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.model.request.ProjectInfoRequest;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.model.response.CheckProjectResponse;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.model.response.ProjectInfoResponse;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectinfo.model.entity.ProjectInfo;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectinfo.service.ProjectInfoDomainService;
@@ -165,18 +162,5 @@ public class ProjectInfoService {
 
                     })
                 );
-    }
-
-    /**
-     * 프로젝트 링크 시 프로젝트 존재여부 체크
-     * @param projectId 프로젝트 아이디
-     * @return CheckProjectResponse 성공여부
-     */
-    public Mono<CheckProjectResponse> checkProject(String projectId) {
-        return projectInfoDomainService.findByProjectId(projectId)
-                .switchIfEmpty(Mono.error(new ProjectInfoException(ErrorCode.INVALID_PROJECT)))
-                .flatMap(projectInfo -> {
-                    return Mono.just(CheckProjectResponse.builder().result(true).build());
-                });
     }
 }

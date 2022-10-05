@@ -1,4 +1,4 @@
-package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.model.response;
+package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.foundationinfo.model.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
