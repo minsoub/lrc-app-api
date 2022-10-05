@@ -16,6 +16,7 @@ import com.bithumbsystems.persistence.mongodb.chat.model.entity.ChatChannel;
 import com.bithumbsystems.persistence.mongodb.chat.model.entity.ChatFile;
 import com.bithumbsystems.persistence.mongodb.chat.model.entity.ChatMessage;
 import com.bithumbsystems.persistence.mongodb.chat.model.enums.ChatRole;
+import com.bithumbsystems.persistence.mongodb.chat.model.enums.FileStatus;
 import com.bithumbsystems.persistence.mongodb.chat.model.enums.UserType;
 import com.bithumbsystems.persistence.mongodb.chat.service.ChatDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.useraccount.service.UserInfoDomainService;
@@ -136,6 +137,7 @@ public class ChatService {
                                 .fileName(result.getFileName())
                                 .fileSize(result.getFileSize())
                                 .fileType(result.getFileType())
+                                .fileStatus(result.getFileStatus())
                                 .userType(result.getUserType())
                                 .userTypeName(null)
                                 .createDate(result.getCreateDate())
@@ -150,6 +152,7 @@ public class ChatService {
                                            .fileName(result.getFileName())
                                            .fileSize(result.getFileSize())
                                            .fileType(result.getFileType())
+                                           .fileStatus(result.getFileStatus())
                                            .userType(result.getUserType())
                                            .userTypeName(AES256Util.decryptAES(awsProperties.getKmsKey(), r1.getEmail()))
                                            .createDate(result.getCreateDate())
@@ -165,6 +168,7 @@ public class ChatService {
                                             .fileName(result.getFileName())
                                             .fileSize(result.getFileSize())
                                             .fileType(result.getFileType())
+                                            .fileStatus(result.getFileStatus())
                                             .userType(result.getUserType())
                                             .userTypeName(r2.getEmail())
                                             .createDate(result.getCreateDate())
@@ -186,6 +190,7 @@ public class ChatService {
                                 .fileName(result.getFileName())
                                 .fileSize(result.getFileSize())
                                 .fileType(result.getFileType())
+                                 .fileStatus(result.getFileStatus())
                                 .userType(result.getUserType())
                                 .userTypeName(null)
                                 .createDate(result.getCreateDate())
@@ -200,6 +205,7 @@ public class ChatService {
                                             .fileName(result.getFileName())
                                             .fileSize(result.getFileSize())
                                             .fileType(result.getFileType())
+                                            .fileStatus(result.getFileStatus())
                                             .userType(result.getUserType())
                                             .userTypeName(AES256Util.decryptAES(awsProperties.getKmsKey(), r1.getEmail()))
                                             .createDate(result.getCreateDate())
@@ -215,6 +221,7 @@ public class ChatService {
                                             .fileName(result.getFileName())
                                             .fileSize(result.getFileSize())
                                             .fileType(result.getFileType())
+                                            .fileStatus(result.getFileStatus())
                                             .userType(result.getUserType())
                                             .userTypeName(r2.getEmail())
                                             .createDate(result.getCreateDate())
@@ -283,6 +290,7 @@ public class ChatService {
                                                                     .fileName(request.getFileName())
                                                                     .fileType(request.getFileType())
                                                                     .fileSize(request.getFileSize())
+                                                                    .fileStatus(FileStatus.ING)
                                                                     .projectId(request.getProjectId())
                                                                     .userType(UserType.ADMIN)
                                                                     .createAccountId(account.getAccountId())
@@ -299,6 +307,7 @@ public class ChatService {
                         .fileType(res.getFileType())
                         .fileSize(res.getFileSize())
                         .fileName(res.getFileName())
+                        .fileStatus(res.getFileStatus())
                         .userType(UserType.ADMIN)
                         .createAccountId(res.getCreateAccountId())
                         .createDate(res.getCreateDate())

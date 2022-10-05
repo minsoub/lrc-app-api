@@ -3,12 +3,15 @@ package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.useraccoun
 import com.bithumbsystems.lrc.management.api.core.config.properties.AwsProperties;
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.util.AES256Util;
+import com.bithumbsystems.lrc.management.api.core.util.MaskingUtil;
+import com.bithumbsystems.lrc.management.api.v1.accesslog.request.AccessLogRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.listener.HistoryLog;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.useraccount.mapper.UserAccountMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.useraccount.model.request.UserAccountRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.useraccount.model.request.UserSaveRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.useraccount.model.response.UserAccountResponse;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.useraccount.model.response.UserInfoResponse;
+import com.bithumbsystems.persistence.mongodb.accesslog.model.enums.ActionType;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.foundationinfo.service.FoundationInfoDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.useraccount.model.entity.UserAccount;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.useraccount.service.UserAccountDomainService;
@@ -20,6 +23,7 @@ import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
@@ -33,6 +37,8 @@ public class UserAccountService {
     private final UserAccountDomainService userAccountDomainService;
     private final UserInfoDomainService userInfoDomainService;
     private final FoundationInfoDomainService foundationInfoDomainService;
+
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     private final AwsProperties properties;
     private final HistoryLog historyLog;
@@ -49,14 +55,14 @@ public class UserAccountService {
                     return userInfoDomainService.findById(user.getUserAccountId())
                                     .flatMap(res -> {
                                         return Mono.just(UserAccountResponse.builder()
-                                                .userEmail(AES256Util.decryptAES(properties.getKmsKey(), res.getEmail()))
+                                                .userEmail(MaskingUtil.getEmailMask(AES256Util.decryptAES(properties.getKmsKey(), res.getEmail())))
                                                 .id(user.getId())
                                                 .userAccountId(user.getUserAccountId())
                                                 .projectId(user.getProjectId())
-                                                .userName(AES256Util.decryptAES(properties.getKmsKey(), user.getName()))
+                                                .userName(MaskingUtil.getNameMask(AES256Util.decryptAES(properties.getKmsKey(), user.getName())))
                                                 .snsId(AES256Util.decryptAES(properties.getKmsKey(), user.getSnsId()))
-                                                .email(AES256Util.decryptAES(properties.getKmsKey(), user.getContactEmail()))
-                                                .phone(AES256Util.decryptAES(properties.getKmsKey(), user.getPhone()))
+                                                .email(MaskingUtil.getEmailMask(AES256Util.decryptAES(properties.getKmsKey(), user.getContactEmail())))
+                                                .phone(MaskingUtil.getPhoneMask(AES256Util.decryptAES(properties.getKmsKey(), user.getPhone())))
                                                 .userType(user.getUserType())
                                                 .build());
                                     });
@@ -64,6 +70,48 @@ public class UserAccountService {
                 .collectList();
     }
 
+    /**
+     * 마스킹 해재 정보를 조회한다.
+     *
+     * @param projectId
+     * @param reason
+     * @param account
+     * @return
+     */
+    public Mono<List<UserAccountResponse>> unMaskfindByProjectId(String projectId, String reason, Account account) {
+        // 개인정보 열람 사유를 남겨야 한다.
+        // log 전송
+        String title = "거래지원 담당자 정보 열람";
+        applicationEventPublisher.publishEvent(
+                AccessLogRequest.builder()
+                        .accountId(account.getAccountId())
+                        .actionType(ActionType.VIEW)
+                        .reason(reason)
+                        .email(account.getEmail())
+                        .description(title)
+                        .siteId(account.getMySiteId())
+                        .ip(account.getUserIp())
+                        .build()
+        );
+        return userAccountDomainService.findByProjectId(projectId)
+                .flatMap(user -> {
+                    return userInfoDomainService.findById(user.getUserAccountId())
+                            .flatMap(res -> {
+                                return Mono.just(UserAccountResponse.builder()
+                                        .userEmail(AES256Util.decryptAES(properties.getKmsKey(), res.getEmail()))
+                                        .id(user.getId())
+                                        .userAccountId(user.getUserAccountId())
+                                        .projectId(user.getProjectId())
+                                        .userName(AES256Util.decryptAES(properties.getKmsKey(), user.getName()))
+                                        .snsId(AES256Util.decryptAES(properties.getKmsKey(), user.getSnsId()))
+                                        .email(AES256Util.decryptAES(properties.getKmsKey(), user.getContactEmail()))
+                                        .phone(AES256Util.decryptAES(properties.getKmsKey(), user.getPhone()))
+                                        .userType(user.getUserType())
+                                        .build());
+                            });
+                })
+                .collectList();
+    }
     /**
      * 생성자 정보를 리턴한다.
      * @param projectId
@@ -114,6 +162,18 @@ public class UserAccountService {
                               .build()
                     ).flatMap(res -> {
                         historyLog.send(projectId, "프로젝트 관리>담당자 정보", "담당자", "담당자 추가", AES256Util.decryptAES( properties.getKmsKey(), result.getEmail()), account);
+
+//                        return Mono.just(UserAccountResponse.builder()
+//                                .userEmail(MaskingUtil.getEmailMask(AES256Util.decryptAES(properties.getKmsKey(), res.getContactEmail())))
+//                                .id(res.getId())
+//                                .userAccountId(res.getUserAccountId())
+//                                .projectId(res.getProjectId())
+//                                .userName(MaskingUtil.getNameMask(AES256Util.decryptAES(properties.getKmsKey(), res.getName())))
+//                                .snsId(AES256Util.decryptAES(properties.getKmsKey(), res.getSnsId()))
+//                                .email(MaskingUtil.getEmailMask(AES256Util.decryptAES(properties.getKmsKey(), res.getContactEmail())))
+//                                .phone(MaskingUtil.getPhoneMask(AES256Util.decryptAES(properties.getKmsKey(), res.getPhone())))
+//                                .userType(res.getUserType())
+//                                .build());
                         return Mono.just(UserAccountMapper.INSTANCE.userAccountResponse(res));
                     });
                 });
@@ -155,6 +215,18 @@ public class UserAccountService {
                                             if (StringUtils.hasLength(result.getEmail()))
                                                 historyLog.send(projectId, "프로젝트 관리>담당자 정보", "이메일 주소", "수정", email, account);
 
+//                                            return Mono.just(UserAccountResponse.builder()
+//                                                    .userEmail(MaskingUtil.getEmailMask(AES256Util.decryptAES(properties.getKmsKey(), r.getContactEmail())))
+//                                                    .id(r.getId())
+//                                                    .userAccountId(r.getUserAccountId())
+//                                                    .projectId(r.getProjectId())
+//                                                    .userName(MaskingUtil.getNameMask(AES256Util.decryptAES(properties.getKmsKey(), r.getName())))
+//                                                    .snsId(AES256Util.decryptAES(properties.getKmsKey(), r.getSnsId()))
+//                                                    .email(MaskingUtil.getEmailMask(AES256Util.decryptAES(properties.getKmsKey(), r.getContactEmail())))
+//                                                    .phone(MaskingUtil.getPhoneMask(AES256Util.decryptAES(properties.getKmsKey(), r.getPhone())))
+//                                                    .userType(r.getUserType())
+//                                                    .build());
+
                                             return Mono.just(UserAccountMapper.INSTANCE.userAccountResponse(r));
                                         });
                             });
@@ -174,13 +246,23 @@ public class UserAccountService {
                 .flatMap(result -> {
                     historyLog.send(projectId, "프로젝트 관리>담당자 정보", "담당자", "담당자 탈퇴", AES256Util.decryptAES( properties.getKmsKey(), result.getContactEmail()), account);
                     return userAccountDomainService.delete(result)
-                            .then(Mono.just(UserAccountMapper.INSTANCE.userAccountResponse(result)));
+                            .then(Mono.just(UserAccountResponse.builder()
+                                    .userEmail(MaskingUtil.getEmailMask(AES256Util.decryptAES(properties.getKmsKey(), result.getContactEmail())))
+                                    .id(result.getId())
+                                    .userAccountId(result.getUserAccountId())
+                                    .projectId(result.getProjectId())
+                                    .userName(MaskingUtil.getNameMask(AES256Util.decryptAES(properties.getKmsKey(), result.getName())))
+                                    .snsId(AES256Util.decryptAES(properties.getKmsKey(), result.getSnsId()))
+                                    .email(MaskingUtil.getEmailMask(AES256Util.decryptAES(properties.getKmsKey(), result.getContactEmail())))
+                                    .phone(MaskingUtil.getPhoneMask(AES256Util.decryptAES(properties.getKmsKey(), result.getPhone())))
+                                    .userType(result.getUserType())
+                                    .build()));
                 });
     }
 
     /**
      * 키워드로 거래지원 사용자를 조회한다.
-     *
+     * 클라이언트에서 마스킹을 해야만 한다.
      * @param keyword
      * @return
      */

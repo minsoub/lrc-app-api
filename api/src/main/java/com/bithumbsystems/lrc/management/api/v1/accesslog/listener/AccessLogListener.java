@@ -26,6 +26,7 @@ public class AccessLogListener {
                 .actionType(accessLogRequest.getActionType())
                 .reason(accessLogRequest.getReason())
                 .description(accessLogRequest.getDescription())
+                .ip(accessLogRequest.getIp())
                 .siteId(accessLogRequest.getSiteId())
                 .createDate(LocalDateTime.now())
                 .build()).publishOn(Schedulers.single()).subscribe();

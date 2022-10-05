@@ -5,6 +5,7 @@ import com.bithumbsystems.lrc.management.api.v1.accesslog.request.AccessLogReque
 import com.bithumbsystems.lrc.management.api.v1.audit.mapper.AuditLogMapper;
 import com.bithumbsystems.lrc.management.api.v1.audit.model.response.AuditLogDetailResponse;
 import com.bithumbsystems.lrc.management.api.v1.audit.model.response.AuditLogResponse;
+import com.bithumbsystems.lrc.management.api.v1.audit.model.response.AuditLogSimpleResponse;
 import com.bithumbsystems.persistence.mongodb.accesslog.model.enums.ActionType;
 import com.bithumbsystems.persistence.mongodb.audit.service.AuditLogDomainService;
 import java.io.ByteArrayInputStream;
@@ -38,13 +39,13 @@ public class AuditLogService {
     private final AuditLogDomainService auditLogDomainService;
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    public Mono<List<AuditLogResponse>> findAuditServiceLog(LocalDate fromDate, LocalDate toDate, String keyword, String mySiteId) {
+    public Mono<List<AuditLogSimpleResponse>> findAuditServiceLog(LocalDate fromDate, LocalDate toDate, String keyword, String mySiteId) {
 
         return auditLogDomainService.findPageBySearchText(
                         fromDate,
                         toDate, keyword, mySiteId)
-                .map(AuditLogMapper.INSTANCE::auditLogResponse)
-                .collectSortedList(Comparator.comparing(AuditLogResponse::getCreateDate).reversed());
+                .map(AuditLogMapper.INSTANCE::auditLogSimpleResponse)
+                .collectSortedList(Comparator.comparing(AuditLogSimpleResponse::getCreateDate).reversed());
     }
 
     /**

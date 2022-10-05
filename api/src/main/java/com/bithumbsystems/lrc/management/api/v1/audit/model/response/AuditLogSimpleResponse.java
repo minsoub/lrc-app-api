@@ -11,7 +11,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Data
 @Builder
-public class AuditLogDetailResponse {
+public class AuditLogSimpleResponse {
     private String id;
     private String email;
     private String ip;
@@ -23,13 +23,13 @@ public class AuditLogDetailResponse {
     private String crud;
     private String uri;
     private String path;
-    private String queryParams;
-    private String parameter;
+    //private String queryParams;
+    //private String parameter;
     private String siteId;
     private String siteName;
     private RoleType roleType;
     private Set<String> roles;
-    private String referer;
+    //private String referer;
     private String device;
     //private String message;
     private LocalDateTime createDate;

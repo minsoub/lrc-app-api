@@ -57,4 +57,6 @@ public class AwsProperties {
   private String smtpUserPassword;
   private String jwtSecretKey;
   private String cryptoKey;
+  private String sqsBucketavUrl;
+
 }

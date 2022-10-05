@@ -1,17 +1,5 @@
 package com.bithumbsystems.lrc.management.api.core.config;
 
-import static com.bithumbsystems.lrc.management.api.core.config.constant.ParameterStoreConstant.CRYPTO_KEY;
-import static com.bithumbsystems.lrc.management.api.core.config.constant.ParameterStoreConstant.DB_NAME;
-import static com.bithumbsystems.lrc.management.api.core.config.constant.ParameterStoreConstant.DB_PASSWORD;
-import static com.bithumbsystems.lrc.management.api.core.config.constant.ParameterStoreConstant.DB_PORT;
-import static com.bithumbsystems.lrc.management.api.core.config.constant.ParameterStoreConstant.DB_URL;
-import static com.bithumbsystems.lrc.management.api.core.config.constant.ParameterStoreConstant.DB_USER;
-import static com.bithumbsystems.lrc.management.api.core.config.constant.ParameterStoreConstant.JWT_SECRET_KEY;
-import static com.bithumbsystems.lrc.management.api.core.config.constant.ParameterStoreConstant.KMS_ALIAS_NAME;
-import static com.bithumbsystems.lrc.management.api.core.config.constant.ParameterStoreConstant.MAIL_SENDER;
-import static com.bithumbsystems.lrc.management.api.core.config.constant.ParameterStoreConstant.SMTP_PASSWORD;
-import static com.bithumbsystems.lrc.management.api.core.config.constant.ParameterStoreConstant.SMTP_USERNAME;
-
 import com.bithumbsystems.lrc.management.api.core.config.properties.AwsProperties;
 import com.bithumbsystems.lrc.management.api.core.config.properties.MongoProperties;
 import java.net.URI;
@@ -25,6 +13,8 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ssm.SsmClient;
 import software.amazon.awssdk.services.ssm.model.GetParameterRequest;
 import software.amazon.awssdk.services.ssm.model.GetParameterResponse;
+
+import static com.bithumbsystems.lrc.management.api.core.config.constant.ParameterStoreConstant.*;
 
 @Slf4j
 @Data
@@ -66,6 +56,7 @@ public class ParameterStoreConfig {
         this.awsProperties.setEmailSender(getParameterValue(awsProperties.getParamStoreMessageName(), MAIL_SENDER));
         this.awsProperties.setSmtpUserName(getParameterValue(awsProperties.getParamStoreMessageName(), SMTP_USERNAME).trim());
         this.awsProperties.setSmtpUserPassword(getParameterValue(awsProperties.getParamStoreMessageName(), SMTP_PASSWORD).trim());
+        this.awsProperties.setSqsBucketavUrl(getParameterValue(awsProperties.getParamStoreMessageName(), SQS_BUCKETAV_URL)); // ADD
         this.awsProperties.setJwtSecretKey(getParameterValue(awsProperties.getParamStoreAuthName(), JWT_SECRET_KEY));
         this.awsProperties.setCryptoKey(getParameterValue(awsProperties.getParamCryptoName(), CRYPTO_KEY));
     }
