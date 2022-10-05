@@ -58,16 +58,11 @@ public class AuditLogService {
                 .map(AuditLogMapper.INSTANCE::auditLogDetailResponse);
     }
 
-    public Mono<ByteArrayInputStream> downloadExcel(LocalDate fromDate, LocalDate toDate, String keyword, String reason, String type, Account account) { // String mySiteId) {
+    public Mono<ByteArrayInputStream> downloadExcel(LocalDate fromDate, LocalDate toDate, String keyword, String reason, Account account) {
 
         // log 전송
-        String title = "";
-        if (type.equals("1")) {
-            // 서비스 로그 조회
-            title = "서비스 로그 관리 > 엑셀 다운로드";
-        }else {
-            title = "감사로그 조회 > 엑셀 다운로드";
-        }
+        String title = "서비스 로그 관리 > 엑셀 다운로드";
+
         applicationEventPublisher.publishEvent(
                 AccessLogRequest.builder()
                         .accountId(account.getAccountId())
