@@ -1,5 +1,8 @@
 package com.bithumbsystems.lrc.management.api.core.config;
 
+import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.services.sqs.AmazonSQSAsync;
+import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
 import com.bithumbsystems.lrc.management.api.core.config.properties.AwsProperties;
 import java.net.URI;
 import javax.annotation.PostConstruct;
@@ -37,7 +40,17 @@ public class AwsConfig {
         .region(Region.of(awsProperties.getRegion()))
         .build();
   }
-
+  @Bean
+  public AmazonSQSAsync amazonSQS() {
+    var endpointConfig = new AwsClientBuilder.EndpointConfiguration(
+            awsProperties.getSqsEndPoint(),
+            awsProperties.getRegion()
+    );
+    return AmazonSQSAsyncClientBuilder.standard()
+//            .withRegion(awsProperties.getRegion())
+            .withEndpointConfiguration(endpointConfig)
+            .build();
+  }
   @PostConstruct
   public void init() {
     kmsAsyncClient = KmsAsyncClient.builder()
