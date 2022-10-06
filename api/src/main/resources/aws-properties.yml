@@ -27,3 +27,6 @@ cloud:
       auth-name: auth
       salt-name: salt
       iv-name: iv
+    sqs:
+      bucketav-queue-name: bucketav_event_queue_local.fifo
+      endpoint: https://sqs.ap-northeast-2.amazonaws.com

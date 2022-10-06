@@ -3,8 +3,10 @@ package com.bithumbsystems.lrc.management.api.v1.chat.service;
 import com.bithumbsystems.lrc.management.api.core.config.properties.AwsProperties;
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
+import com.bithumbsystems.lrc.management.api.core.model.request.BucketUploadRequest;
 import com.bithumbsystems.lrc.management.api.core.util.AES256Util;
 import com.bithumbsystems.lrc.management.api.core.util.FileUtil;
+import com.bithumbsystems.lrc.management.api.core.util.sender.AwsSQSSender;
 import com.bithumbsystems.lrc.management.api.v1.chat.model.request.ChatFileRequest;
 import com.bithumbsystems.lrc.management.api.v1.chat.model.request.ChatRequest;
 import com.bithumbsystems.lrc.management.api.v1.chat.model.response.ChatFileResponse;
@@ -12,6 +14,7 @@ import com.bithumbsystems.lrc.management.api.v1.chat.model.response.ChatResponse
 import com.bithumbsystems.lrc.management.api.v1.file.exception.FileException;
 import com.bithumbsystems.lrc.management.api.v1.file.service.FileService;
 import com.bithumbsystems.persistence.mongodb.account.service.AccountDomainService;
+import com.bithumbsystems.persistence.mongodb.audit.model.enums.RoleType;
 import com.bithumbsystems.persistence.mongodb.chat.model.entity.ChatChannel;
 import com.bithumbsystems.persistence.mongodb.chat.model.entity.ChatFile;
 import com.bithumbsystems.persistence.mongodb.chat.model.entity.ChatMessage;
@@ -19,6 +22,7 @@ import com.bithumbsystems.persistence.mongodb.chat.model.enums.ChatRole;
 import com.bithumbsystems.persistence.mongodb.chat.model.enums.FileStatus;
 import com.bithumbsystems.persistence.mongodb.chat.model.enums.UserType;
 import com.bithumbsystems.persistence.mongodb.chat.service.ChatDomainService;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.reviewestimate.model.entity.ReviewEstimate;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.useraccount.service.UserInfoDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +60,7 @@ public class ChatService {
 
     private final S3AsyncClient s3AsyncClient;
 
+    private final AwsSQSSender<BucketUploadRequest> awsSQSSender;
     /**
      * 사용자 존재하는 체크해서 없으면 채팅방에 신규 등록
      * 있으면 해당 방에 프로젝트아이디가 존재하는지 체크하고 없으면 추가해서 저장한다.
@@ -296,7 +301,11 @@ public class ChatService {
                                                                     .createAccountId(account.getAccountId())
                                                                     .createDate(LocalDateTime.now())
                                                                     .build()
-                                                    );
+                                                    ).flatMap(r1 -> {
+                                                        // 파일 업로드 했으므로 s3 상태를 조회할 수 있도록 SQS에 파일 정보를 전송한다.
+                                                        awsSQSSender.sendMessage(makeReviewSqsData(r1), UUID.randomUUID().toString());
+                                                        return Mono.just(r1);
+                                                    });
                                                 });
 
                                     });
@@ -409,5 +418,23 @@ public class ChatService {
                     return new ByteArrayInputStream(out.toByteArray());
                 })
                 .log();
+    }
+
+    /**
+     * SQS 전송 데이터 생성
+     *
+     * @param chatFile
+     * @return
+     */
+    private BucketUploadRequest makeReviewSqsData(ChatFile chatFile) {
+        return BucketUploadRequest.builder()
+                .bucketName(awsProperties.getBucket())
+                .accountId(chatFile.getCreateAccountId())
+                .roleType(RoleType.ADMIN)
+                .sysType("LRC")
+                .fileKey(chatFile.getId())
+                .fileStatus(chatFile.getFileStatus())
+                .tableName("lrc_chat_file")
+                .build();
     }
 }

@@ -28,6 +28,9 @@ cloud:
       auth-name: auth
       salt-name: salt
       iv-name: iv
+    sqs:
+      bucketav-queue-name: bs-bucketav_result_qafifo
+      endpoint: https://sqs.ap-northeast-2.amazonaws.com/257160057157/bs-bucketav_result_qa.fifo
 logging:
   level:
     root: ${management.api.logging.level.root:DEBUG}
