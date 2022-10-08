@@ -39,6 +39,7 @@ public class FileUtil {
   public static final String[] ALLOW_MIME_TYPE_DEFAULT = {
           "IMAGE/JPEG", "APPLICATION/VND.OPENXMLFORMATS-OFFICEDOCUMENT.SPREADSHEETML.SHEET",
           "APPLICATION/MSWORD", "APPLICATION/POSTSCRIPT", "IMAGE/GIF", "TEXT/PLAIN", "VIDEO/QUICKTIME", "VIDEO/X-MSVIDEO",
+          "IMAGE/PNG",
           "APPLICATION/PDF", "AI", "MOV", "MP4", "AVI", "MKV", "TXT", "DOC", "DOCX", "XLS",
           "XLSX", "PPT", "PPTX", "PDF", "JPG", "JPEG", "PNG", "GIF", "CSV"
   };
@@ -56,6 +57,7 @@ public class FileUtil {
         entry("application/vnd.openxmlformats-officedocument.presentationml.presentation", new ArrayList<String>(Arrays.asList("PPTX"))),
         entry("image/gif", new ArrayList<String>(Arrays.asList("GIF"))),
         entry("image/jpeg", new ArrayList<String>(Arrays.asList("JPEG", "JPG"))),
+        entry("image/png", new ArrayList<String>(Arrays.asList("PNG"))),
         entry("text/plain", new ArrayList<String>(Arrays.asList("TXT"))),
         entry("text/csv", new ArrayList<String>(Arrays.asList("CSV"))),
         entry("video/quicktime", new ArrayList<String>(Arrays.asList("MOV"))),

@@ -1,6 +1,7 @@
 package com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.file.model.entity;
 
 
+import com.bithumbsystems.persistence.mongodb.chat.model.enums.FileStatus;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.model.enums.SubmittedDocumentEnums;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -25,6 +26,7 @@ public class SubmittedDocumentFile {
     private SubmittedDocumentEnums type;            //구분
     private String fileKey;         //파일코드
     private String fileName;        //파일명
+    private FileStatus fileStatus;  // 파일 상태
     private String email;           // 작성자 메일 주소
 
     private LocalDateTime createDate; //생성날짜

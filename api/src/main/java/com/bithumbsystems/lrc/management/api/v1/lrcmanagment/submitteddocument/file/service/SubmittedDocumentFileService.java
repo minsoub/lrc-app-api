@@ -55,6 +55,7 @@ public class SubmittedDocumentFileService {
                             .type(result.getType())
                             .fileKey(result.getFileKey())
                             .fileName(result.getFileName())
+                            .fileStatus(result.getFileStatus())
                             .email(AES256Util.decryptAES(awsProperties.getKmsKey(), result.getEmail()))
                             .createDate(result.getCreateDate())
                             .createAdminAccountId(result.getCreateAdminAccountId())
