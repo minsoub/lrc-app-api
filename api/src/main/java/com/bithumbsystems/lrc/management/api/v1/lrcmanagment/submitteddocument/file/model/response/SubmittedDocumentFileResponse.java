@@ -1,6 +1,7 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.model.response;
 
 
+import com.bithumbsystems.persistence.mongodb.chat.model.enums.FileStatus;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.model.enums.SubmittedDocumentEnums;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -30,6 +31,9 @@ public class SubmittedDocumentFileResponse {
 
     @Schema(description = "파일 명")
     private String fileName;        //파일명
+
+    @Schema(description = "파일 상태")
+    private FileStatus fileStatus;        //파일 상태
 
     @Schema(description = "작성자 메일 주소")
     private String email;

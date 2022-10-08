@@ -113,7 +113,7 @@ public class ChatController {
 
         return chatService.findById(fileKey)
                 .flatMap(res -> {
-                    if (res.getCreateAccountId() == account.getAccountId()) {
+                    if (res.getCreateAccountId().equals(account.getAccountId())) {
                         return Mono.error(new LrcException(INVALID_FILE));
                     }
                     log.debug("find file => {}", res);

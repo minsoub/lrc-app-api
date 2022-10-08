@@ -1,6 +1,7 @@
 package com.bithumbsystems.lrc.management.api.v1.audit.service;
 
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
+import com.bithumbsystems.lrc.management.api.core.util.MaskingUtil;
 import com.bithumbsystems.lrc.management.api.v1.accesslog.request.AccessLogRequest;
 import com.bithumbsystems.lrc.management.api.v1.audit.mapper.AuditLogMapper;
 import com.bithumbsystems.lrc.management.api.v1.audit.model.response.AuditLogDetailResponse;
@@ -44,6 +45,10 @@ public class AuditLogService {
         return auditLogDomainService.findPageBySearchText(
                         fromDate,
                         toDate, keyword, mySiteId)
+                .flatMap(result -> {
+                    result.setEmail(MaskingUtil.getEmailMask(result.getEmail()));
+                    return Mono.just(result);
+                })
                 .map(AuditLogMapper.INSTANCE::auditLogSimpleResponse)
                 .collectSortedList(Comparator.comparing(AuditLogSimpleResponse::getCreateDate).reversed());
     }

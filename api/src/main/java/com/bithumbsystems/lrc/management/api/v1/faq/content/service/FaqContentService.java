@@ -2,6 +2,7 @@ package com.bithumbsystems.lrc.management.api.v1.faq.content.service;
 
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
+import com.bithumbsystems.lrc.management.api.core.util.MaskingUtil;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.exception.FaqContentException;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.mapper.FaqContentMapper;
 import com.bithumbsystems.lrc.management.api.v1.faq.content.model.request.FaqContentRequest;
@@ -54,6 +55,7 @@ public class FaqContentService {
                 .map(m -> {
                     FaqContentResponse faqContentResponse = FaqContentMapper.INSTANCE.faqContentResponse(m.getT1());
                     faqContentResponse.setCategory(m.getT2().getName());
+                    faqContentResponse.setEmail(MaskingUtil.getEmailMask(faqContentResponse.getEmail()));
                     return faqContentResponse;
                 }))
                 .collectSortedList(Comparator.comparing(FaqContentResponse::getOrderNo));
