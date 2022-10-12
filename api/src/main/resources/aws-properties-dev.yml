@@ -30,4 +30,4 @@ cloud:
       iv-name: iv
     sqs:
       bucketav-queue-name: bs-bucketav_result_dev.fifo
-      endpoint: https://sqs.ap-northeast-2.amazonaws.com/257160057157/bs-bucketav_result_dev.fifo
+      endpoint: https://vpce-05d66ad0576f0715e-kb70y93b.sqs.ap-northeast-2.vpce.amazonaws.com
