@@ -72,20 +72,16 @@ public class AuditLogController {
     }
 
     @GetMapping(value = "/logs/excel/export", produces = APPLICATION_OCTET_STREAM_VALUE)
-    @Operation(summary = "서비스 로그 관리 - 엑셀 다운로드", description = "사기 신고 관리: 엑셀 다운로드", tags = "사기 신고 관리")
+    @Operation(summary = "서비스 로그 관리 - 엑셀 다운로드", description = "서비스 로그 관리: 엑셀 다운로드", tags = "서비스 로그 관리")
     public Mono<ResponseEntity<?>> downloadExcel(@Parameter(name = "fromDate", description = "fromDate 이전 날짜(* 날짜 입력 형식 2022-02-22)", required = true) @RequestParam(required = false) String fromDate,
                                                  @Parameter(name = "toDate", description = "toDate 다음 날짜(* 날짜 입력 형식 2022-02-22)", required = true) @RequestParam(required = false) String toDate,
                                                  @Parameter(name = "keyword", description = "로그 관련 키워드 조건 검색") @RequestParam(required = false) String keyword,
                                                  @Parameter(name = "reason", description = "다운로드 사유") @RequestParam(required = true) String reason,
-                                                 @Parameter(name = "type", description = "업무구분") @RequestParam(required = true) String type,
                                                  @Parameter(hidden = true) @CurrentUser Account account) {
         LocalDate nFromDate = LocalDate.parse(fromDate);
         LocalDate nToDate = LocalDate.parse(toDate);
 
-        // 사유 입력.
-
-
-        return auditLogService.downloadExcel(nFromDate, nToDate, keyword, reason, type, account)
+        return auditLogService.downloadExcel(nFromDate, nToDate, keyword, reason, account)
                 .flatMap(inputStream -> {
                     HttpHeaders headers = new HttpHeaders();
                     String fileName = "서비스로그.xlsx";

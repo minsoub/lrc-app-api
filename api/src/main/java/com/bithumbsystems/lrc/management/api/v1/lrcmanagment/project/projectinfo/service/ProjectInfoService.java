@@ -1,7 +1,6 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.service;
 
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.listener.HistoryDto;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.listener.HistoryLog;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.mapper.ProjectInfoMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.model.request.ProjectInfoRequest;
@@ -9,13 +8,11 @@ import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectinfo.model.entity.ProjectInfo;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectinfo.service.ProjectInfoDomainService;
 import com.bithumbsystems.persistence.mongodb.statusmanagement.linemng.service.LineMngDomainService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor

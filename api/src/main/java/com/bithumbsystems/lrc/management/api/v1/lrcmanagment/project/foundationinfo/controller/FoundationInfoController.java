@@ -52,4 +52,18 @@ public class FoundationInfoController {
                 .map(c -> new SingleResponse(c))
         );
     }
+
+    /**
+     * 프로젝트 링크 시 프로젝트 존재 여부 체크
+     * @param id
+     * @return FoundationInfoResponse Object
+     */
+    @GetMapping("/foundation-check/{id}")
+    @Operation(summary = "거래지원 관리 - 프로젝트 존재 여부", description = "메신저 링크로 이동시 프로젝트 존재여부 체크", tags = "메신저 프로젝트 링크")
+    public ResponseEntity<Mono<?>> checkProject(@Parameter(name = "id", description = "project 의 id", in = ParameterIn.PATH)
+                                                     @PathVariable("id") String id) {
+        return ResponseEntity.ok().body(foundationInfoService.checkProject(id)
+                .map(c -> new SingleResponse(c))
+        );
+    }
 }

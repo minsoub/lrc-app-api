@@ -30,7 +30,7 @@ cloud:
       iv-name: iv
     sqs:
       bucketav-queue-name: bs-bucketav_result.fifo
-      endpoint: https://sqs.ap-northeast-2.amazonaws.com/257160057157/bs-bucketav_result.fifo
+      endpoint: https://vpce-0252aacd7d5b8ecbb-0d9ak2w8.sqs.ap-northeast-2.vpce.amazonaws.com
 logging:
   level:
     root: ${management.api.logging.level.root:DEBUG}
