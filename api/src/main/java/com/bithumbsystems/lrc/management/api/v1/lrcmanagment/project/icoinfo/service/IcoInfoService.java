@@ -54,7 +54,7 @@ public class IcoInfoService {
                         .flatMap(result -> {
                           if (icoInfo.getMarketInfo().equals("KRW")) {
                             if (!Objects.equals(result.getPrice(), icoInfo.getPrice())) {
-                              historyLog.send(projectId, "프로젝트 관리>상장 정보", "KRW 상장가", "수정", String.format("%.0f", icoInfo.getPrice()), account);
+                              historyLog.send(projectId, "프로젝트 관리>상장 정보", "KRW 상장가", "수정", String.valueOf(icoInfo.getPrice()), account);
                             }
                             if (result.getIcoDate() == null && icoInfo.getIcoDate() != null) {
                               historyLog.send(projectId, "프로젝트 관리>상장 정보", "KRW 상장일", "수정", icoInfo.getIcoDate().toString(), account);
@@ -99,7 +99,7 @@ public class IcoInfoService {
                 ).flatMap(res -> {
                   if (icoInfo.getMarketInfo().equals("KRW")) {
                     if (icoInfo.getPrice() != null)
-                      historyLog.send(projectId, "프로젝트 관리>상장 정보", "KRW 상장가", "등록", String.format("%d", icoInfo.getPrice()), account);
+                      historyLog.send(projectId, "프로젝트 관리>상장 정보", "KRW 상장가", "등록", String.valueOf(icoInfo.getPrice()), account);
                     if (icoInfo.getIcoDate() != null)
                       historyLog.send(projectId, "프로젝트 관리>상장 정보", "KRW 상장일", "등록", icoInfo.getIcoDate().toString(), account);
                   } else {

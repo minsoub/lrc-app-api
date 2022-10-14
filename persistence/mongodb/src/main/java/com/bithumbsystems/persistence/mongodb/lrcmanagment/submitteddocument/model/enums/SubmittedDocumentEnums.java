@@ -11,5 +11,6 @@ public enum SubmittedDocumentEnums {
     ETHICAL_WRITE_AUTH,             //윤리 서약서
     REGULATORY_COMPLIANCE,          //규제 준수 확약서
     ETC,                            //기타,
-    PERSONAL_INFO_REQ               // 별첨-1] 개인정보 요청서
+    PERSONAL_INFO_REQ,               // 별첨-1] 개인정보 요청서
+    SHAREHOLDER                     // 주주명부
 }
