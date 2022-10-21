@@ -34,7 +34,7 @@ public class AwsSQSSenderImpl<T> implements AwsSQSSender<T> {
     public SendMessageResult sendMessage(T bucketUploadRequest, String groupId) {
         log.debug("AwsSQSSender Thread {}" , Thread.currentThread().getName());
         return amazonSQS.sendMessage(
-                new SendMessageRequest(awsProperties.getSqsBucketavUrl(), new Gson().toJson(bucketUploadRequest))
+                new SendMessageRequest(awsProperties.getSqsEndPoint() + "/" + awsProperties.getBucketAvQueueName(), new Gson().toJson(bucketUploadRequest))
                         .withMessageGroupId(groupId)
                         .withMessageDeduplicationId(UUID.randomUUID().toString())
         );

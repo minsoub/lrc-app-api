@@ -125,6 +125,8 @@ public class SubmittedDocumentUrlService {
             subject = "규제준수 확약서";
         } else if(type.equals(SubmittedDocumentEnums.ETC)) {
             subject = "기타";
+        } else if(type.equals(SubmittedDocumentEnums.SHAREHOLDER)) {
+            subject = "주주명부";
         }
         applicationEventPublisher.publishEvent(
                 HistoryDto.builder()
