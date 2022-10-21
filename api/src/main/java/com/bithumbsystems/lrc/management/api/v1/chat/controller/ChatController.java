@@ -107,6 +107,7 @@ public class ChatController {
      * @return
      */
     @GetMapping(value = "/chat/file/{fileKey}", produces = APPLICATION_OCTET_STREAM_VALUE)
+    @Operation(summary = "Chat file 다운로드", description = "Chat file 정보를 다운로드 합니다.", tags = "chat / 파일다운로드")
     public Mono<ResponseEntity<?>> s3download(@PathVariable String fileKey, @Parameter(hidden = true) @CurrentUser Account account) {
 
         AtomicReference<String> fileName = new AtomicReference<>();

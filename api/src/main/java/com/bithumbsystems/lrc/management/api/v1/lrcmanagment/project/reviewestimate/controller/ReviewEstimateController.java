@@ -1,6 +1,10 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.reviewestimate.controller;
 
 
+import static com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode.INVALID_FILE;
+import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
+
 import com.bithumbsystems.lrc.management.api.core.config.properties.AwsProperties;
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.config.resolver.CurrentUser;
@@ -20,12 +24,14 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-
-import static com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode.INVALID_FILE;
-import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
-import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @RequiredArgsConstructor
 @RestController
@@ -89,6 +95,7 @@ public class ReviewEstimateController {
      * @return
      */
     @GetMapping(value = "/review-estimate/file/{projectId}/{id}/{fileKey}", produces = APPLICATION_OCTET_STREAM_VALUE)
+    @Operation(summary = "거래지원 관리 - 검토 평가 다운로드", description = "id를 이용하여 검토 평가 정보를 다운로드합니다.", tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 검토 평가 > 다운로드")
     public Mono<ResponseEntity<?>> reviewDownload(@Parameter(name = "projectId", description = "project 의 projectId", in = ParameterIn.PATH) @PathVariable("projectId") String projectId,
                                                       @Parameter(name = "id", description = "검토평가의 id", in = ParameterIn.PATH) @PathVariable("id") String id,
                                                       @Parameter(name = "fileKey", description = "project 의 fileKey", in = ParameterIn.PATH) @PathVariable String fileKey,
