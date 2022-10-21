@@ -9,6 +9,7 @@ import com.bithumbsystems.lrc.management.api.core.config.resolver.CurrentUser;
 import com.bithumbsystems.lrc.management.api.core.model.response.SingleResponse;
 import com.bithumbsystems.lrc.management.api.v1.exception.LrcException;
 import com.bithumbsystems.lrc.management.api.v1.file.service.FileService;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.file.service.SubmittedDocumentFileDomainService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,6 +38,7 @@ import reactor.core.publisher.Mono;
 public class FileController {
 
     private final FileService fileService;
+    private final SubmittedDocumentFileDomainService submittedDocumentFileDomainService;
     private final AwsProperties awsProperties;
 
 //    @PostMapping(value = "/upload/s3", consumes = MULTIPART_FORM_DATA_VALUE)
@@ -97,9 +99,9 @@ public class FileController {
 
         AtomicReference<String> fileName = new AtomicReference<>();
 
-        return fileService.findById(fileKey)
+        return submittedDocumentFileDomainService.findSubmittedDocumentFileById(fileKey) // .findById(fileKey)
                  .flatMap(res -> {
-                     if (res.getCreatedId() == account.getAccountId()) {
+                     if (res.getCreateAccountId() == account.getAccountId()) {
                          return Mono.error(new LrcException(INVALID_FILE));
                      }
                                 log.debug("find file => {}", res);
