@@ -131,6 +131,7 @@ public class FaqContentService {
             c.setOrderNo(faqContentRequest.getOrderNo());
             c.setTitle(faqContentRequest.getTitle());
             c.setContent(faqContentRequest.getContent());
+            c.setUseYn(faqContentRequest.getUseYn());
             c.setUpdateDate(LocalDateTime.now());
             c.setUpdateAdminAccountId(account.getAccountId());
             return faqDomainService.updateContent(c).map(FaqContentMapper.INSTANCE::faqContentResponse);
