@@ -154,4 +154,24 @@ public class FoundationInfoService {
                     return Mono.just(CheckProjectResponse.builder().result(true).build());
                 });
     }
+
+    /**
+     * 프로젝트 이름 중복 체크
+     * @param foundationInfoRequest
+     * @return
+     */
+    public Mono<Boolean> checkProjectName(FoundationInfoRequest foundationInfoRequest) {
+        return foundationInfoDomainService.getByName(foundationInfoRequest.getProjectName()).flatMap(flag -> {
+            if (flag) {
+                return foundationInfoDomainService.findById(foundationInfoRequest.getId()).flatMap(c -> {
+                    if (c.getName().equals(foundationInfoRequest.getProjectName())) {
+                        return Mono.just(true);
+                    }
+                    return Mono.error(new ProjectInfoException(ErrorCode.PROJECT_NAME_DUPLICATE));
+                });
+            } else {
+                return Mono.just(true);
+            }
+        });
+    }
 }

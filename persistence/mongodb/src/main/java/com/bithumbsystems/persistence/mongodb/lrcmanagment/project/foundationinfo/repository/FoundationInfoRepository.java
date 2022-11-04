@@ -9,4 +9,6 @@ import reactor.core.publisher.Mono;
 public interface FoundationInfoRepository extends ReactiveMongoRepository<FoundationInfo, String> {
 
     Mono<FoundationInfo> findById(String id);
+
+    Mono<Boolean> existsByName(String name);
 }

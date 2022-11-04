@@ -80,4 +80,14 @@ public class FoundationInfoDomainService {
     public Flux<FoundationInfo> findByCustomSearch(LocalDate fromDate, LocalDate toDate, String contractCode, String progressCode, String keyword) {
         return foundationInfoCustomRepository.findByCustomSearch(fromDate, toDate, contractCode, progressCode, keyword);
     }
+
+
+    /**
+     * 프로젝트 이름이 이미 있는지 체크
+     * @param name
+     * @return SubmittedDocumentResponse Object
+     */
+    public Mono<Boolean> getByName(String name) {
+        return foundationInfoRepository.existsByName(name);
+    }
 }

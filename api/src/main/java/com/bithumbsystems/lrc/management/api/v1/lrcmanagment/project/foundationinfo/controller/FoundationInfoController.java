@@ -48,7 +48,9 @@ public class FoundationInfoController {
                                                             @PathVariable("id") String id,
                                                         @RequestBody FoundationInfoRequest foundationInfoRequest,
                                                         @Parameter(hidden = true) @CurrentUser Account account) {
-        return ResponseEntity.ok().body(foundationInfoService.updateFoundationInfo(id, foundationInfoRequest, account)
+        return ResponseEntity.ok().body(
+                foundationInfoService.checkProjectName((foundationInfoRequest)).flatMap(flag ->
+                    foundationInfoService.updateFoundationInfo(id, foundationInfoRequest, account))
                 .map(c -> new SingleResponse(c))
         );
     }
