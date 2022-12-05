@@ -19,7 +19,7 @@ import static com.bithumbsystems.lrc.management.api.core.config.constant.Paramet
 
 @Log4j2
 @Data
-@Profile("local|default")
+@Profile("local|localstack|default")
 @Configuration
 public class LocalParameterStoreConfig {
 

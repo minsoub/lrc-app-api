@@ -83,6 +83,25 @@ application:
 ---
 spring:
   config:
+    import: classpath:aws-properties-localstack.yml, classpath:springdoc.yml
+    activate:
+      on-profile: localstack
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: ${smartadmin.mongodb:test}
+mail:
+  logo-url: http://localhost:3000/images/maillogo.png
+  login-url: http://localhost:3000/
+application:
+  role-type: ADMIN
+  site-id: 62a15f4ae4129b518b133127
+logging:
+  config: classpath:logback-spring-local.xml
+---
+spring:
+  config:
     import: classpath:aws-properties-dev.yml, classpath:springdoc.yml
     activate:
       on-profile: dev
