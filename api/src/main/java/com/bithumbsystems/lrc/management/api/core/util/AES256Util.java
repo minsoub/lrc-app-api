@@ -15,6 +15,7 @@ import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 /**
  * The type Aes 256 util.
@@ -84,6 +85,9 @@ public class AES256Util {
 
   // we need the same password, salt and iv to decrypt it
   public static String decryptAES(String password, String cipherMessage) {
+    if (!StringUtils.hasLength(cipherMessage)) {
+      return "";
+    }
     var plainMessage = "";
 
     try {
