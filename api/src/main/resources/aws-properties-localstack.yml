@@ -1,0 +1,33 @@
+cloud:
+  aws:
+    credentials:
+      profile-name: ${aws.default.profile:localstack}
+      instanceProfile: true
+    stack:
+      auto: ${management.aws.stack.auto:false}
+    s3:
+      bucket: ${management.aws.s3.bucket:lrc-dev-bucket}
+    region:
+      static: ${management.aws.region:ap-northeast-2}
+      auto: ${management.aws.region.auto:false}
+    ssm:
+      endpoint: http://10.20.163.86:4566
+    ses:
+      endpoint: 10.20.163.86
+      port: 4566
+    kms:
+      endpoint: http://10.20.163.86:4566
+    param-store:
+      enabled: true
+      fail-fast: true
+      prefix: /smartadmin
+      doc-name: docdb
+      kms-name: kms
+      message-name: message
+      crypto-name: crypto
+      auth-name: auth
+      salt-name: salt
+      iv-name: iv
+    sqs:
+      bucketav-queue-name: bucketav_event_queue_localstack.fifo
+      endpoint: http://10.20.163.86:4566
