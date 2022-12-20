@@ -29,12 +29,27 @@ public class AES256Util {
   private static final int SALT_LENGTH_BYTE = 16;
   private static final Charset UTF_8 = StandardCharsets.UTF_8;
 
+  /**
+   * Get random nonce byte [ ].
+   *
+   * @param length the length
+   * @return the byte [ ]
+   */
   public static byte[] getRandomNonce(int length) {
     byte[] nonce = new byte[length];
     new SecureRandom().nextBytes(nonce);
     return nonce;
   }
 
+  /**
+   * Gets aes key from password.
+   *
+   * @param password the password
+   * @param salt     the salt
+   * @return the aes key from password
+   * @throws NoSuchAlgorithmException the no such algorithm exception
+   * @throws InvalidKeySpecException  the invalid key spec exception
+   */
   // AES 128 bits secret key derived from a password
   public static SecretKey getAESKeyFromPassword(char[] password, byte[] salt)
       throws NoSuchAlgorithmException, InvalidKeySpecException {
@@ -46,6 +61,13 @@ public class AES256Util {
     return new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
   }
 
+  /**
+   * Encrypt aes string.
+   *
+   * @param password     the password
+   * @param plainMessage the plain message
+   * @return the string
+   */
   // string a base64 encoded AES encrypted text
   public static String encryptAES(String password, String plainMessage) {
     var cipherMessage = "";
@@ -76,13 +98,20 @@ public class AES256Util {
 
       // string representation, base64, send this string to other for decryption.
       cipherMessage = java.util.Base64.getEncoder().encodeToString(cipherTextWithIvSalt);
-    } catch(Exception e) {
+    } catch (Exception e) {
       log.error(e.getMessage());
     }
 
     return cipherMessage;
   }
 
+  /**
+   * Decrypt aes string.
+   *
+   * @param password      the password
+   * @param cipherMessage the cipher message
+   * @return the string
+   */
   // we need the same password, salt and iv to decrypt it
   public static String decryptAES(String password, String cipherMessage) {
     if (!StringUtils.hasLength(cipherMessage)) {
@@ -120,6 +149,15 @@ public class AES256Util {
     return plainMessage;
   }
 
+  /**
+   * Gets aes key from password legacy.
+   *
+   * @param password the password
+   * @param salt     the salt
+   * @return the aes key from password legacy
+   * @throws NoSuchAlgorithmException the no such algorithm exception
+   * @throws InvalidKeySpecException  the invalid key spec exception
+   */
   // AES 128 bits secret key derived from a password
   public static SecretKey getAESKeyFromPasswordLegacy(char[] password, byte[] salt)
       throws NoSuchAlgorithmException, InvalidKeySpecException {
@@ -132,11 +170,11 @@ public class AES256Util {
   }
 
   /**
-   * Decrypt (AES)
+   * Decrypt (AES).
    *
-   * @param keyString  the key string
+   * @param keyString     the key string
    * @param cipherMessage the cipher text
-   * @return string
+   * @return string string
    */
   public static String decryptAESLegacy(String keyString, String cipherMessage) {
     var plainMessage = "";
@@ -171,6 +209,15 @@ public class AES256Util {
     return plainMessage;
   }
 
+  /**
+   * Encrypt aes string.
+   *
+   * @param password     the password
+   * @param plainMessage the plain message
+   * @param saltKey      the salt key
+   * @param ivKey        the iv key
+   * @return the string
+   */
   public static String encryptAES(String password, String plainMessage, String saltKey, String ivKey) {
     var cipherMessage = "";
 
@@ -197,7 +244,7 @@ public class AES256Util {
 
       // string representation, base64, send this string to other for decryption.
       cipherMessage = java.util.Base64.getEncoder().encodeToString(cipherTextWithIvSalt);
-    } catch(Exception e) {
+    } catch (Exception e) {
       log.error(e.getMessage());
     }
 
