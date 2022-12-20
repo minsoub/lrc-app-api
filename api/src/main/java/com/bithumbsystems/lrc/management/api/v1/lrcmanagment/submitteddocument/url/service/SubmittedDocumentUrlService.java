@@ -1,28 +1,29 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.service;
 
+import com.bithumbsystems.lrc.management.api.core.config.constant.RegExpConstant;
 import com.bithumbsystems.lrc.management.api.core.config.properties.AwsProperties;
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.core.util.AES256Util;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.listener.HistoryDto;
+import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.exception.SubmittedDocumentUrlException;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.mapper.SubmittedDocumentUrlMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.model.request.SubmittedDocumentUrlRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.model.response.SubmittedDocumentUrlResponse;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.model.enums.SubmittedDocumentEnums;
-import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.exception.SubmittedDocumentUrlException;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.model.entity.SubmittedDocumentUrl;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.service.SubmittedDocumentUrlDomainService;
+import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
+import java.util.UUID;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
-
-import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -45,7 +46,7 @@ public class SubmittedDocumentUrlService {
                             .projectId(result.getProjectId())
                             .type(result.getType())
                             .url(result.getUrl())
-                            .email(AES256Util.decryptAES(awsProperties.getKmsKey(), result.getEmail()))
+                            .email(Pattern.matches(RegExpConstant.EMAIL_REG_EXP, result.getEmail()) ? result.getEmail() : AES256Util.decryptAES(awsProperties.getKmsKey(), result.getEmail()))
                             .createDate(result.getCreateDate())
                             .createAdminAccountId(result.getCreateAdminAccountId())
                             .createAccountId(result.getCreateAccountId())
