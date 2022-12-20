@@ -8,5 +8,6 @@ import reactor.core.publisher.Flux;
 @Repository
 public interface ChatMessageRepository extends ReactiveMongoRepository<ChatMessage, String> {
 
-    public Flux<ChatMessage> findByChatRoomAndSiteId(String chatRoom, String siteId);
+    Flux<ChatMessage> findAllByChatRoomAndSiteIdAndIsDeleteFalse(String chatRoom, String siteId);
+
 }

@@ -20,8 +20,8 @@ public enum ErrorCode {
   INVALID_PROJECT("F017","INVALID_PROJECT"),
   INVALID_NUMBER_FORMAT("N004","You can enter up to 4 decimal places."),
   FAIL_SEND_MAIL("M411","FAIL_SEND_MAIL"),
-  PROJECT_NAME_DUPLICATE("F029", "PROJECT_NAME_DUPLICATE");
-
+  PROJECT_NAME_DUPLICATE("F029", "PROJECT_NAME_DUPLICATE"),
+  INVALID_CHAT_ROOM("C001", "CHAT_ROOM is invalid");
 
   private final String code;
 

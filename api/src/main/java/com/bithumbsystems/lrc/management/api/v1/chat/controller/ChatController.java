@@ -11,7 +11,9 @@ import com.bithumbsystems.lrc.management.api.core.model.response.MultiResponse;
 import com.bithumbsystems.lrc.management.api.core.model.response.SingleResponse;
 import com.bithumbsystems.lrc.management.api.v1.chat.model.request.ChatFileRequest;
 import com.bithumbsystems.lrc.management.api.v1.chat.model.request.ChatRequest;
+import com.bithumbsystems.lrc.management.api.v1.chat.model.request.MessageRequest;
 import com.bithumbsystems.lrc.management.api.v1.chat.model.response.ChatFileResponse;
+import com.bithumbsystems.lrc.management.api.v1.chat.model.response.ChatMessageResponse;
 import com.bithumbsystems.lrc.management.api.v1.chat.service.ChatService;
 import com.bithumbsystems.lrc.management.api.v1.exception.LrcException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,6 +49,23 @@ public class ChatController {
 
     private final ChatService chatService;
     private final AwsProperties awsProperties;
+
+    @PostMapping("/chat/project/{projectId}")
+    @Operation(summary = "Communication 메시지 저장", description = "Communication 메시지 보내기", tags = "내 프로젝트 > Communication")
+    public ResponseEntity<Mono<?>> sendMessages(@Parameter(name = "projectId", description = "project 의 id(room ID)", in = ParameterIn.PATH) @PathVariable String projectId,
+        final MessageRequest messageRequest,
+        @Parameter(hidden = true) @CurrentUser final Account account) {
+      return ResponseEntity.ok().body(chatService.saveMessage(account, projectId, messageRequest).map(m -> new SingleResponse(m)));
+    }
+
+    @GetMapping("/chat/project/{projectId}")
+    @Operation(summary = "Communication 메시지 가져오기", description = "Communication 메시지 가져오기", tags = "내 프로젝트 > Communication")
+    public ResponseEntity<Mono<?>> getChatMessages(@Parameter(name = "projectId", description = "project 의 id(room ID)", in = ParameterIn.PATH) @PathVariable String projectId,
+        @RequestParam final String siteId,
+        @Parameter(hidden = true) @CurrentUser final Account account) {
+      return ResponseEntity.ok().body(chatService.findChatMessages(account, projectId, siteId)
+          .collectSortedList(Comparator.comparing(ChatMessageResponse::getCreateDate)).map(m -> new SingleResponse(m)));
+    }
 
     @PutMapping("/chat")
     @Operation(summary = "chat 참여 여부 조회 및 생성" , description = "chat 참여 여부 조회 및 생성", tags = "chat > chat 참여 여부 조회 및 생성")
