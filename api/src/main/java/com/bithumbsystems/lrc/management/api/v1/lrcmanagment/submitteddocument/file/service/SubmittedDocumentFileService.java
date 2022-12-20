@@ -1,5 +1,6 @@
 package com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.service;
 
+import com.bithumbsystems.lrc.management.api.core.config.constant.RegExpConstant;
 import com.bithumbsystems.lrc.management.api.core.config.properties.AwsProperties;
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
@@ -14,6 +15,14 @@ import com.bithumbsystems.persistence.mongodb.file.model.entity.File;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.file.model.entity.SubmittedDocumentFile;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.file.service.SubmittedDocumentFileDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.model.enums.SubmittedDocumentEnums;
+import java.nio.ByteBuffer;
+import java.text.Normalizer;
+import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -22,14 +31,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-
-import java.nio.ByteBuffer;
-import java.text.Normalizer;
-import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -56,7 +57,7 @@ public class SubmittedDocumentFileService {
                             .fileKey(result.getFileKey())
                             .fileName(result.getFileName())
                             .fileStatus(result.getFileStatus())
-                            .email(AES256Util.decryptAES(awsProperties.getKmsKey(), result.getEmail()))
+                            .email(Pattern.matches(RegExpConstant.EMAIL_REG_EXP, result.getEmail()) ? result.getEmail() : AES256Util.decryptAES(awsProperties.getKmsKey(), result.getEmail()))
                             .createDate(result.getCreateDate())
                             .createAdminAccountId(result.getCreateAdminAccountId())
                             .createAccountId(result.getCreateAccountId())
