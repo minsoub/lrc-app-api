@@ -12,4 +12,6 @@ public interface UserAccountRepository extends ReactiveMongoRepository<UserAccou
     Flux<UserAccount> findByProjectId(String projectId);
 
     Mono<UserAccount> findByProjectIdAndUserAccountId(String projectId, String userAccountId);
+
+    Mono<UserAccount> findByProjectIdAndContactEmail(String projectId, String contactEmail);
 }

@@ -66,4 +66,15 @@ public class UserAccountDomainService {
   public Mono<UserAccount> findByProjectIdAndUserAccountId(String projectId, String userAccountId) {
     return userAccountRepository.findByProjectIdAndUserAccountId(projectId, userAccountId);
   }
+
+  /**
+   * 프로젝트 ID와 이메일로 검색
+   *
+   * @param projectId     the project id
+   * @param contactEmail the user contact email
+   * @return mono
+   */
+  public Mono<UserAccount> findByProjectIdAndContactEmail(String projectId, String contactEmail) {
+    return userAccountRepository.findByProjectIdAndContactEmail(projectId, contactEmail);
+  }
 }
