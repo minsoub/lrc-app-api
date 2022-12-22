@@ -50,18 +50,19 @@ public class ChatController {
     private final ChatService chatService;
     private final AwsProperties awsProperties;
 
-    @PostMapping("/chat/project/{projectId}")
+    @PostMapping("/chat/{siteId}/{projectId}")
     @Operation(summary = "Communication 메시지 저장", description = "Communication 메시지 보내기", tags = "내 프로젝트 > Communication")
     public ResponseEntity<Mono<?>> sendMessages(@Parameter(name = "projectId", description = "project 의 id(room ID)", in = ParameterIn.PATH) @PathVariable String projectId,
+        @PathVariable String siteId,
         final MessageRequest messageRequest,
         @Parameter(hidden = true) @CurrentUser final Account account) {
       return ResponseEntity.ok().body(chatService.saveMessage(account, projectId, messageRequest).map(m -> new SingleResponse(m)));
     }
 
-    @GetMapping("/chat/project/{projectId}")
+    @GetMapping("/chat/{siteId}/{projectId}")
     @Operation(summary = "Communication 메시지 가져오기", description = "Communication 메시지 가져오기", tags = "내 프로젝트 > Communication")
     public ResponseEntity<Mono<?>> getChatMessages(@Parameter(name = "projectId", description = "project 의 id(room ID)", in = ParameterIn.PATH) @PathVariable String projectId,
-        @RequestParam final String siteId,
+        @PathVariable final String siteId,
         @Parameter(hidden = true) @CurrentUser final Account account) {
       return ResponseEntity.ok().body(chatService.findChatMessages(account, projectId, siteId)
           .collectSortedList(Comparator.comparing(ChatMessageResponse::getCreateDate)).map(m -> new SingleResponse(m)));
