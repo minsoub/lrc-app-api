@@ -14,6 +14,7 @@ import com.bithumbsystems.lrc.management.api.v1.chat.model.request.ChatRequest;
 import com.bithumbsystems.lrc.management.api.v1.chat.model.request.MessageRequest;
 import com.bithumbsystems.lrc.management.api.v1.chat.model.response.ChatFileResponse;
 import com.bithumbsystems.lrc.management.api.v1.chat.model.response.ChatMessageResponse;
+import com.bithumbsystems.lrc.management.api.v1.chat.model.response.ChatResponse;
 import com.bithumbsystems.lrc.management.api.v1.chat.service.ChatService;
 import com.bithumbsystems.lrc.management.api.v1.exception.LrcException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,6 +22,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +42,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+/**
+ * The type Chat controller.
+ */
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -47,144 +52,181 @@ import reactor.core.publisher.Mono;
 @Tag(name = "Chat 서비스 관리", description = "Chat 서비스 관리 API")
 public class ChatController {
 
-    private final ChatService chatService;
-    private final AwsProperties awsProperties;
+  private final ChatService chatService;
+  private final AwsProperties awsProperties;
 
-    @PostMapping("/chat/{siteId}/{projectId}")
-    @Operation(summary = "Communication 메시지 저장", description = "Communication 메시지 보내기", tags = "내 프로젝트 > Communication")
-    public ResponseEntity<Mono<?>> sendMessages(@Parameter(name = "projectId", description = "project 의 id(room ID)", in = ParameterIn.PATH) @PathVariable String projectId,
-        @PathVariable String siteId,
-        final MessageRequest messageRequest,
-        @Parameter(hidden = true) @CurrentUser final Account account) {
-      return ResponseEntity.ok().body(chatService.saveMessage(account, projectId, messageRequest).map(m -> new SingleResponse(m)));
-    }
+  /**
+   * Send messages response entity.
+   *
+   * @param projectId      the project id
+   * @param siteId         the site id
+   * @param messageRequest the message request
+   * @param account        the account
+   * @return the response entity
+   */
+  @PostMapping("/chat/{siteId}/{projectId}")
+  @Operation(summary = "Communication 메시지 저장", description = "Communication 메시지 보내기", tags = "내 프로젝트 > Communication")
+  public ResponseEntity<Mono<SingleResponse<ChatMessageResponse>>> sendMessages(
+      @Parameter(name = "projectId", description = "project 의 id(room ID)", in = ParameterIn.PATH) @PathVariable String projectId,
+      @PathVariable String siteId, final MessageRequest messageRequest, @Parameter(hidden = true) @CurrentUser final Account account) {
+    return ResponseEntity.ok().body(chatService.saveMessage(account, projectId, messageRequest).map(SingleResponse::new));
+  }
 
-    @GetMapping("/chat/{siteId}/{projectId}")
-    @Operation(summary = "Communication 메시지 가져오기", description = "Communication 메시지 가져오기", tags = "내 프로젝트 > Communication")
-    public ResponseEntity<Mono<?>> getChatMessages(@Parameter(name = "projectId", description = "project 의 id(room ID)", in = ParameterIn.PATH) @PathVariable String projectId,
-        @PathVariable final String siteId,
-        @Parameter(hidden = true) @CurrentUser final Account account) {
-      return ResponseEntity.ok().body(chatService.findChatMessages(account, projectId, siteId)
-          .collectSortedList(Comparator.comparing(ChatMessageResponse::getCreateDate)).map(m -> new SingleResponse(m)));
-    }
+  /**
+   * Gets chat messages.
+   *
+   * @param projectId the project id
+   * @param siteId    the site id
+   * @param account   the account
+   * @return the chat messages
+   */
+  @GetMapping("/chat/{siteId}/{projectId}")
+  @Operation(summary = "Communication 메시지 가져오기", description = "Communication 메시지 가져오기", tags = "내 프로젝트 > Communication")
+  public ResponseEntity<Mono<SingleResponse<List<ChatMessageResponse>>>> getChatMessages(
+      @Parameter(name = "projectId", description = "project 의 id(room ID)", in = ParameterIn.PATH) @PathVariable String projectId,
+      @PathVariable final String siteId, @Parameter(hidden = true) @CurrentUser final Account account) {
+    return ResponseEntity.ok().body(chatService.findChatMessages(account, projectId, siteId)
+        .collectSortedList(Comparator.comparing(ChatMessageResponse::getCreateDate))
+        .map(SingleResponse::new));
+  }
 
-    @PutMapping("/chat")
-    @Operation(summary = "chat 참여 여부 조회 및 생성" , description = "chat 참여 여부 조회 및 생성", tags = "chat > chat 참여 여부 조회 및 생성")
-    public ResponseEntity<Mono<?>> getChatInfoAndSave(@RequestBody ChatRequest chatRequest,
-                                                     @Parameter(hidden = true) @CurrentUser Account account) {
+  /**
+   * Gets chat info and save.
+   *
+   * @param chatRequest the chat request
+   * @param account     the account
+   * @return the chat info and save
+   */
+  @PutMapping("/chat")
+  @Operation(summary = "chat 참여 여부 조회 및 생성", description = "chat 참여 여부 조회 및 생성", tags = "chat > chat 참여 여부 조회 및 생성")
+  public ResponseEntity<Mono<SingleResponse<ChatResponse>>> getChatInfoAndSave(@RequestBody ChatRequest chatRequest,
+                                                                               @Parameter(hidden = true) @CurrentUser Account account) {
+    return ResponseEntity.ok().body(chatService.chatChannelCheckAndAdd(chatRequest, account).map(SingleResponse::new));
+  }
 
-        return ResponseEntity.ok().body(chatService.chatChannelCheckAndAdd(chatRequest, account)
-                .map(SingleResponse::new));
-    }
+  /**
+   * 파일 목록 조회.
+   *
+   * @param id the id
+   * @return file list
+   */
+  @GetMapping("/chat/files/{id}")
+  @Operation(summary = "파일 리스트 정보 조회", description = "projectId를 이용하여 파일리스트를 조회합니다.", tags = "chat > chat 파일 리스트 정보 조회")
+  public ResponseEntity<Mono<MultiResponse<ChatFileResponse>>> getFileList(
+      @Parameter(name = "id", description = "project 의 id", in = ParameterIn.PATH) @PathVariable("id") String id) {
+    return ResponseEntity.ok().body(chatService.findByFileList(id)
+        .collectSortedList(Comparator.comparing(ChatFileResponse::getCreateDate).reversed())
+        .map(MultiResponse::new)
+    );
+  }
 
-    /**
-     * 파일 목록 조회
-     * @param id
-     * @return
-     */
-    @GetMapping("/chat/files/{id}")
-    @Operation(summary = "파일 리스트 정보 조회", description = "projectId를 이용하여 파일리스트를 조회합니다.", tags = "chat > chat 파일 리스트 정보 조회")
-    public ResponseEntity<Mono<?>> getFileList(@Parameter(name = "id", description = "project 의 id", in = ParameterIn.PATH)
-                                                     @PathVariable("id") String id) {
-        return ResponseEntity.ok().body(chatService.findByFileList(id)
-                        .collectSortedList(Comparator.comparing(ChatFileResponse::getCreateDate).reversed())
-                .map(c -> new MultiResponse(c))
-        );
-    }
+  /**
+   * 파일 상세 세부 조회.
+   *
+   * @param id      the id
+   * @param fileKey the file key
+   * @return file info
+   */
+  @GetMapping("/chat/files/{id}/{fileKey}")
+  @Operation(summary = "파일 상제 정보 조회", description = "projectId 및 파일키를 이용하여 파일정보를 조회합니다.", tags = "chat > chat 파일 정보 조회")
+  public ResponseEntity<Mono<SingleResponse<ChatFileResponse>>> getFileInfo(
+      @Parameter(name = "id", description = "project 의 id", in = ParameterIn.PATH)
+      @PathVariable("id") String id,
+      @Parameter(name = "fileKey", description = "file 의 id", in = ParameterIn.PATH)
+      @PathVariable("fileKey") String fileKey) {
+    return ResponseEntity.ok().body(chatService.findByFileInfo(id, fileKey)
+            .map(SingleResponse::new)
+    );
+  }
 
-    /**
-     * 파일 상세 세부 조회
-     * @param id
-     * @return
-     */
-    @GetMapping("/chat/files/{id}/{fileKey}")
-    @Operation(summary = "파일 상제 정보 조회", description = "projectId 및 파일키를 이용하여 파일정보를 조회합니다.", tags = "chat > chat 파일 정보 조회")
-    public ResponseEntity<Mono<?>> getFileInfo(@Parameter(name = "id", description = "project 의 id", in = ParameterIn.PATH)
-                                               @PathVariable("id") String id,
-                                               @Parameter(name = "fileKey", description = "file 의 id", in = ParameterIn.PATH)
-                                               @PathVariable("fileKey") String fileKey) {
-        return ResponseEntity.ok().body(chatService.findByFileInfo(id, fileKey)
-                .map(c -> new SingleResponse(c))
-        );
-    }
+  /**
+   * Chat file 저장.
+   *
+   * @param chattFileRequest the chatt file request
+   * @param account          the account
+   * @return ChatFileResponse Object
+   */
+  @PostMapping(value = "/chat/file", consumes = MULTIPART_FORM_DATA_VALUE)
+  @Operation(summary = "Chat file 저장", description = "Chat file 정보를 저장 합니다.", tags = "chat / 파일 저장")
+  public ResponseEntity<Mono<SingleResponse<ChatFileResponse>>> chatFileUpload(
+      @ModelAttribute(value = "chattFileRequest") ChatFileRequest chattFileRequest,
+      @Parameter(hidden = true) @CurrentUser Account account) {
+    return ResponseEntity.ok().body(chatService.fileSave(Mono.just(chattFileRequest), account)
+            .map(SingleResponse::new));
+  }
 
-    /**
-     * Chat file 저장
-     * @param chattFileRequest
-     * @return ChatFileResponse Object
-     */
-    @PostMapping(value = "/chat/file", consumes = MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Chat file 저장", description = "Chat file 정보를 저장 합니다.", tags = "chat / 파일저장")
-    public ResponseEntity<Mono<?>> chatFileUpload(@ModelAttribute(value = "chattFileRequest") ChatFileRequest chattFileRequest,
-                                                               @Parameter(hidden = true) @CurrentUser Account account) {
-        return ResponseEntity.ok().body(chatService.fileSave(Mono.just(chattFileRequest), account)
-                .map(c -> new SingleResponse(c)));
-    }
+  /**
+   * 파일 다운로드.
+   *
+   * @param fileKey the file key
+   * @param account the account
+   * @return mono
+   */
+  @GetMapping(value = "/chat/file/{fileKey}", produces = APPLICATION_OCTET_STREAM_VALUE)
+  @Operation(summary = "Chat file 다운로드", description = "Chat file 정보를 다운로드 합니다.", tags = "chat / 파일 다운로드")
+  public Mono<ResponseEntity<InputStreamResource>> s3download(@PathVariable String fileKey, @Parameter(hidden = true) @CurrentUser Account account) {
+    AtomicReference<String> fileName = new AtomicReference<>();
 
-    /**
-     * 파일 다운로드
-     * @param fileKey
-     * @return
-     */
-    @GetMapping(value = "/chat/file/{fileKey}", produces = APPLICATION_OCTET_STREAM_VALUE)
-    @Operation(summary = "Chat file 다운로드", description = "Chat file 정보를 다운로드 합니다.", tags = "chat / 파일다운로드")
-    public Mono<ResponseEntity<?>> s3download(@PathVariable String fileKey, @Parameter(hidden = true) @CurrentUser Account account) {
+    return chatService.findById(fileKey)
+            .flatMap(res -> {
+              if (res.getCreateAccountId().equals(account.getAccountId())) {
+                return Mono.error(new LrcException(INVALID_FILE));
+              }
+              log.debug("find file => {}", res);
+              fileName.set(res.getFileName());
+              // s3에서 파일을 다운로드 받는다.
+              return chatService.download(fileKey, awsProperties.getBucket());
+            })
+            .log()
+            .map(inputStream -> {
+              log.debug("finaly result...here");
+              HttpHeaders headers = new HttpHeaders();
+              headers.setContentDispositionFormData(fileName.toString(), fileName.toString());
+              return ResponseEntity.ok().cacheControl(CacheControl.noCache())
+                      .headers(headers)
+                      .body(new InputStreamResource(inputStream));
+            });
+  }
 
-        AtomicReference<String> fileName = new AtomicReference<>();
-
-        return chatService.findById(fileKey)
-                .flatMap(res -> {
-                    if (res.getCreateAccountId().equals(account.getAccountId())) {
-                        return Mono.error(new LrcException(INVALID_FILE));
-                    }
-                    log.debug("find file => {}", res);
-                    fileName.set(res.getFileName());
-                    // s3에서 파일을 다운로드 받는다.
-                    return chatService.download(fileKey, awsProperties.getBucket());
-                })
-                .log()
-                .map(inputStream -> {
-                    log.debug("finaly result...here");
-                    HttpHeaders headers = new HttpHeaders();
-                    headers.setContentDispositionFormData(fileName.toString(), fileName.toString());
-                    ResponseEntity<?> entity = ResponseEntity.ok().cacheControl(CacheControl.noCache())
-                            .headers(headers)
-                            .body(new InputStreamResource(inputStream));
-                    return entity;
-                });
-    }
-
-    /**
-     * Chat Message 삭제
-     *
-     * @param id
-     * @param account
-     * @return
-     */
-    @DeleteMapping("/chat/{id}")
-    @Operation(summary = "Chat message 삭제", description = "Chat Message 삭제", tags = "chat/메시지 삭제")
-    public ResponseEntity<Mono<?>> deleteChatMessage(@Parameter(name="id", description = "Chat Message Id", in=ParameterIn.PATH)
-                                                     @PathVariable("id") String id,
-                                                     @Parameter(hidden = true) @CurrentUser Account account) {
-
-        return ResponseEntity.ok().body(chatService.deleteMessage(id, account)
-                .map(c -> new SingleResponse(c)));
-    }
+  /**
+   * Chat Message 삭제.
+   *
+   * @param id      the id
+   * @param account the account
+   * @return response entity
+   */
+  @DeleteMapping("/chat/{id}")
+  @Operation(summary = "Chat message 삭제", description = "Chat Message 삭제", tags = "chat/메시지 삭제")
+  public ResponseEntity<Mono<SingleResponse<ChatResponse>>> deleteChatMessage(
+      @Parameter(name = "id", description = "Chat Message Id", in = ParameterIn.PATH)
+      @PathVariable("id") String id,
+      @Parameter(hidden = true) @CurrentUser Account account) {
+    return ResponseEntity.ok().body(chatService.deleteMessage(id, account)
+            .map(SingleResponse::new));
+  }
 
 
-    @GetMapping(value = "/chat/excel/export", produces = APPLICATION_OCTET_STREAM_VALUE)
-    @Operation(summary = "Chat Message - 엑셀 다운로드", description = "Chat Message: 엑셀 다운로드", tags = "chat/메시지 다운로드")
-    public Mono<ResponseEntity<?>> downloadExcel(@Parameter(name = "id", description = "chat room id", required = true) @RequestParam(required = false) String id,
-                                                 @Parameter(hidden = true) @CurrentUser Account account) {
+  /**
+   * Download excel mono.
+   *
+   * @param id      the id
+   * @param account the account
+   * @return the mono
+   */
+  @GetMapping(value = "/chat/excel/export", produces = APPLICATION_OCTET_STREAM_VALUE)
+  @Operation(summary = "Chat Message - 엑셀 다운로드", description = "Chat Message: 엑셀 다운로드", tags = "chat/메시지 다운로드")
+  public Mono<ResponseEntity<InputStreamResource>> downloadExcel(
+      @Parameter(name = "id", description = "chat room id", required = true) @RequestParam(required = false) String id,
+      @Parameter(hidden = true) @CurrentUser Account account) {
 
-        return chatService.downloadExcel(id, account.getMySiteId())
-                .flatMap(inputStream -> {
-                    HttpHeaders headers = new HttpHeaders();
-                    String fileName = "ChatMessage.xlsx";
-                    headers.setContentDispositionFormData(fileName, fileName);
-                    return Mono.just(ResponseEntity.ok().cacheControl(CacheControl.noCache())
-                            .headers(headers)
-                            .body(new InputStreamResource(inputStream)));
-                });
-    }
+    return chatService.downloadExcel(id, account.getMySiteId())
+        .flatMap(inputStream -> {
+          HttpHeaders headers = new HttpHeaders();
+          String fileName = "ChatMessage.xlsx";
+          headers.setContentDispositionFormData(fileName, fileName);
+          return Mono.just(ResponseEntity.ok().cacheControl(CacheControl.noCache())
+              .headers(headers)
+              .body(new InputStreamResource(inputStream)));
+        });
+  }
 }

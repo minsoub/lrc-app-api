@@ -10,12 +10,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+/**
+ * The type Chat validator.
+ */
 @Service
 @RequiredArgsConstructor
 public class ChatValidator {
 
   private final ChatChannelDomainService chatChannelDomainService;
 
+  /**
+   * Check valid chat room mono.
+   *
+   * @param account  the account
+   * @param chatRoom the chat room
+   * @return the mono
+   */
   public Mono<ChatChannel> checkValidChatRoom(final Account account, final String chatRoom) {
     return chatChannelDomainService.findByAccountIdAndRoleAndChatRoomsContains(
             account.getAccountId(), ChatRole.ADMIN, chatRoom)
