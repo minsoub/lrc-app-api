@@ -379,6 +379,7 @@ public class FoundationService {
                                 .contractCode(foundationInfo.getContractCode())
                                 .progressCode(foundationInfo.getProcessCode())
                                 .createDate(foundationInfo.getCreateDate())
+                                .updateDate(foundationInfo.getUpdateDate())
                                 .build()
                         )
                 )
@@ -458,6 +459,7 @@ public class FoundationService {
                                                 .projectLink(res.getProjectLink())
                                                 .icoDate(res.getIcoDate())
                                                 .createDate(res.getCreateDate())
+                                                .updateDate(res.getUpdateDate())
                                                 .build()))
                                 );
                     }
@@ -501,6 +503,7 @@ public class FoundationService {
                                             .projectLink(res.getProjectLink())
                                             .icoDate(res.getIcoDate())
                                             .createDate(res.getCreateDate())
+                                            .updateDate(res.getUpdateDate())
                                             .build()))
                             );
                 })
@@ -550,6 +553,7 @@ public class FoundationService {
                                             .projectLink(res.getProjectLink())
                                             .icoDate(res.getIcoDate())
                                             .createDate(res.getCreateDate())
+                                            .updateDate(res.getUpdateDate())
                                             .build()))
                             );
                 })
@@ -595,6 +599,7 @@ public class FoundationService {
                                             .projectLink(res.getProjectLink())
                                             .icoDate(res.getIcoDate())
                                             .createDate(res.getCreateDate())
+                                            .updateDate(res.getUpdateDate())
                                             .build()))
                             );
                 })
@@ -642,7 +647,7 @@ public class FoundationService {
                         return Mono.just(res);
                     }
                 })
-                .collectSortedList(Comparator.comparing(FoundationResponse::getCreateDate).reversed());
+                .collectSortedList(Comparator.comparing(FoundationResponse::getUpdateDate).reversed());
 
     }
 
