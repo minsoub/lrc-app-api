@@ -22,7 +22,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Comparator;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +58,7 @@ public class ChatController {
   @Operation(summary = "Communication 메시지 저장", description = "Communication 메시지 보내기", tags = "내 프로젝트 > Communication")
   public ResponseEntity<Mono<SingleResponse<ChatMessageResponse>>> sendMessages(
       @Parameter(name = "projectId", description = "project 의 id(room ID)", in = ParameterIn.PATH) @PathVariable String projectId,
-      @PathVariable String siteId, final MessageRequest messageRequest, @Parameter(hidden = true) @CurrentUser final Account account) {
+      @PathVariable String siteId, @RequestBody MessageRequest messageRequest, @Parameter(hidden = true) @CurrentUser final Account account) {
     return ResponseEntity.ok().body(chatService.saveMessage(account, projectId, messageRequest).map(SingleResponse::new));
   }
 
@@ -73,12 +72,12 @@ public class ChatController {
    */
   @GetMapping("/chat/{siteId}/{projectId}")
   @Operation(summary = "Communication 메시지 가져오기", description = "Communication 메시지 가져오기", tags = "내 프로젝트 > Communication")
-  public ResponseEntity<Mono<SingleResponse<List<ChatMessageResponse>>>> getChatMessages(
+  public ResponseEntity<Mono<MultiResponse<ChatMessageResponse>>> getChatMessages(
       @Parameter(name = "projectId", description = "project 의 id(room ID)", in = ParameterIn.PATH) @PathVariable String projectId,
       @PathVariable final String siteId, @Parameter(hidden = true) @CurrentUser final Account account) {
     return ResponseEntity.ok().body(chatService.findChatMessages(account, projectId, siteId)
         .collectSortedList(Comparator.comparing(ChatMessageResponse::getCreateDate))
-        .map(SingleResponse::new));
+        .map(MultiResponse::new));
   }
 
   /**
