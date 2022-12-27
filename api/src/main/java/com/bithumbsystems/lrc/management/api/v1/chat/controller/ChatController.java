@@ -28,16 +28,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -53,8 +44,7 @@ public class ChatController {
     @PostMapping("/chat/{siteId}/{projectId}")
     @Operation(summary = "Communication 메시지 저장", description = "Communication 메시지 보내기", tags = "내 프로젝트 > Communication")
     public ResponseEntity<Mono<?>> sendMessages(@Parameter(name = "projectId", description = "project 의 id(room ID)", in = ParameterIn.PATH) @PathVariable String projectId,
-        @PathVariable String siteId,
-        final MessageRequest messageRequest,
+        @PathVariable String siteId, @RequestBody MessageRequest messageRequest,
         @Parameter(hidden = true) @CurrentUser final Account account) {
       return ResponseEntity.ok().body(chatService.saveMessage(account, projectId, messageRequest).map(m -> new SingleResponse(m)));
     }
