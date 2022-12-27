@@ -5,11 +5,13 @@ import com.bithumbsystems.lrc.management.api.core.config.properties.AwsPropertie
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.core.util.AES256Util;
+import com.bithumbsystems.lrc.management.api.core.util.MaskingUtil;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.listener.HistoryDto;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.exception.SubmittedDocumentUrlException;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.mapper.SubmittedDocumentUrlMapper;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.model.request.SubmittedDocumentUrlRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.url.model.response.SubmittedDocumentUrlResponse;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.useraccount.service.UserAccountDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.model.enums.SubmittedDocumentEnums;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.model.entity.SubmittedDocumentUrl;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.url.service.SubmittedDocumentUrlDomainService;
@@ -23,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 
 /**
@@ -35,6 +38,7 @@ public class SubmittedDocumentUrlService {
   private final SubmittedDocumentUrlDomainService submittedDocumentUrlDomainService;
   private final ApplicationEventPublisher applicationEventPublisher;
   private final AwsProperties awsProperties;
+  private final UserAccountDomainService userAccountDomainService;
 
   /**
    * 제출 서류 관리 id, type 으로 url 찾기.
@@ -44,17 +48,36 @@ public class SubmittedDocumentUrlService {
    */
   public Mono<List<SubmittedDocumentUrlResponse>> findByProjectId(String projectId) {
     return submittedDocumentUrlDomainService.findByProjectId(projectId)
-        .flatMap(result -> Mono.just(SubmittedDocumentUrlResponse.builder()
-            .id(result.getId())
-            .projectId(result.getProjectId())
-            .type(result.getType())
-            .url(result.getUrl())
-            .email(Pattern.matches(RegExpConstant.EMAIL_REG_EXP, result.getEmail()) ? result.getEmail()
-                : AES256Util.decryptAES(awsProperties.getKmsKey(), result.getEmail()))
-            .createDate(result.getCreateDate())
-            .createAdminAccountId(result.getCreateAdminAccountId())
-            .createAccountId(result.getCreateAccountId())
-            .build()))
+        .flatMap(result -> {
+          String encryptEmail = result.getEmail();
+          String decryptEmail = result.getEmail();
+          if (Pattern.matches(RegExpConstant.EMAIL_REG_EXP, result.getEmail())) {
+            encryptEmail = AES256Util.encryptAES(awsProperties.getKmsKey(), result.getEmail(), awsProperties.getSaltKey(), awsProperties.getIvKey());
+          } else {
+            decryptEmail = AES256Util.decryptAES(awsProperties.getKmsKey(), result.getEmail());
+          }
+
+          SubmittedDocumentUrlResponse submittedDocumentUrlResponse = SubmittedDocumentUrlResponse.builder()
+              .id(result.getId())
+              .projectId(result.getProjectId())
+              .type(result.getType())
+              .url(result.getUrl())
+              .email(MaskingUtil.getEmailMask(decryptEmail))
+              .createDate(result.getCreateDate())
+              .createAdminAccountId(result.getCreateAdminAccountId())
+              .createAccountId(result.getCreateAccountId())
+              .build();
+
+          return userAccountDomainService.findByProjectIdAndContactEmail(result.getProjectId(), encryptEmail)
+              .flatMap(subResult -> {
+                if (StringUtils.hasLength(subResult.getName())) {
+                  submittedDocumentUrlResponse.setEmail(MaskingUtil.getNameMask(AES256Util.decryptAES(awsProperties.getKmsKey(), subResult.getName()))
+                      + "(" + MaskingUtil.getEmailMask(AES256Util.decryptAES(awsProperties.getKmsKey(), subResult.getContactEmail())) + ")");
+                }
+                return Mono.just(submittedDocumentUrlResponse);
+              })
+              .switchIfEmpty(Mono.defer(() -> Mono.just(submittedDocumentUrlResponse)));
+        })
         .collectSortedList(Comparator.comparing(SubmittedDocumentUrlResponse::getCreateDate).reversed());
   }
 

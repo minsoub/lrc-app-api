@@ -63,4 +63,7 @@ public class FoundationResponse {
 
     @Schema(description = "생성날짜")
     private LocalDateTime createDate; //생성날짜
+
+    @Schema(description = "수정날짜")
+    private LocalDateTime updateDate; //수정날짜
 }

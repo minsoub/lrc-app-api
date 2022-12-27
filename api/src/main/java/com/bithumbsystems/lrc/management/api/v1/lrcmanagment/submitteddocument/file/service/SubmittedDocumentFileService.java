@@ -5,6 +5,7 @@ import com.bithumbsystems.lrc.management.api.core.config.properties.AwsPropertie
 import com.bithumbsystems.lrc.management.api.core.config.resolver.Account;
 import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.core.util.AES256Util;
+import com.bithumbsystems.lrc.management.api.core.util.MaskingUtil;
 import com.bithumbsystems.lrc.management.api.v1.file.service.FileService;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.history.listener.HistoryDto;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.exception.SubmittedDocumentFileException;
@@ -12,6 +13,7 @@ import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.f
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.model.request.SubmittedDocumentFileRequest;
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.submitteddocument.file.model.response.SubmittedDocumentFileResponse;
 import com.bithumbsystems.persistence.mongodb.file.model.entity.File;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.useraccount.service.UserAccountDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.file.model.entity.SubmittedDocumentFile;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.file.service.SubmittedDocumentFileDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.submitteddocument.model.enums.SubmittedDocumentEnums;
@@ -29,6 +31,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -43,6 +46,7 @@ public class SubmittedDocumentFileService {
   private final ApplicationEventPublisher applicationEventPublisher;
   private final AwsProperties awsProperties;
   private final FileService fileService;
+  private final UserAccountDomainService userAccountDomainService;
 
   /**
    * 제출 서류 관리 id, type 으로 file 찾기.
@@ -52,19 +56,38 @@ public class SubmittedDocumentFileService {
    */
   public Mono<List<SubmittedDocumentFileResponse>> findByProjectId(String projectId) {
     return submittedDocumentFileDomainService.findByProjectId(projectId)
-        .flatMap(result -> Mono.just(SubmittedDocumentFileResponse.builder()
-            .id(result.getId())
-            .projectId(result.getProjectId())
-            .type(result.getType())
-            .fileKey(result.getFileKey())
-            .fileName(result.getFileName())
-            .fileStatus(result.getFileStatus())
-            .email(Pattern.matches(RegExpConstant.EMAIL_REG_EXP, result.getEmail()) ? result.getEmail() :
-                AES256Util.decryptAES(awsProperties.getKmsKey(), result.getEmail()))
-            .createDate(result.getCreateDate())
-            .createAdminAccountId(result.getCreateAdminAccountId())
-            .createAccountId(result.getCreateAccountId())
-            .build()))
+        .flatMap(result -> {
+          String encryptEmail = result.getEmail();
+          String decryptEmail = result.getEmail();
+          if (Pattern.matches(RegExpConstant.EMAIL_REG_EXP, result.getEmail())) {
+            encryptEmail = AES256Util.encryptAES(awsProperties.getKmsKey(), result.getEmail(), awsProperties.getSaltKey(), awsProperties.getIvKey());
+          } else {
+            decryptEmail = AES256Util.decryptAES(awsProperties.getKmsKey(), result.getEmail());
+          }
+
+          SubmittedDocumentFileResponse submittedDocumentFileResponse = SubmittedDocumentFileResponse.builder()
+              .id(result.getId())
+              .projectId(result.getProjectId())
+              .type(result.getType())
+              .fileKey(result.getFileKey())
+              .fileName(result.getFileName())
+              .fileStatus(result.getFileStatus())
+              .email(MaskingUtil.getEmailMask(decryptEmail))
+              .createDate(result.getCreateDate())
+              .createAdminAccountId(result.getCreateAdminAccountId())
+              .createAccountId(result.getCreateAccountId())
+              .build();
+
+          return userAccountDomainService.findByProjectIdAndContactEmail(result.getProjectId(), encryptEmail)
+              .flatMap(subResult -> {
+                if (StringUtils.hasLength(subResult.getName())) {
+                  submittedDocumentFileResponse.setEmail(MaskingUtil.getNameMask(AES256Util.decryptAES(awsProperties.getKmsKey(), subResult.getName()))
+                      + "(" + MaskingUtil.getEmailMask(AES256Util.decryptAES(awsProperties.getKmsKey(), subResult.getContactEmail())) + ")");
+                }
+                return Mono.just(submittedDocumentFileResponse);
+              })
+              .switchIfEmpty(Mono.just(submittedDocumentFileResponse));
+        })
         .collectSortedList(Comparator.comparing(SubmittedDocumentFileResponse::getCreateDate).reversed());
   }
 

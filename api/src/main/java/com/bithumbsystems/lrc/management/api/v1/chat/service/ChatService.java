@@ -6,6 +6,7 @@ import com.bithumbsystems.lrc.management.api.core.model.enums.ErrorCode;
 import com.bithumbsystems.lrc.management.api.core.model.request.BucketUploadRequest;
 import com.bithumbsystems.lrc.management.api.core.util.AES256Util;
 import com.bithumbsystems.lrc.management.api.core.util.FileUtil;
+import com.bithumbsystems.lrc.management.api.core.util.MaskingUtil;
 import com.bithumbsystems.lrc.management.api.core.util.sender.AwsSQSSender;
 import com.bithumbsystems.lrc.management.api.v1.chat.model.request.ChatFileRequest;
 import com.bithumbsystems.lrc.management.api.v1.chat.model.request.ChatRequest;
@@ -26,6 +27,7 @@ import com.bithumbsystems.persistence.mongodb.chat.model.enums.UserType;
 import com.bithumbsystems.persistence.mongodb.chat.service.ChatChannelDomainService;
 import com.bithumbsystems.persistence.mongodb.chat.service.ChatFileDomainService;
 import com.bithumbsystems.persistence.mongodb.chat.service.ChatMessageDomainService;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.useraccount.service.UserAccountDomainService;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.useraccount.service.UserInfoDomainService;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -40,26 +42,21 @@ import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.CreationHelper;
-import org.apache.poi.ss.usermodel.FillPatternType;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import software.amazon.awssdk.core.BytesWrapper;
 import software.amazon.awssdk.core.async.AsyncResponseTransformer;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
+/**
+ * The type Chat service.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -69,7 +66,7 @@ public class ChatService {
   private final ChatFileDomainService chatFileDomainService;
 
   private final AccountDomainService accountDomainService;
-  private final UserInfoDomainService userAccountDomainService;
+  private final UserInfoDomainService userInfoDomainService;
 
   private final AwsProperties awsProperties;
   private final FileService fileService;
@@ -81,6 +78,16 @@ public class ChatService {
   private final ChatMessageDomainService chatMessageDomainService;
   private final ChatValidator chatValidator;
 
+  private final UserAccountDomainService userAccountDomainService;
+
+  /**
+   * Save message mono.
+   *
+   * @param account            the account
+   * @param projectId          the project id
+   * @param chatMessageRequest the chat message request
+   * @return the mono
+   */
   public Mono<ChatMessageResponse> saveMessage(final Account account, final String projectId,
       final MessageRequest chatMessageRequest) {
     return chatValidator.checkValidChatRoom(account, projectId)
@@ -117,6 +124,14 @@ public class ChatService {
             .build()));
   }
 
+  /**
+   * Find chat messages flux.
+   *
+   * @param account  the account
+   * @param chatRoom the chat room
+   * @param siteId   the site id
+   * @return the flux
+   */
   public Flux<ChatMessageResponse> findChatMessages(final Account account, final String chatRoom,
       final String siteId) {
     return chatValidator.checkValidChatRoom(account, chatRoom)
@@ -137,9 +152,9 @@ public class ChatService {
   /**
    * 사용자 존재하는 체크해서 없으면 채팅방에 신규 등록 있으면 해당 방에 프로젝트아이디가 존재하는지 체크하고 없으면 추가해서 저장한다.
    *
-   * @param chatRequest
-   * @param account
-   * @return
+   * @param chatRequest the chat request
+   * @param account     the account
+   * @return mono
    */
   public Mono<ChatResponse> chatChannelCheckAndAdd(ChatRequest chatRequest, Account account) {
     return chatChannelDomainService.findByAccountId(account.getAccountId())
@@ -153,9 +168,7 @@ public class ChatService {
             roomList.add(chatRequest.getProjectId());
             result.setChatRooms(roomList);
             return chatChannelDomainService.update(result)
-                .flatMap(r -> {
-                  return Mono.just(ChatResponse.builder().isUse(true).build());
-                });
+                .flatMap(r -> Mono.just(ChatResponse.builder().isUse(true).build()));
           }
         })
         .switchIfEmpty(
@@ -166,13 +179,18 @@ public class ChatService {
                     .role(ChatRole.ADMIN)
                     .chatRooms(Set.of(chatRequest.getProjectId()))
                     .build())
-                .flatMap(result -> {
-                  return Mono.just(ChatResponse.builder().isUse(true).build());
-                })
+                .flatMap(result -> Mono.just(ChatResponse.builder().isUse(true).build()))
                 .switchIfEmpty(Mono.just(ChatResponse.builder().isUse(false).build()))
         );
   }
 
+  /**
+   * Download mono.
+   *
+   * @param fileKey    the file key
+   * @param bucketName the bucket name
+   * @return the mono
+   */
   public Mono<InputStream> download(String fileKey, String bucketName) {
 
     GetObjectRequest getObjectRequest = GetObjectRequest.builder()
@@ -180,31 +198,29 @@ public class ChatService {
         .key(fileKey)
         .build();
 
+    // .asByteArray(); // ResponseBytes::asByteArray
     return Mono.fromFuture(
         s3AsyncClient.getObject(getObjectRequest, AsyncResponseTransformer.toBytes())
-            .thenApply(bytes -> {
-              return bytes.asInputStream();  // .asByteArray(); // ResponseBytes::asByteArray
-            })
+            .thenApply(BytesWrapper::asInputStream)
             .whenComplete((res, error) -> {
-                  try {
-                    if (res != null) {
-                      log.debug("whenComplete -> {}", res);
-                    } else {
-                      error.printStackTrace();
-                    }
-                  } finally {
-                    //s3AsyncClient.close();
-                  }
+              try {
+                if (res != null) {
+                  log.debug("whenComplete -> {}", res);
+                } else {
+                  error.printStackTrace();
                 }
-            )
+              } finally {
+                //s3AsyncClient.close();
+              }
+            })
     );
   }
 
   /**
    * 채팅 파일 리스트 정보를 리턴한다.
    *
-   * @param projectId
-   * @return
+   * @param projectId the project id
+   * @return flux
    */
   public Flux<ChatFileResponse> findByFileList(String projectId) {
     return chatFileDomainService.findByList(projectId)
@@ -223,9 +239,9 @@ public class ChatService {
                 .createAccountId(result.getCreateAccountId())
                 .build());
           } else if (result.getUserType().equals(UserType.USER)) {
-            return userAccountDomainService.findById(result.getCreateAccountId())
+            return userInfoDomainService.findById(result.getCreateAccountId())
                 .flatMap(r1 -> {
-                  return Mono.just(ChatFileResponse.builder()
+                  ChatFileResponse chatFileResponse = ChatFileResponse.builder()
                       .id(result.getId())
                       .projectId(result.getProjectId())
                       .fileName(result.getFileName())
@@ -233,32 +249,44 @@ public class ChatService {
                       .fileType(result.getFileType())
                       .fileStatus(result.getFileStatus())
                       .userType(result.getUserType())
-                      .userTypeName(AES256Util.decryptAES(awsProperties.getKmsKey(), r1.getEmail()))
+                      .userTypeName(MaskingUtil.getEmailMask(AES256Util.decryptAES(awsProperties.getKmsKey(), r1.getEmail())))
                       .createDate(result.getCreateDate())
                       .createAccountId(result.getCreateAccountId())
-                      .build());
+                      .build();
+
+                  return userAccountDomainService.findByProjectIdAndContactEmail(result.getProjectId(), r1.getEmail())
+                      .flatMap(subResult -> {
+                        chatFileResponse.setUserTypeName(MaskingUtil.getNameMask(AES256Util.decryptAES(awsProperties.getKmsKey(), subResult.getName()))
+                            + "(" + MaskingUtil.getEmailMask(AES256Util.decryptAES(awsProperties.getKmsKey(), subResult.getContactEmail())) + ")");
+                        return Mono.just(chatFileResponse);
+                      }).switchIfEmpty(Mono.just(chatFileResponse));
                 });
           } else if (result.getUserType().equals(UserType.ADMIN)) {
             return accountDomainService.findByAdminId(result.getCreateAccountId())
-                .flatMap(r2 -> {
-                  return Mono.just(ChatFileResponse.builder()
-                      .id(result.getId())
-                      .projectId(result.getProjectId())
-                      .fileName(result.getFileName())
-                      .fileSize(result.getFileSize())
-                      .fileType(result.getFileType())
-                      .fileStatus(result.getFileStatus())
-                      .userType(result.getUserType())
-                      .userTypeName(r2.getEmail())
-                      .createDate(result.getCreateDate())
-                      .createAccountId(result.getCreateAccountId())
-                      .build());
-                });
+                .flatMap(r2 -> Mono.just(ChatFileResponse.builder()
+                    .id(result.getId())
+                    .projectId(result.getProjectId())
+                    .fileName(result.getFileName())
+                    .fileSize(result.getFileSize())
+                    .fileType(result.getFileType())
+                    .fileStatus(result.getFileStatus())
+                    .userType(result.getUserType())
+                    .userTypeName(MaskingUtil.getNameMask(r2.getName()) + "(" + MaskingUtil.getEmailMask(r2.getEmail()) + ")")
+                    .createDate(result.getCreateDate())
+                    .createAccountId(result.getCreateAccountId())
+                    .build()));
           }
           return null;
         });
   }
 
+  /**
+   * Find by file info mono.
+   *
+   * @param projectId the project id
+   * @param fileKey   the file key
+   * @return the mono
+   */
   public Mono<ChatFileResponse> findByFileInfo(String projectId, String fileKey) {
     return chatFileDomainService.findByFileId(fileKey)
         .flatMap(result -> {
@@ -276,7 +304,7 @@ public class ChatService {
                 .createAccountId(result.getCreateAccountId())
                 .build());
           } else if (result.getUserType().equals(UserType.USER)) {
-            return userAccountDomainService.findById(result.getCreateAccountId())
+            return userInfoDomainService.findById(result.getCreateAccountId())
                 .flatMap(r1 -> {
                   return Mono.just(ChatFileResponse.builder()
                       .id(result.getId())
@@ -315,8 +343,8 @@ public class ChatService {
   /**
    * 파일 상세 정보 조회
    *
-   * @param fileKey
-   * @return
+   * @param fileKey the file key
+   * @return mono
    */
   public Mono<ChatFile> findById(String fileKey) {
     return chatFileDomainService.findByFileId(fileKey);
@@ -325,7 +353,8 @@ public class ChatService {
   /**
    * 제출 서류 관리 file 저장
    *
-   * @param fileRequest
+   * @param fileRequest the file request
+   * @param account     the account
    * @return SubmittedDocumentResponse Object
    */
   public Mono<ChatFileResponse> fileSave(Mono<ChatFileRequest> fileRequest, Account account) {
@@ -406,9 +435,9 @@ public class ChatService {
   /**
    * 채팅 메시지를 삭제한다.
    *
-   * @param id
-   * @param account
-   * @return
+   * @param id      the id
+   * @param account the account
+   * @return mono
    */
   public Mono<ChatResponse> deleteMessage(String id, Account account) {
     return chatMessageDomainService.findById(id)
@@ -424,88 +453,86 @@ public class ChatService {
   /**
    * 엑셀 파일을 만들어서 리턴한다.
    *
-   * @param roomId
-   * @param siteId
-   * @return
+   * @param roomId the room id
+   * @param siteId the site id
+   * @return mono
    */
   public Mono<ByteArrayInputStream> downloadExcel(String roomId, String siteId) {
     return chatMessageDomainService.findMessages(roomId, siteId)
         //.map(AuditLogMapper.INSTANCE::auditLogResponse)
         .collectSortedList(Comparator.comparing(ChatMessage::getCreateDate))
-        .flatMap(list -> this.createExcelFile(list));
+        .flatMap(this::createExcelFile);
   }
 
   /**
    * 엑셀 파일 생성.
    *
-   * @param chatList
-   * @return
+   * @param chatList chat list
+   * @return byte array input stream
    */
   private Mono<ByteArrayInputStream> createExcelFile(List<ChatMessage> chatList) {
     return Mono.fromCallable(() -> {
-          log.debug("엑셀 파일 생성 시작");
+      log.debug("엑셀 파일 생성 시작");
 
-          SXSSFWorkbook workbook = new SXSSFWorkbook(
-              SXSSFWorkbook.DEFAULT_WINDOW_SIZE);  // keep 100 rows in memory, exceeding rows will be flushed to disk
-          ByteArrayOutputStream out = new ByteArrayOutputStream();
+      SXSSFWorkbook workbook = new SXSSFWorkbook(
+          SXSSFWorkbook.DEFAULT_WINDOW_SIZE);  // keep 100 rows in memory, exceeding rows will be flushed to disk
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-          CreationHelper creationHelper = workbook.getCreationHelper();
+      Sheet sheet = workbook.createSheet("Chat Message");
 
-          Sheet sheet = workbook.createSheet("Chat Message");
+      Font headerFont = workbook.createFont();
+      headerFont.setFontName("맑은 고딕");
+      headerFont.setFontHeight((short) (10 * 20));
+      headerFont.setBold(true);
+      headerFont.setColor(IndexedColors.BLACK.index);
 
-          Font headerFont = workbook.createFont();
-          headerFont.setFontName("맑은 고딕");
-          headerFont.setFontHeight((short) (10 * 20));
-          headerFont.setBold(true);
-          headerFont.setColor(IndexedColors.BLACK.index);
+      Font bodyFont = workbook.createFont();
+      bodyFont.setFontName("맑은 고딕");
+      bodyFont.setFontHeight((short) (10 * 20));
 
-          Font bodyFont = workbook.createFont();
-          bodyFont.setFontName("맑은 고딕");
-          bodyFont.setFontHeight((short) (10 * 20));
+      // Cell 스타일 생성
+      CellStyle headerStyle = workbook.createCellStyle();
+      headerStyle.setAlignment(HorizontalAlignment.CENTER);
+      headerStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+      headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.index);
+      headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+      headerStyle.setFont(headerFont);
 
-          // Cell 스타일 생성
-          CellStyle headerStyle = workbook.createCellStyle();
-          headerStyle.setAlignment(HorizontalAlignment.CENTER);
-          headerStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-          headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.index);
-          headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-          headerStyle.setFont(headerFont);
+      // Row for Header
+      Row headerRow = sheet.createRow(0);
 
-          // Row for Header
-          Row headerRow = sheet.createRow(0);
+      // Header
+      String[] fields = {"구분", "이메일", "내용", "삭제여부", "작성일자"};
+      for (int col = 0; col < fields.length; col++) {
+        Cell cell = headerRow.createCell(col);
+        cell.setCellValue(fields[col]);
+        cell.setCellStyle(headerStyle);
+      }
 
-          // Header
-          String[] fields = {"구분", "이메일", "내용", "삭제여부", "작성일자"};
-          for (int col = 0; col < fields.length; col++) {
-            Cell cell = headerRow.createCell(col);
-            cell.setCellValue(fields[col]);
-            cell.setCellStyle(headerStyle);
-          }
+      // Body
+      int rowIdx = 1;
+      for (ChatMessage res : chatList) {
+        Row row = sheet.createRow(rowIdx++);
 
-          // Body
-          int rowIdx = 1;
-          for (ChatMessage res : chatList) {
-            Row row = sheet.createRow(rowIdx++);
+        row.createCell(0).setCellValue(res.getRole().toString());
+        row.createCell(1)
+            .setCellValue(AES256Util.decryptAES(awsProperties.getKmsKey(), res.getEmail()));
+        row.createCell(2)
+            .setCellValue(AES256Util.decryptAES(awsProperties.getKmsKey(), res.getContent()));
+        row.createCell(3).setCellValue(res.getIsDelete());
+        row.createCell(4).setCellValue(res.getCreateDate().plusHours(9)
+            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+      }
+      workbook.write(out);
 
-            row.createCell(0).setCellValue(res.getRole().toString());
-            row.createCell(1)
-                .setCellValue(AES256Util.decryptAES(awsProperties.getKmsKey(), res.getEmail()));
-            row.createCell(2)
-                .setCellValue(AES256Util.decryptAES(awsProperties.getKmsKey(), res.getContent()));
-            row.createCell(3).setCellValue(res.getIsDelete());
-            row.createCell(4).setCellValue(res.getCreateDate().plusHours(9)
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-          }
-          workbook.write(out);
-
-          log.debug("엑셀 파일 생성 종료");
-          return new ByteArrayInputStream(out.toByteArray());
-        })
-        .log();
+      log.debug("엑셀 파일 생성 종료");
+      return new ByteArrayInputStream(out.toByteArray());
+    })
+    .log();
   }
 
   /**
-   * SQS 전송 데이터 생성
+   * SQS 전송 데이터 생성.
    *
    * @param chatFile
    * @return
