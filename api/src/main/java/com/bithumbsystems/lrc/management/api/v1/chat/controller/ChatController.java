@@ -73,8 +73,9 @@ public class ChatController {
   @GetMapping("/chat/{siteId}/{projectId}")
   @Operation(summary = "Communication 메시지 가져오기", description = "Communication 메시지 가져오기", tags = "내 프로젝트 > Communication")
   public ResponseEntity<Mono<MultiResponse<ChatMessageResponse>>> getChatMessages(
-      @Parameter(name = "projectId", description = "project 의 id(room ID)", in = ParameterIn.PATH) @PathVariable String projectId,
-      @PathVariable final String siteId, @Parameter(hidden = true) @CurrentUser final Account account) {
+      @PathVariable final String siteId,
+      @PathVariable String projectId,
+      @Parameter(hidden = true) @CurrentUser final Account account) {
     return ResponseEntity.ok().body(chatService.findChatMessages(account, projectId, siteId)
         .collectSortedList(Comparator.comparing(ChatMessageResponse::getCreateDate))
         .map(MultiResponse::new));
