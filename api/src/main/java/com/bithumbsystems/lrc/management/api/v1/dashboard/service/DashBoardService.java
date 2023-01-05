@@ -8,6 +8,7 @@ import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.foundationinf
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.projectinfo.service.ProjectInfoDomainService;
 import com.bithumbsystems.persistence.mongodb.statusmanagement.linemng.service.LineMngDomainService;
 import com.bithumbsystems.persistence.mongodb.statusmanagement.statuscode.service.StatusCodeDomainService;
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,7 +31,7 @@ public class DashBoardService {
      * 상태값 관리 모두 가져오기
      * @return DashBoardStatusCodeResponse
      */
-    public Mono<List<DashBoardStatusCodeResponse>> getStatusCode() {
+    public Mono<List<DashBoardStatusCodeResponse>> getStatusCode(LocalDate searchFromDate, LocalDate searchToDate) {
         return statusCodeDomainService.findAllStatus()
                 .map(statusCode ->
                         DashBoardStatus.builder()
@@ -44,7 +45,7 @@ public class DashBoardService {
                 .filter(DashBoardStatus::getUseYn)
                 .flatMap(c ->
                         Mono.just(c)
-                                .zipWith(foundationInfoDomainService.findByCustomContractProcess(c.getId()).count())
+                                .zipWith(foundationInfoDomainService.findByCustomContractProcess(c.getId(), searchFromDate, searchToDate).count())
                                 .map(t -> {
                                     t.getT1().setCount(t.getT2());
                                     return t.getT1();
