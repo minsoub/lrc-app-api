@@ -21,7 +21,7 @@ public interface FoundationInfoCustomRepository {
      * @param keyword
      * @return FoundationInfoResponse
      */
-    public Flux<FoundationInfo> findByCustomContractProcess(String keyword);
+    public Flux<FoundationInfo> findByCustomContractProcess(String keyword, LocalDate searchFromDate, LocalDate searchToDate);
 
     /**
      * 재단정보를 symbol로 like 검색한다.
