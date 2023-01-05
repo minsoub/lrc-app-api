@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * The type User account response.
+ */
 @Data
 @Builder
 @AllArgsConstructor
@@ -13,28 +16,32 @@ import lombok.NoArgsConstructor;
 @Schema(description = "사용자 정보")
 public class UserAccountResponse {
 
-    private String id;
+  private String id;
 
-    @Schema(description = "계정")
-    private String userEmail;
-    @Schema(description = "프로젝트 코드")
-    private String projectId;               //프로젝트 코드
+  @Schema(description = "계정")
+  private String userEmail;
 
-    @Schema(description = "회원 아이디")
-    private String userAccountId;           //회원 아이디
+  @Schema(description = "프로젝트 코드")
+  private String projectId;
 
-    @Schema(description = "회원명")
-    private String userName;
+  @Schema(description = "회원 아이디")
+  private String userAccountId;
 
-    @Schema(description = "마스터/담당자구분")
-    private String userType;                //마스터/담당자구분
+  @Schema(description = "회원명")
+  private String userName;
 
-    @Schema(description = "SNS ID")
-    private String snsId;
+  @Schema(description = "마스터/담당자구분")
+  private String userType;
 
-    @Schema(description = "Email")
-    private String email;
+  @Schema(description = "SNS ID")
+  private String snsId;
 
-    @Schema(description = "Phone")
-    private String phone;
+  @Schema(description = "Email")
+  private String email;
+
+  @Schema(description = "Phone")
+  private String phone;
+
+  @Schema(description = "프로젝트명")
+  private String projectName;
 }

@@ -1,6 +1,7 @@
 package com.bithumbsystems.persistence.mongodb.lrcmanagment.project.useraccount.service;
 
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.useraccount.model.entity.UserAccount;
+import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.useraccount.repository.UserAccountCustomRepository;
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.project.useraccount.repository.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import reactor.core.publisher.Mono;
 public class UserAccountDomainService {
 
   private final UserAccountRepository userAccountRepository;
+  private final UserAccountCustomRepository userAccountCustomRepository;
 
   /**
    * 담당자 정보 project id로 찾기.
@@ -76,5 +78,15 @@ public class UserAccountDomainService {
    */
   public Mono<UserAccount> findByProjectIdAndContactEmail(String projectId, String contactEmail) {
     return userAccountRepository.findByProjectIdAndContactEmail(projectId, contactEmail);
+  }
+
+  /**
+   * 이메일 정보로 참여 프로젝트 리스트 조회.
+   *
+   * @param email the email
+   * @return the flux
+   */
+  public Flux<UserAccount> findByCustomProjectInfo(String email) {
+    return userAccountCustomRepository.findByCustomProjectInfo(email);
   }
 }

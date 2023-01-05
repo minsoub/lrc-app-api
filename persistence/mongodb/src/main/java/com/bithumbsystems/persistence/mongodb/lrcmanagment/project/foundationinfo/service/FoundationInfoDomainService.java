@@ -35,8 +35,8 @@ public class FoundationInfoDomainService {
    * @param keyword the keyword
    * @return FoundationInfoResponse flux
    */
-  public Flux<FoundationInfo> findByCustomContractProcess(String keyword) {
-    return foundationInfoCustomRepository.findByCustomContractProcess(keyword);
+  public Flux<FoundationInfo> findByCustomContractProcess(String keyword, LocalDate searchFromDate, LocalDate searchToDate) {
+    return foundationInfoCustomRepository.findByCustomContractProcess(keyword, searchFromDate, searchToDate);
   }
 
   /**
@@ -100,5 +100,15 @@ public class FoundationInfoDomainService {
    */
   public Mono<Boolean> getByName(String name) {
     return foundationInfoRepository.existsByName(name);
+  }
+
+  /**
+   * 생성자 ID로 프로젝트 리스트 조회.
+   *
+   * @param createAccountId the create account id
+   * @return the flux
+   */
+  public Flux<FoundationInfo> findByCreateAccountId(String createAccountId) {
+    return foundationInfoRepository.findByCreateAccountId(createAccountId);
   }
 }
