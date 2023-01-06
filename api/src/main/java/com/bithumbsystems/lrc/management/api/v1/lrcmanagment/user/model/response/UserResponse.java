@@ -15,17 +15,17 @@ public class UserResponse {
   private String id;
   @Schema(description = "계정 ID")
   private String email;
-  @Schema(description = "계정 상태")
+  @Schema(description = "계정 상태", allowableValues = {"NORMAL", "DENY_ACCESS", "EMAIL_VALID"})
   private String status;
-  @Schema(description = "계정 상태명")
+  @Schema(description = "계정 상태명", allowableValues = {"정상", "로그인 차단", "이메일 인증 중"})
   private String statusName;
-  @Schema(description = "생성 프로젝트")
-  private String createProject;
-  @Schema(description = "참여 프로젝트")
-  private String joinProject;
-  @Schema(description = "등록일시")
+  @Schema(description = "생성 프로젝트 (a, b)")
+  private String createProjectsName;
+  @Schema(description = "참여 프로젝트 (a, b)")
+  private String joinProjectsName;
+  @Schema(description = "등록일시 (yyyy-MM-dd hh:mm)")
   private LocalDateTime createDate;
-  @Schema(description = "최근 접속일시")
+  @Schema(description = "최근 접속일시 (yyyy-MM-dd hh:mm)")
   private LocalDateTime lastLoginDate;
 
   /**
@@ -47,21 +47,21 @@ public class UserResponse {
   }
 
   /**
-   * Sets create project.
+   * Sets create projects name.
    *
-   * @param createProject the creation project
+   * @param createProjectsName the create projects name
    */
-  public void setCreateProject(String createProject) {
-    this.createProject = createProject;
+  public void setCreateProjectsName(String createProjectsName) {
+    this.createProjectsName = createProjectsName;
   }
 
   /**
-   * Sets join project.
+   * Sets join projects name.
    *
-   * @param joinProject the join project
+   * @param joinProjectsName the join projects name
    */
-  public void setJoinProject(String joinProject) {
-    this.joinProject = joinProject;
+  public void setJoinProjectsName(String joinProjectsName) {
+    this.joinProjectsName = joinProjectsName;
   }
 
   /**

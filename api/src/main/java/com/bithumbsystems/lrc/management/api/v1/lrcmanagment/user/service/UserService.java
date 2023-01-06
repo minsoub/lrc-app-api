@@ -78,9 +78,9 @@ public class UserService {
                         .collectList()
                 )
                 .map(tuple -> {
-                  tuple.getT1().setCreateProject(
+                  tuple.getT1().setCreateProjectsName(
                       tuple.getT2().stream().map(FoundationInfoResponse::getProjectName).collect(joining(", ")));
-                  tuple.getT1().setJoinProject(
+                  tuple.getT1().setJoinProjectsName(
                       tuple.getT3().stream().map(UserAccountResponse::getProjectName).collect(joining(", ")));
                   return tuple.getT1();
                 })

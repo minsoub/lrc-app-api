@@ -10,13 +10,14 @@ import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.user.service.UserSe
 import com.bithumbsystems.persistence.mongodb.lrcmanagment.user.model.enums.UserStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -46,16 +47,14 @@ public class UserController {
    * @return the list
    */
   @GetMapping("")
-  @Operation(summary = "재단 사용자 관리 - 다건 조회", description = "검색 조건에 따른 재단 사용자 정보를 조회합니다. (개인정보 마스킹 처리)", tags = "")
-  @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = UserResponse.class))),
-      @ApiResponse(responseCode = "404", description = "NOT FOUND")
-  })
+  @Operation(summary = "재단 사용자 관리 - 다건 조회", description = "검색 조건에 따른 재단 사용자 정보를 조회합니다. (개인정보 마스킹 처리)", tags = "사이트 운영  > 재단 사용자 관리 > 재단 사용자 검색")
+  @ApiResponse(responseCode = "200", description = "OK",
+      content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = UserResponse.class))))
   public ResponseEntity<Mono<MultiResponse<UserResponse>>> getList(
-      @Parameter(name = "fromDate", description = "검색조건 - 해당일자 이후", example = "2022-01-01") @RequestParam(required = false) String fromDate,
-      @Parameter(name = "toDate", description = "검색조건 - 해당일자 까지", example = "2022-01-01") @RequestParam(required = false) String toDate,
-      @Parameter(name = "userStatus", description = "검색조건 - 계정상태", example = "NORMAL") @RequestParam(required = false) UserStatus userStatus,
-      @Parameter(name = "keyword", description = "검색조건 - 검색어", example = "아무거나") @RequestParam(required = false) String keyword
+      @Parameter(description = "검색조건 - 해당일자 이후", example = "2023-01-01") @RequestParam(required = false) String fromDate,
+      @Parameter(description = "검색조건 - 해당일자 까지", example = "2023-01-01") @RequestParam(required = false) String toDate,
+      @Parameter(description = "검색조건 - 계정상태", example = "NORMAL") @RequestParam(required = false) UserStatus userStatus,
+      @Parameter(description = "검색조건 - 검색어", example = "아무거나") @RequestParam(required = false) String keyword
   ) {
     LocalDate searchFromDate = null;
     LocalDate searchToDate = null;
