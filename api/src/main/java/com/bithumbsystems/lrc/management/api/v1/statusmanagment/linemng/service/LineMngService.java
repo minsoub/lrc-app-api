@@ -61,7 +61,7 @@ public class LineMngService {
               .collectSortedList(Comparator.comparing(LineMngResponse::getOrderNo))
               .flatMap(lineList -> Mono.just(res.setChildren(lineList)))
         )
-        .collectSortedList(Comparator.comparing(LineMngResponse::getOrderNo));
+        .collectSortedList(Comparator.comparing(LineMngResponse::getType).thenComparing(LineMngResponse::getOrderNo));
   }
 
   /**

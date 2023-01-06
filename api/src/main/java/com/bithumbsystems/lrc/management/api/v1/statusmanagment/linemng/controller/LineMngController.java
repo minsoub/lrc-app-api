@@ -69,7 +69,7 @@ public class LineMngController {
       content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
           array = @ArraySchema(schema = @Schema(implementation = LineMngResponse.class))))
   public ResponseEntity<Mono<MultiResponse<LineMngResponse>>> getLinesTree(
-      @Parameter(description = "계열 구분", example = "BUSINESS", required = true) @RequestParam("type") LineType type,
+      @Parameter(description = "계열 구분", example = "BUSINESS") @RequestParam(value = "type", required = false) LineType type,
       @Parameter(description = "사용안함 포함", example = "true") @RequestParam(defaultValue = "true") Boolean isUse) {
     return ResponseEntity.ok().body(lineMngService.findAllTree(type, isUse)
         .map(MultiResponse::new)
