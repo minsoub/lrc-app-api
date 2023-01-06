@@ -1,0 +1,39 @@
+variables:
+  SAST_JAVA_VERSION: "11"
+  
+cache:
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches   
+stages:
+  - build
+
+include:
+    - template: Security/SAST.gitlab-ci.yml
+
+build:
+  image: 
+    name: gradle:7.1.0-jdk11
+  stage: build
+  script:
+    - gradle clean build -x test -Pprofile=dev 
+  cache:
+    paths:
+      - .gradle/wrapper
+      - .gradle/caches    
+  artifacts:
+    paths:
+      - ".gradle/"
+      - build/
+      - api/build/
+      - persistence/mongodb/build/
+
+# Run a SAST scan & report on the sources
+sast:
+    stage: build
+    artifacts:
+      paths:
+        - 'gl-sast-report.json'
+    variables:
+        SAST_EXCLUDED_PATHS: spec, test, tests, tmp, server/libs, assets, vendor, *.min.js
+        SECURE_LOG_LEVEL: "debug"
