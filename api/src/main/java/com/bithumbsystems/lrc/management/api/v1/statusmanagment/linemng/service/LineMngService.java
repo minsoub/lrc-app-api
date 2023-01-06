@@ -9,82 +9,117 @@ import com.bithumbsystems.lrc.management.api.v1.statusmanagment.linemng.model.re
 import com.bithumbsystems.persistence.mongodb.statusmanagement.linemng.model.entity.LineMng;
 import com.bithumbsystems.persistence.mongodb.statusmanagement.linemng.model.enums.LineType;
 import com.bithumbsystems.persistence.mongodb.statusmanagement.linemng.service.LineMngDomainService;
+import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-
+/**
+ * The type Line mng service.
+ */
 @Service
 @RequiredArgsConstructor
 public class LineMngService {
 
-    private final LineMngDomainService businessListDomainService;
+  private final LineMngDomainService businessListDomainService;
 
-    /**
-     * 계열관리 모든 정보
-     * @return BusinessListResponse
-     */
-    public Flux<LineMngResponse> findAll(LineType type) {
-        return businessListDomainService.findAll()
-                .filter(f -> type == null || f.getType().equals(type))
-                .filter(f -> f.getDelYn() == null || f.getDelYn().equals(false))
-                //.filter(LineMng::getUseYn)
-                .map(LineMngMapper.INSTANCE::businessListResponse);
-    }
+  /**
+   * 계열관리 모든 정보.
+   *
+   * @param type the type
+   * @return BusinessListResponse flux
+   */
+  public Flux<LineMngResponse> findAll(LineType type) {
+    return businessListDomainService.findAll()
+        .filter(f -> type == null || f.getType().equals(type))
+        .filter(f -> f.getDelYn() == null || f.getDelYn().equals(false))
+        //.filter(LineMng::getUseYn)
+        .map(LineMngMapper.INSTANCE::businessListResponse);
+  }
 
-    /**
-     * 계열관리 1개 저장
-     * @param lineMngRequest
-     * @return BusinessListResponse
-     */
-    public Mono<LineMngResponse> create(LineMngRequest lineMngRequest, Account account) {
-        return businessListDomainService.save(LineMng.builder()
-                        .id(UUID.randomUUID().toString())
-                        .name(lineMngRequest.getName())
-                        .type(lineMngRequest.getType())
-                        .useYn(true)
-                        .delYn(false)
-                        .createDate(LocalDateTime.now())
-                        .createAdminAccountId(account.getAccountId()).build())
-                .map(LineMngMapper.INSTANCE::businessListResponse)
-                .switchIfEmpty(Mono.error(new LineMngException(ErrorCode.FAIL_CREATE_CONTENT)));
-    }
+  /**
+   * 계열관리 트리 구조 만들기.
+   *
+   * @param type  the type
+   * @param isUse the is use
+   * @return the mono
+   */
+  public Mono<List<LineMngResponse>> findAllTree(LineType type, Boolean isUse) {
+    return businessListDomainService.findAll()
+        .filter(f -> type == null || f.getType().equals(type))
+        .filter(f -> f.getDelYn() == null || f.getDelYn().equals(false))
+        .filter(f -> StringUtils.isEmpty(f.getParentId()))
+        .map(LineMngMapper.INSTANCE::businessListResponse)
+        .flatMap(res -> businessListDomainService.findByParentId(res.getId())
+              .map(LineMngMapper.INSTANCE::businessListResponse)
+              .filter(f -> isUse || f.getUseYn())
+              .collectSortedList(Comparator.comparing(LineMngResponse::getOrderNo))
+              .flatMap(lineList -> Mono.just(res.setChildren(lineList)))
+        )
+        .collectSortedList(Comparator.comparing(LineMngResponse::getOrderNo));
+  }
 
-    /**
-     * 계열관리 업데이트
-     * @param id
-     * @param lineMngRequest
-     * @return BusinessListResponse
-     */
-    public Mono<LineMngResponse> updateLine(String id, LineMngRequest lineMngRequest, Account account) {
-        return businessListDomainService.findById(id).flatMap(c -> {
-            c.setName(lineMngRequest.getName());
-            c.setUseYn(lineMngRequest.getUseYn());
-            c.setUpdateDate(LocalDateTime.now());
-            c.setUpdateAdminAccountId(account.getAccountId());
-            return businessListDomainService.updateLine(c)
-                    .map(LineMngMapper.INSTANCE::businessListResponse);
+  /**
+   * 계열관리 1개 저장.
+   *
+   * @param lineMngRequest the line mng request
+   * @param account        the account
+   * @return BusinessListResponse mono
+   */
+  public Mono<LineMngResponse> create(LineMngRequest lineMngRequest, Account account) {
+    return businessListDomainService.save(LineMng.builder()
+            .id(UUID.randomUUID().toString())
+            .name(lineMngRequest.getName())
+            .type(lineMngRequest.getType())
+            .useYn(true)
+            .delYn(false)
+            .createDate(LocalDateTime.now())
+            .createAdminAccountId(account.getAccountId()).build())
+        .map(LineMngMapper.INSTANCE::businessListResponse)
+        .switchIfEmpty(Mono.error(new LineMngException(ErrorCode.FAIL_CREATE_CONTENT)));
+  }
+
+  /**
+   * 계열관리 업데이트.
+   *
+   * @param id             the id
+   * @param lineMngRequest the line mng request
+   * @param account        the account
+   * @return BusinessListResponse mono
+   */
+  public Mono<LineMngResponse> updateLine(String id, LineMngRequest lineMngRequest, Account account) {
+    return businessListDomainService.findById(id).flatMap(c -> {
+          c.setName(lineMngRequest.getName());
+          c.setUseYn(lineMngRequest.getUseYn());
+          c.setUpdateDate(LocalDateTime.now());
+          c.setUpdateAdminAccountId(account.getAccountId());
+          return businessListDomainService.updateLine(c)
+              .map(LineMngMapper.INSTANCE::businessListResponse);
         })
-                .switchIfEmpty(Mono.error(new LineMngException(ErrorCode.FAIL_UPDATE_CONTENT)));
-    }
+        .switchIfEmpty(Mono.error(new LineMngException(ErrorCode.FAIL_UPDATE_CONTENT)));
+  }
 
-    /**
-     * 계열관리 삭제 - 상태 여부만 변경.
-     * @param id
-     * @return null
-     */
-    public Mono<LineMngResponse> deleteLine(String id, Account account) {
-        return businessListDomainService.findById(id).flatMap(c -> {
-                    c.setUseYn(false);  // 상태 여부만 변경
-                    c.setDelYn(true);
-                    c.setUpdateDate(LocalDateTime.now());
-                    c.setUpdateAdminAccountId(account.getAccountId());
-                    return businessListDomainService.updateLine(c)
-                            .map(LineMngMapper.INSTANCE::businessListResponse);
-                })
-                .switchIfEmpty(Mono.error(new LineMngException(ErrorCode.FAIL_UPDATE_CONTENT)));
-    }
+  /**
+   * 계열관리 삭제 - 상태 여부만 변경.
+   *
+   * @param id      the id
+   * @param account the account
+   * @return null mono
+   */
+  public Mono<LineMngResponse> deleteLine(String id, Account account) {
+    return businessListDomainService.findById(id).flatMap(c -> {
+          c.setUseYn(false);  // 상태 여부만 변경
+          c.setDelYn(true);
+          c.setUpdateDate(LocalDateTime.now());
+          c.setUpdateAdminAccountId(account.getAccountId());
+          return businessListDomainService.updateLine(c)
+              .map(LineMngMapper.INSTANCE::businessListResponse);
+        })
+        .switchIfEmpty(Mono.error(new LineMngException(ErrorCode.FAIL_UPDATE_CONTENT)));
+  }
 }

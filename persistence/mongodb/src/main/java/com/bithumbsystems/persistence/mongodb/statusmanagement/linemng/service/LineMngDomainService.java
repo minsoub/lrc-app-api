@@ -67,4 +67,13 @@ public class LineMngDomainService {
     return lineMngRepository.delete(businessList);
   }
 
+  /**
+   * 계열관리 트리 구조 만들기.
+   *
+   * @param parentId the parent id
+   * @return the flux
+   */
+  public Flux<LineMng> findByParentId(String parentId) {
+    return lineMngRepository.findByParentId(parentId);
+  }
 }
