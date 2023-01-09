@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.ReadOnlyProperty;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
@@ -33,5 +34,7 @@ public class LineMng {
   private LocalDateTime updateDate;       //수정날짜
   private String updateAdminAccountId;    //수정자 id
   private Integer orderNo;                //순서
-  private String parentId;              //상위분류코드
+  private String parentId;                //상위분류코드
+  @ReadOnlyProperty
+  private LineMng parentInfo;             // 상위 계열 정보
 }

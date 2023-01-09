@@ -1,6 +1,7 @@
 package com.bithumbsystems.persistence.mongodb.statusmanagement.linemng.service;
 
 import com.bithumbsystems.persistence.mongodb.statusmanagement.linemng.model.entity.LineMng;
+import com.bithumbsystems.persistence.mongodb.statusmanagement.linemng.repository.LineMngCustomRepository;
 import com.bithumbsystems.persistence.mongodb.statusmanagement.linemng.repository.LineMngRepository;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import reactor.core.publisher.Mono;
 public class LineMngDomainService {
 
   private final LineMngRepository lineMngRepository;
+  private final LineMngCustomRepository lineMngCustomRepository;
 
   /**
    * 계열관리 모두 가져오기.
@@ -75,5 +77,15 @@ public class LineMngDomainService {
    */
   public Flux<LineMng> findByParentId(String parentId) {
     return lineMngRepository.findByParentId(parentId);
+  }
+
+  /**
+   * ID로 상위 계열 정보 포함한 계열 정보 조회.
+   *
+   * @param id the id
+   * @return the mono
+   */
+  public Mono<LineMng> findByIdWithParentInfo(String id) {
+    return lineMngCustomRepository.findByIdWithParentInfo(id);
   }
 }
