@@ -401,27 +401,6 @@ public class FoundationService {
                   );
                   return tuple.getT1();
                 });
-//                                .switchIfEmpty(
-//                                        Mono.defer(() -> Mono.just(FoundationResponse.builder()
-//                                                .id(res.getProjectId())
-//                                                .projectId(res.getProjectId())
-//                                                .projectName(res.getProjectName())
-//                                                .symbol(res.getSymbol())
-//                                                .contractCode(res.getContractCode())
-//                                                .contractName(res.getContractName())
-//                                                .progressCode(res.getProgressCode())
-//                                                .progressName(res.getProgressName())
-//                                                .businessCode(res.getBusinessCode())
-//                                                .businessName(res.getBusinessName())
-//                                                .networkCode(res.getNetworkCode())
-//                                                .networkName(res.getNetworkName())
-//                                                .minimumQuantity(res.getMinimumQuantity())
-//                                                .actualQuantity(res.getActualQuantity())
-//                                                .projectLink(res.getProjectLink())
-//                                                .icoDate(res.getIcoDate())
-//                                                .createDate(res.getCreateDate())
-//                                                .build()))
-//                                );
           } else { // 검색 조건이 없다면..
             // .findByProjectInfo(res.getProjectId(), businessCode, networkCode)
             return res1.zipWith(projectInfoDomainService.findByProjectId(res.getProjectId())
@@ -601,9 +580,9 @@ public class FoundationService {
         })
         .flatMap(res -> {
           if (!StringUtils.isEmpty(res.getBusinessCode())) {
-            return lineMngDomainService.findById(res.getBusinessCode())
+            return lineMngDomainService.findByIdWithParentInfo(res.getBusinessCode())
                 .map(business -> {
-                  res.setBusinessName(business.getName());
+                  res.setBusinessName(business.getParentInfo() == null ? business.getName() : business.getParentInfo().getName());
                   return res;
                 });
           } else {
@@ -612,9 +591,9 @@ public class FoundationService {
         })
         .flatMap(res -> {
           if (!StringUtils.isEmpty(res.getNetworkCode())) {
-            return lineMngDomainService.findById(res.getNetworkCode())
+            return lineMngDomainService.findByIdWithParentInfo(res.getNetworkCode())
                 .map(business -> {
-                  res.setNetworkName(business.getName());
+                  res.setNetworkName(business.getParentInfo() == null ? business.getName() : business.getParentInfo().getName());
                   return res;
                 });
           } else {
