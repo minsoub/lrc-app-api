@@ -8,8 +8,12 @@ import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo
 import com.bithumbsystems.lrc.management.api.v1.lrcmanagment.project.projectinfo.service.ProjectInfoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,6 +44,8 @@ public class ProjectInfoController {
   @GetMapping("/project-info/{projectId}")
   @Operation(summary = "거래지원 관리 - 프로젝트 정보 1개 id 찾기", description = "projectId를 이용하여 프로젝트 정보를 조회합니다.",
       tags = "사이트 운영 > 거래지원 관리 > 프로젝트 관리 > 프로젝트 정보 > 1개 찾기")
+  @ApiResponse(responseCode = "200", description = "OK",
+      content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ProjectInfoResponse.class)))
   public ResponseEntity<Mono<SingleResponse<ProjectInfoResponse>>> getProjectInfo(
       @Parameter(description = "project 의 projectId") @PathVariable("projectId") String projectId) {
     return ResponseEntity.ok().body(projectInfoService.findByProjectId(projectId)
