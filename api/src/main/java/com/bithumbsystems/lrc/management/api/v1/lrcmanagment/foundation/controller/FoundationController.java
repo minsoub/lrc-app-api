@@ -119,25 +119,24 @@ public class FoundationController {
   @GetMapping("foundation/search")
   @Operation(summary = "거래지원 관리 - 재단 검색 하기", description = "재단 정보를 저장합니다.", tags = "사이트 운영 > 거래지원 관리 > 재단 검색")
   public ResponseEntity<Mono<SingleResponse<List<FoundationResponse>>>> getFoundationSearch(
-      @Parameter(name = "fromDate", description = "fromDate 이전 날짜", required = true) @RequestParam(required = false) String fromDate,
-      @Parameter(name = "toDate", description = "toDate 다음 날짜", required = true) @RequestParam(required = false) String toDate,
-      @Parameter(name = "contractCode", description = "계약상태", in = ParameterIn.QUERY) @RequestParam(required = false) String contractCode,
-      @Parameter(name = "progressCode", description = "진행상태", in = ParameterIn.QUERY) @RequestParam(required = false) String progressCode,
-      @Parameter(name = "businessCode", description = "사업계열", in = ParameterIn.QUERY) @RequestParam(required = false) String businessCode,
-      @Parameter(name = "networkCode", description = "네트워크계열", in = ParameterIn.QUERY) @RequestParam(required = false) String networkCode,
-      @Parameter(name = "keyword", description = "프로젝트명,심볼 조건 검색", in = ParameterIn.QUERY) @RequestParam(required = false) String keyword)
+      @Parameter(description = "fromDate 이전 날짜") @RequestParam(required = false) String fromDate,
+      @Parameter(description = "toDate 다음 날짜") @RequestParam(required = false) String toDate,
+      @Parameter(description = "계약상태") @RequestParam(required = false) String contractCode,
+      @Parameter(description = "진행상태") @RequestParam(required = false) String progressCode,
+      @Parameter(description = "사업계열") @RequestParam(required = false) String businessCode,
+      @Parameter(description = "네트워크계열") @RequestParam(required = false) String networkCode,
+      @Parameter(description = "프로젝트명,심볼 조건 검색") @RequestParam(required = false) String keyword)
           throws UnsupportedEncodingException {
-    LocalDate nFromDate = LocalDate.parse(fromDate);
-    LocalDate nToDate = LocalDate.parse(toDate);
-
-    if (Boolean.TRUE.equals(DateUtil.isAfter(nFromDate, nToDate))) {
-      throw new AuditLogException(ErrorCode.INVALID_DATE_DAY_PREVIOUS);
+    LocalDate nFromDate = null;
+    LocalDate nToDate = null;
+    if (StringUtils.isNotBlank(fromDate) && StringUtils.isNotBlank(toDate)) {
+      nFromDate = LocalDate.parse(fromDate);
+      nToDate = LocalDate.parse(toDate);
+      if (Boolean.TRUE.equals(DateUtil.isAfter(nFromDate, nToDate))) {
+        throw new AuditLogException(ErrorCode.INVALID_DATE_DAY_PREVIOUS);
+      }
+      nToDate = nToDate.plusDays(1);
     }
-
-//        if(DateUtil.isBetterThenPrevious(nFromDate, nToDate, 3))    //최대 3개월
-//            throw new AuditLogException(ErrorCode.INVALID_DATE_MONTH_AFTER);
-
-    nToDate = nToDate.plusDays(1);
 
     List<String> business = new ArrayList<>();
     if (StringUtils.isNotEmpty(businessCode)) {
@@ -149,9 +148,10 @@ public class FoundationController {
       network = Arrays.asList(URLDecoder.decode(networkCode, StandardCharsets.UTF_8).split(";"));
     }
 
-    return ResponseEntity.ok().body(foundationService.getFoundationSearch(nFromDate, nToDate, contractCode, progressCode, business, network, keyword)
+    return ResponseEntity.ok()
+        .body(foundationService.getFoundationSearch(nFromDate, nToDate, contractCode, progressCode, business, network, keyword)
             .map(SingleResponse::new)
-    );
+        );
   }
 
   /**
@@ -170,26 +170,24 @@ public class FoundationController {
   @GetMapping("foundation/excel/download")
   @Operation(summary = "거래지원 관리 - 재단 검색 데이터 Excel download", description = "재단 정보 Excel download.", tags = "사이트 운영 > 거래지원 관리 > 재단 검색")
   public Mono<ResponseEntity<InputStreamResource>> downloadExcel(
-      @Parameter(name = "fromDate", description = "fromDate 이전 날짜", required = true) @RequestParam(required = false) String fromDate,
-      @Parameter(name = "toDate", description = "toDate 다음 날짜", required = true) @RequestParam(required = false) String toDate,
-      @Parameter(name = "contractCode", description = "계약상태", in = ParameterIn.QUERY) @RequestParam(required = false) String contractCode,
-      @Parameter(name = "progressCode", description = "진행상태", in = ParameterIn.QUERY) @RequestParam(required = false) String progressCode,
-      @Parameter(name = "businessCode", description = "사업계열", in = ParameterIn.QUERY) @RequestParam(required = false) String businessCode,
-      @Parameter(name = "networkCode", description = "네트워크계열", in = ParameterIn.QUERY) @RequestParam(required = false) String networkCode,
-      @Parameter(name = "keyword", description = "프로젝트명,심볼 조건 검색", in = ParameterIn.QUERY) @RequestParam(required = false) String keyword)
+      @Parameter(description = "fromDate 이전 날짜") @RequestParam(required = false) String fromDate,
+      @Parameter(description = "toDate 다음 날짜") @RequestParam(required = false) String toDate,
+      @Parameter(description = "계약상태") @RequestParam(required = false) String contractCode,
+      @Parameter(description = "진행상태") @RequestParam(required = false) String progressCode,
+      @Parameter(description = "사업계열") @RequestParam(required = false) String businessCode,
+      @Parameter(description = "네트워크계열") @RequestParam(required = false) String networkCode,
+      @Parameter(description = "프로젝트명,심볼 조건 검색") @RequestParam(required = false) String keyword)
           throws UnsupportedEncodingException {
-
-    LocalDate nFromDate = LocalDate.parse(fromDate);
-    LocalDate nToDate = LocalDate.parse(toDate);
-
-    if (Boolean.TRUE.equals(DateUtil.isAfter(nFromDate, nToDate))) {
-      throw new AuditLogException(ErrorCode.INVALID_DATE_DAY_PREVIOUS);
+    LocalDate nFromDate = null;
+    LocalDate nToDate = null;
+    if (StringUtils.isNotBlank(fromDate) && StringUtils.isNotBlank(toDate)) {
+      nFromDate = LocalDate.parse(fromDate);
+      nToDate = LocalDate.parse(toDate);
+      if (Boolean.TRUE.equals(DateUtil.isAfter(nFromDate, nToDate))) {
+        throw new AuditLogException(ErrorCode.INVALID_DATE_DAY_PREVIOUS);
+      }
+      nToDate = nToDate.plusDays(1);
     }
-
-//        if(DateUtil.isBetterT000000000henPrevious(nFromDate, nToDate, 3))    //최대 3개월
-//            throw new AuditLogException(ErrorCode.INVALID_DATE_MONTH_AFTER);
-
-    nToDate = nToDate.plusDays(1);
 
     List<String> business = new ArrayList<>();
     if (StringUtils.isNotEmpty(businessCode)) {
