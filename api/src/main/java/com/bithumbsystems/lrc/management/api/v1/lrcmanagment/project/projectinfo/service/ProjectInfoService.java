@@ -29,7 +29,7 @@ public class ProjectInfoService {
     public Mono<ProjectInfoResponse> findByProjectId(String projectId) {
         return projectInfoDomainService.findByProjectId(projectId)
                 .flatMap(result -> {
-                    return lineMngDomainService.findById(result.getBusinessCode())
+                    return lineMngDomainService.findByIdWithParentInfo(result.getBusinessCode())
                             .flatMap(r -> {
                                 return Mono.just(ProjectInfoResponse.builder()
                                         .id(result.getId())
@@ -40,6 +40,8 @@ public class ProjectInfoService {
                                         .networkCode(result.getNetworkCode())
                                         .createDate(result.getCreateDate())
                                         .contractAddress(result.getContractAddress())
+                                        .parentBusinessCode(r.getParentInfo() == null ? "" : r.getParentInfo().getId())
+                                        .parentBusinessName(r.getParentInfo() == null ? "" : r.getParentInfo().getName())
                                         .build());
                             })
                             .switchIfEmpty(Mono.just(ProjectInfoResponse.builder()
@@ -51,13 +53,17 @@ public class ProjectInfoService {
                                     .networkCode(result.getNetworkCode())
                                     .createDate(result.getCreateDate())
                                     .contractAddress(result.getContractAddress())
+                                    .parentBusinessCode("")
+                                    .parentBusinessName("")
                                     .build()));
 
                 })
                 .flatMap(res -> {
-                                return lineMngDomainService.findById(res.getNetworkCode())
+                                return lineMngDomainService.findByIdWithParentInfo(res.getNetworkCode())
                                         .flatMap(c -> {
                                             res.setNetworkName(c.getName());
+                                            res.setParentNetworkCode(c.getParentInfo() == null ? "" : c.getParentInfo().getId());
+                                            res.setParentNetworkName(c.getParentInfo() == null ? "" : c.getParentInfo().getName());
                                             return Mono.just(res);
                                         })
                                         .switchIfEmpty(Mono.just(res));

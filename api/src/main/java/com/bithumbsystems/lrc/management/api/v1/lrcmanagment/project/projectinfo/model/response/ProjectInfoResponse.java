@@ -41,4 +41,16 @@ public class ProjectInfoResponse {
 
     @Schema(description = "최초발행일")
     private LocalDate createDate;       //최초 발행일
+
+  @Schema(description = "상위 사업계열")
+  private String parentBusinessCode;            //사업계열
+
+  @Schema(description = "상위 사업계열명")
+  private String parentBusinessName;
+
+  @Schema(description = "상위 네트워크")
+  private String parentNetworkCode;             //네트워크계열
+
+  @Schema(description = "상위 네트워크명")
+  private String parentNetworkName;
 }
