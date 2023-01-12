@@ -5,14 +5,22 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+/**
+ * The type Dash board exception.
+ */
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
 @Getter
 public class DashBoardException extends RuntimeException {
 
-    private final ErrorCode errorCode;
+  private final ErrorCode errorCode;
 
-    public DashBoardException(ErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.errorCode = errorCode;
-    }
+  /**
+   * Instantiates a new Dash board exception.
+   *
+   * @param errorCode the error code
+   */
+  public DashBoardException(ErrorCode errorCode) {
+    super(errorCode.getMessage());
+    this.errorCode = errorCode;
+  }
 }
