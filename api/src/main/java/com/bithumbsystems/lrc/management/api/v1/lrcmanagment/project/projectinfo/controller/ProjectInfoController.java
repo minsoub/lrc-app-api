@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,7 +26,7 @@ import reactor.core.publisher.Mono;
  */
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("lrc/lrcmanagment/project")
+@RequestMapping(value = "lrc/lrcmanagment/project", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "프로젝트 정보", description = "프로젝트 정보 API")
 public class ProjectInfoController {
 

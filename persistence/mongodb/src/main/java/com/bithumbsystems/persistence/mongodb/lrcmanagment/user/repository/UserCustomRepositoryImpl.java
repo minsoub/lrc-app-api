@@ -21,18 +21,11 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
   private final ReactiveMongoTemplate reactiveMongoTemplate;
 
   @Override
-  public Flux<UserInfo> findByCustomGetList(LocalDate searchFromDate, LocalDate searchToDate, UserStatus userStatus, String encryptEmail, String keyword) {
+  public Flux<UserInfo> findList(LocalDate searchFromDate, LocalDate searchToDate, UserStatus userStatus, String keyword) {
     Query query = new Query();
     if (searchFromDate != null && searchToDate != null) {
       query.addCriteria(Criteria.where("create_date").gte(searchFromDate).lte(searchToDate));
     }
-    //if (StringUtils.isNotEmpty(keyword)) {
-    //  query.addCriteria(new Criteria().orOperator(
-    //     Criteria.where("email").is(encryptEmail)
-    //      // 생성프로젝트명
-    //      // 참여프로젝트명
-    //  ));
-    //}
     if (userStatus != null) {
       query.addCriteria(Criteria.where("status").is(userStatus));
     }

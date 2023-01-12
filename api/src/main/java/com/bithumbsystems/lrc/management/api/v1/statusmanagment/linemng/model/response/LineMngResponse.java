@@ -40,13 +40,13 @@ public class LineMngResponse {
   @Schema(description = "수정자 id")
   private String updateAdminAccountId;
 
-  @Schema(description = "순서")
+  @Schema(description = "정렬 순서")
   private Integer orderNo;
 
   @Schema(description = "상위분류코드")
   private String parentId;
 
-  @Schema(description = "하위분류 리스트", implementation = LineMngResponse.class)
+  @Schema(description = "하위분류 리스트")
   private List<LineMngResponse> children;
 
   /**
