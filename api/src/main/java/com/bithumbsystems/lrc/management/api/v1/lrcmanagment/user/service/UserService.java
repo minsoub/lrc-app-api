@@ -46,18 +46,13 @@ public class UserService {
    * @return the list
    */
   public Mono<List<UserResponse>> getList(LocalDate searchFromDate, LocalDate searchToDate, UserStatus userStatus, String keyword) {
-
-    String encryptEmail = StringUtils.isNotEmpty(keyword)
-        ? AES256Util.encryptAES(awsProperties.getKmsKey(), keyword, awsProperties.getSaltKey(), awsProperties.getIvKey()) : null;
-
-    return userDomainService.findByCustomGetList(searchFromDate, searchToDate, userStatus, encryptEmail, keyword)
+    return userDomainService.findList(searchFromDate, searchToDate, userStatus, keyword)
         .map(UserMapper.INSTANCE::userInfoTouserResponse)
         .map(user -> {
           user.setEmail(AES256Util.decryptAES(awsProperties.getKmsKey(), user.getEmail()));
           user.setStatusName(Enum.valueOf(UserStatus.class, user.getStatus()).getCodeName());
           return user;
         })
-        .filter(user -> StringUtils.isEmpty(keyword) || user.getEmail().contains(keyword))
         .flatMap(user -> Mono.zip(Mono.just(user),
                     foundationInfoDomainService.findByCreateAccountId(user.getId())
                         .map(res -> {
@@ -84,6 +79,7 @@ public class UserService {
                       tuple.getT3().stream().map(UserAccountResponse::getProjectName).collect(joining(", ")));
                   return tuple.getT1();
                 })
+                .filter(t1 -> StringUtils.isEmpty(keyword) || t1.getCreateProjectsName().toUpperCase().contains(keyword.toUpperCase()) || t1.getJoinProjectsName().toUpperCase().contains(keyword.toUpperCase()) || t1.getEmail().toUpperCase().contains(keyword.toUpperCase()))
         )
         .collectSortedList(Comparator.comparing(UserResponse::getCreateDate).reversed());
   }

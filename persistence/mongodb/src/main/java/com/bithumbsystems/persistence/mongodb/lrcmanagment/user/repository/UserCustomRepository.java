@@ -20,5 +20,5 @@ public interface UserCustomRepository {
    * @param keyword        the keyword
    * @return the flux
    */
-  Flux<UserInfo> findByCustomGetList(LocalDate searchFromDate, LocalDate searchToDate, UserStatus userStatus, String encryptEmail, String keyword);
+  Flux<UserInfo> findList(LocalDate searchFromDate, LocalDate searchToDate, UserStatus userStatus, String keyword);
 }

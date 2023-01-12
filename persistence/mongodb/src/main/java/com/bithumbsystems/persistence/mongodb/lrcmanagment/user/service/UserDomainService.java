@@ -25,8 +25,8 @@ public class UserDomainService {
    * @param keyword        the keyword
    * @return the flux
    */
-  public Flux<UserInfo> findByCustomGetList(
-      LocalDate searchFromDate, LocalDate searchToDate, UserStatus userStatus, String encryptEmail, String keyword) {
-    return userCustomRepository.findByCustomGetList(searchFromDate, searchToDate, userStatus, encryptEmail, keyword);
+  public Flux<UserInfo> findList(
+      LocalDate searchFromDate, LocalDate searchToDate, UserStatus userStatus, String keyword) {
+    return userCustomRepository.findList(searchFromDate, searchToDate, userStatus, keyword);
   }
 }
