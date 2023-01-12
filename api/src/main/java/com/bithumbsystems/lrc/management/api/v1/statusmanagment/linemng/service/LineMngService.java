@@ -16,14 +16,17 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import javax.validation.Valid;
 
 /**
  * The type Line mng service.
  */
 @Service
 @RequiredArgsConstructor
+@Validated
 public class LineMngService {
 
   private final LineMngDomainService businessListDomainService;
@@ -38,7 +41,6 @@ public class LineMngService {
     return businessListDomainService.findAll()
         .filter(f -> type == null || f.getType().equals(type))
         .filter(f -> f.getDelYn() == null || f.getDelYn().equals(false))
-        //.filter(LineMng::getUseYn)
         .map(LineMngMapper.INSTANCE::businessListResponse);
   }
 
@@ -56,10 +58,10 @@ public class LineMngService {
         .filter(f -> StringUtils.isEmpty(f.getParentId()))
         .map(LineMngMapper.INSTANCE::businessListResponse)
         .flatMap(res -> businessListDomainService.findByParentId(res.getId())
-              .map(LineMngMapper.INSTANCE::businessListResponse)
-              .filter(f -> isUse || f.getUseYn())
-              .collectSortedList(Comparator.comparing(LineMngResponse::getOrderNo))
-              .flatMap(lineList -> Mono.just(res.setChildren(lineList)))
+            .map(LineMngMapper.INSTANCE::businessListResponse)
+            .filter(f -> isUse || f.getUseYn())
+            .collectSortedList(Comparator.comparing(LineMngResponse::getOrderNo))
+            .flatMap(lineList -> Mono.just(res.setChildren(lineList)))
         )
         .collectSortedList(Comparator.comparing(LineMngResponse::getType).thenComparing(LineMngResponse::getOrderNo));
   }
@@ -71,12 +73,15 @@ public class LineMngService {
    * @param account        the account
    * @return BusinessListResponse mono
    */
-  public Mono<LineMngResponse> create(LineMngRequest lineMngRequest, Account account) {
+  @Validated(LineMngRequest.OnCreate.class)
+  public Mono<LineMngResponse> create(@Valid LineMngRequest lineMngRequest, Account account) {
     return businessListDomainService.save(LineMng.builder()
             .id(UUID.randomUUID().toString())
             .name(lineMngRequest.getName())
-            .type(lineMngRequest.getType())
-            .useYn(true)
+            .type(LineType.valueOf(lineMngRequest.getType()))
+            .orderNo(lineMngRequest.getOrderNo())
+            .parentId(lineMngRequest.getParentId())
+            .useYn(Boolean.valueOf(lineMngRequest.getUseYn()))
             .delYn(false)
             .createDate(LocalDateTime.now())
             .createAdminAccountId(account.getAccountId()).build())
@@ -92,15 +97,17 @@ public class LineMngService {
    * @param account        the account
    * @return BusinessListResponse mono
    */
-  public Mono<LineMngResponse> updateLine(String id, LineMngRequest lineMngRequest, Account account) {
+  @Validated(LineMngRequest.OnUpdate.class)
+  public Mono<LineMngResponse> updateLine(String id, @Valid LineMngRequest lineMngRequest, Account account) {
     return businessListDomainService.findById(id).flatMap(c -> {
-          c.setName(lineMngRequest.getName());
-          c.setUseYn(lineMngRequest.getUseYn());
-          c.setUpdateDate(LocalDateTime.now());
-          c.setUpdateAdminAccountId(account.getAccountId());
-          return businessListDomainService.updateLine(c)
-              .map(LineMngMapper.INSTANCE::businessListResponse);
-        })
+      c.setName(lineMngRequest.getName());
+      c.setOrderNo(lineMngRequest.getOrderNo());
+      c.setUseYn(Boolean.valueOf(lineMngRequest.getUseYn()));
+      c.setUpdateDate(LocalDateTime.now());
+      c.setUpdateAdminAccountId(account.getAccountId());
+      return businessListDomainService.updateLine(c)
+          .map(LineMngMapper.INSTANCE::businessListResponse);
+    })
         .switchIfEmpty(Mono.error(new LineMngException(ErrorCode.FAIL_UPDATE_CONTENT)));
   }
 
@@ -113,13 +120,13 @@ public class LineMngService {
    */
   public Mono<LineMngResponse> deleteLine(String id, Account account) {
     return businessListDomainService.findById(id).flatMap(c -> {
-          c.setUseYn(false);  // 상태 여부만 변경
-          c.setDelYn(true);
-          c.setUpdateDate(LocalDateTime.now());
-          c.setUpdateAdminAccountId(account.getAccountId());
-          return businessListDomainService.updateLine(c)
-              .map(LineMngMapper.INSTANCE::businessListResponse);
-        })
+      c.setUseYn(false);
+      c.setDelYn(true);
+      c.setUpdateDate(LocalDateTime.now());
+      c.setUpdateAdminAccountId(account.getAccountId());
+      return businessListDomainService.updateLine(c)
+          .map(LineMngMapper.INSTANCE::businessListResponse);
+    })
         .switchIfEmpty(Mono.error(new LineMngException(ErrorCode.FAIL_UPDATE_CONTENT)));
   }
 }

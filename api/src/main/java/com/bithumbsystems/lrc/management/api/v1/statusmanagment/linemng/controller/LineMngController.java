@@ -10,10 +10,6 @@ import com.bithumbsystems.lrc.management.api.v1.statusmanagment.linemng.service.
 import com.bithumbsystems.persistence.mongodb.statusmanagement.linemng.model.enums.LineType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Comparator;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +31,7 @@ import reactor.core.publisher.Mono;
  */
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("lrc/statusmanagment")
+@RequestMapping(value = "lrc/statusmanagment", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "계열 관리", description = "계열 관리 API")
 public class LineMngController {
 
@@ -65,20 +61,16 @@ public class LineMngController {
    */
   @GetMapping("/line-code/tree")
   @Operation(summary = "상태값 관리 - 계열 관리 - 계열 트리 구조 만들기", description = "계열 목록 트리 정보를 조회합니다.", tags = "사이트 운영 > 상태값 관리 > 계열 관리 > 트리구조 만들기")
-  @ApiResponse(responseCode = "200", description = "OK",
-      content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-          array = @ArraySchema(schema = @Schema(implementation = LineMngResponse.class))))
   public ResponseEntity<Mono<MultiResponse<LineMngResponse>>> getLinesTree(
       @Parameter(description = "계열 구분", example = "BUSINESS") @RequestParam(value = "type", required = false) LineType type,
-      @Parameter(description = "사용안함 포함", example = "true") @RequestParam(defaultValue = "true") Boolean isUse) {
+      @Parameter(description = "사용안함 포함", example = "true", required = true) @RequestParam(defaultValue = "true") Boolean isUse) {
     return ResponseEntity.ok().body(lineMngService.findAllTree(type, isUse)
         .map(MultiResponse::new)
     );
   }
 
-
   /**
-   * 계열관리 1개 저장.
+   * 계열관리 생성.
    *
    * @param lineMngRequest the line mng request
    * @param account        the account
@@ -95,7 +87,7 @@ public class LineMngController {
   }
 
   /**
-   * 계열관리 업데이트.
+   * 계열관리 수정.
    *
    * @param id             the id
    * @param lineMngRequest the line mng request
@@ -106,7 +98,7 @@ public class LineMngController {
   @Operation(summary = "상태값 관리 - 계열 관리 - 계열관리 업데이트", description = "계열관리 정보를 수정합니다.", tags = "사이트 운영 > 상태값 관리 > 계열 관리 > 수정")
   public ResponseEntity<Mono<SingleResponse<LineMngResponse>>> updateLines(
       @Parameter(name = "id", description = "계열관리 id") @PathVariable("id") String id,
-      @Parameter(name = "serviceLog", description = "계열관리 Model") @RequestBody LineMngRequest lineMngRequest,
+      @Parameter(name = "business Object", description = "계열관리 Model") @RequestBody LineMngRequest lineMngRequest,
       @Parameter(hidden = true) @CurrentUser Account account) {
     return ResponseEntity.ok().body(lineMngService.updateLine(id, lineMngRequest, account)
         .map(SingleResponse::new)
