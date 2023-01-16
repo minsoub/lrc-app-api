@@ -17,4 +17,11 @@ public interface LineMngRepository extends ReactiveMongoRepository<LineMng, Stri
    * @return the flux
    */
   Flux<LineMng> findByParentId(String parentId);
+
+  /**
+   * Find all by use yn is true flux.
+   *
+   * @return the flux
+   */
+  Flux<LineMng> findAllByUseYnIsTrue();
 }

@@ -64,4 +64,15 @@ public class ChatMessageDomainService {
     entity.setDeleteDate(LocalDateTime.now());
     return chatMessageRepository.save(entity);
   }
+
+  /**
+   * Find all by role and site id and is delete false flux.
+   *
+   * @param role   the role
+   * @param siteId the site id
+   * @return the flux
+   */
+  public Flux<ChatMessage> findAllByRoleAndSiteIdAndIsDeleteFalse(String role, String siteId) {
+    return chatMessageRepository.findAllByRoleAndSiteIdAndIsDeleteFalse(role, siteId);
+  }
 }

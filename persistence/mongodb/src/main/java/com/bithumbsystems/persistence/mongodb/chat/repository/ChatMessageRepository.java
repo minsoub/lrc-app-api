@@ -19,5 +19,6 @@ public interface ChatMessageRepository extends ReactiveMongoRepository<ChatMessa
    * @return the flux
    */
   Flux<ChatMessage> findAllByChatRoomAndSiteIdAndIsDeleteFalse(String chatRoom, String siteId);
+  Flux<ChatMessage> findAllByRoleAndSiteIdAndIsDeleteFalse(String role, String siteId);
 
 }

@@ -1,11 +1,18 @@
 package com.bithumbsystems.persistence.mongodb.lrcmanagment.project.foundationinfo.model.entity;
 
-import lombok.*;
+import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
-
+/**
+ * The type Foundation info.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,17 +22,17 @@ import java.time.LocalDateTime;
 @Document("lrc_project_foundation_info")
 public class FoundationInfo {
 
-    @Id
-    private String id;
-    private String name;     //프로젝트 명
-    private String symbol;          //심볼
-    private String contractCode;    //계약상태 code
-    private String processCode;    //진행상태 code
-    private String memo;       //관리자 메모
+  @Id
+  private String id;
+  private String name;     //프로젝트 명
+  private String symbol;          //심볼
+  private String contractCode;    //계약상태 code
+  private String processCode;    //진행상태 code
+  private String memo;       //관리자 메모
 
-    private LocalDateTime createDate; //생성날짜
-    private String createAccountId;  //생성자 id
+  private LocalDateTime createDate; //생성날짜
+  private String createAccountId;  //생성자 id
 
-    private LocalDateTime updateDate; //수정날짜
-    private String updateAccountId; //수정자 id
+  private LocalDateTime updateDate; //수정날짜
+  private String updateAccountId; //수정자 id
 }

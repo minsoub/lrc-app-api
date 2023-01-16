@@ -56,8 +56,8 @@ public class ProjectInfoDomainService {
    * @param keyword the keyword
    * @return ProjectInfoResponse Object
    */
-  public Flux<ProjectInfo> findByCustomBusinessNetwork(String keyword) {
-    return projectInfoCustomRepository.findByCustomBusinessNetwork(keyword);
+  public Flux<ProjectInfo> findAllByCustomBusinessNetwork(String keyword) {
+    return projectInfoCustomRepository.findAllByCustomBusinessNetwork(keyword);
   }
 
   /**
@@ -70,5 +70,14 @@ public class ProjectInfoDomainService {
    */
   public Flux<ProjectInfo> findByProjectInfo(String projectId, List<String> businessCode, List<String> networkCode) {
     return projectInfoCustomRepository.findByCustomProjectInfo(projectId, businessCode, networkCode);
+  }
+
+  /**
+   * Find all flux.
+   *
+   * @return the flux
+   */
+  public Flux<ProjectInfo> findAll() {
+    return projectInfoRepository.findAll();
   }
 }

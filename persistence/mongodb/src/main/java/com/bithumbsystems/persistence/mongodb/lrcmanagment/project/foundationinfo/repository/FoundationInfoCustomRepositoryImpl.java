@@ -53,8 +53,9 @@ public class FoundationInfoCustomRepositoryImpl implements FoundationInfoCustomR
           Criteria.where("contract_code").is(keyword),  //계약상태
           Criteria.where("process_code").is(keyword)    //진행상태
       ));
-      if (searchFromDate != null && searchToDate != null)
-        query.addCriteria(Criteria.where("update_date").gte(searchFromDate).lte(searchToDate)); //날짜
+      if (searchFromDate != null && searchToDate != null) {
+        query.addCriteria(Criteria.where("update_date").gte(searchFromDate).lte(searchToDate));
+      }
     }
 
     return reactiveMongoTemplate.find(query, FoundationInfo.class);
