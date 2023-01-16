@@ -5,6 +5,7 @@ import com.bithumbsystems.lrc.management.api.core.model.response.SingleResponse;
 import com.bithumbsystems.lrc.management.api.core.util.DateUtil;
 import com.bithumbsystems.lrc.management.api.v1.dashboard.exception.DashBoardException;
 import com.bithumbsystems.lrc.management.api.v1.dashboard.model.response.DashBoardLineMngResponse;
+import com.bithumbsystems.lrc.management.api.v1.dashboard.model.response.DashBoardOverallResponse;
 import com.bithumbsystems.lrc.management.api.v1.dashboard.model.response.DashBoardStatusCodeResponse;
 import com.bithumbsystems.lrc.management.api.v1.dashboard.service.DashBoardService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -84,21 +85,8 @@ public class DashBoardController {
    */
   @GetMapping("/overall-status")
   @Operation(summary = "재단 현황", description = "재단 현황 정보를 조회합니다.", tags = "사이트 운영 > 거래지원 현황 > 재단현황 조회")
-  public ResponseEntity<Mono<SingleResponse<List<DashBoardLineMngResponse>>>> getOverallStatus() {
-    return ResponseEntity.ok().body(dashBoardService.getLineMng()
-        .map(SingleResponse::new)
-    );
-  }
-
-  /**
-   * 계열관리 통계 모두 가져오기 - 2차 오픈 용.
-   *
-   * @return DashBoardLineMngResponse line mng new
-   */
-  @GetMapping("/line-code-new")
-  @Operation(summary = "거래지원 현황 - 계열관리 통계 모두 가져오기 (2차 오픈)", description = "계열관리 통계 목록 정보를 조회합니다.", tags = "사이트 운영 > 거래지원 현황 > 계열관리 조회")
-  public ResponseEntity<Mono<SingleResponse<List<DashBoardLineMngResponse>>>> getLineMngNew() {
-    return ResponseEntity.ok().body(dashBoardService.getLineMng()
+  public ResponseEntity<Mono<SingleResponse<DashBoardOverallResponse>>> getOverallStatus() {
+    return ResponseEntity.ok().body(dashBoardService.getOverallStatus()
         .map(SingleResponse::new)
     );
   }

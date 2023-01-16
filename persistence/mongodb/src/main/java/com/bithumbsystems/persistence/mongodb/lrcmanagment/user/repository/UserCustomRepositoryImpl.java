@@ -21,7 +21,7 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
   private final ReactiveMongoTemplate reactiveMongoTemplate;
 
   @Override
-  public Flux<UserInfo> findList(LocalDate searchFromDate, LocalDate searchToDate, UserStatus userStatus, String keyword) {
+  public Flux<UserInfo> findList(LocalDate searchFromDate, LocalDate searchToDate, UserStatus userStatus) {
     Query query = new Query();
     if (searchFromDate != null && searchToDate != null) {
       query.addCriteria(Criteria.where("create_date").gte(searchFromDate).lte(searchToDate));

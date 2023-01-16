@@ -88,4 +88,13 @@ public class LineMngDomainService {
   public Mono<LineMng> findByIdWithParentInfo(String id) {
     return lineMngCustomRepository.findByIdWithParentInfo(id);
   }
+
+  /**
+   * Find all by use yn is true flux.
+   *
+   * @return the flux
+   */
+  public Flux<LineMng> findAllByUseYnIsTrue() {
+    return lineMngRepository.findAllByUseYnIsTrue();
+  }
 }

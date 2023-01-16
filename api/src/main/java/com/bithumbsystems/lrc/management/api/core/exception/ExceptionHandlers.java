@@ -77,21 +77,21 @@ public class ExceptionHandlers {
    */
   @ExceptionHandler(AuditLogException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  public ResponseEntity<Mono<?>> auditLogExceptionHandler(AuditLogException ex) {
+  public ResponseEntity<Mono<ErrorResponse>> auditLogExceptionHandler(AuditLogException ex) {
     log.error(ex.getMessage(), ex);
     ErrorResponse errorResponse = new ErrorResponse(new ErrorData(ex.getErrorCode()));
     return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(Mono.just(errorResponse));
   }
 
   /**
-   * Dash board exception handler response entity.
+   * Dashboard exception handler response entity.
    *
    * @param ex the ex
    * @return the response entity
    */
   @ExceptionHandler(DashBoardException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  public ResponseEntity<Mono<?>> dashBoardExceptionHandler(DashBoardException ex) {
+  public ResponseEntity<Mono<ErrorResponse>> dashBoardExceptionHandler(DashBoardException ex) {
     log.error(ex.getMessage(), ex);
     ErrorResponse errorResponse = new ErrorResponse(new ErrorData(ex.getErrorCode()));
     return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(Mono.just(errorResponse));
@@ -105,7 +105,7 @@ public class ExceptionHandlers {
    */
   @ExceptionHandler(FaqCategoryException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  public ResponseEntity<Mono<?>> faqCategoryExceptionHandler(FaqCategoryException ex) {
+  public ResponseEntity<Mono<ErrorResponse>> faqCategoryExceptionHandler(FaqCategoryException ex) {
     log.error(ex.getMessage(), ex);
     ErrorResponse errorResponse = new ErrorResponse(new ErrorData(ex.getErrorCode()));
     return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(Mono.just(errorResponse));
@@ -119,7 +119,7 @@ public class ExceptionHandlers {
    */
   @ExceptionHandler(FaqContentException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  public ResponseEntity<Mono<?>> faqContentExceptionHandler(FaqContentException ex) {
+  public ResponseEntity<Mono<ErrorResponse>> faqContentExceptionHandler(FaqContentException ex) {
     log.error(ex.getMessage(), ex);
     ErrorResponse errorResponse = new ErrorResponse(new ErrorData(ex.getErrorCode()));
     return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(Mono.just(errorResponse));
@@ -133,7 +133,7 @@ public class ExceptionHandlers {
    */
   @ExceptionHandler(FoundationException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  public ResponseEntity<Mono<?>> foundationExceptionHandler(FoundationException ex) {
+  public ResponseEntity<Mono<ErrorResponse>> foundationExceptionHandler(FoundationException ex) {
     log.error(ex.getMessage(), ex);
     ErrorResponse errorResponse = new ErrorResponse(new ErrorData(ex.getErrorCode()));
     return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(Mono.just(errorResponse));
@@ -147,7 +147,7 @@ public class ExceptionHandlers {
    */
   @ExceptionHandler(HistoryException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  public ResponseEntity<Mono<?>> historyExceptionHandler(HistoryException ex) {
+  public ResponseEntity<Mono<ErrorResponse>> historyExceptionHandler(HistoryException ex) {
     log.error(ex.getMessage(), ex);
     ErrorResponse errorResponse = new ErrorResponse(new ErrorData(ex.getErrorCode()));
     return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(Mono.just(errorResponse));
@@ -161,7 +161,7 @@ public class ExceptionHandlers {
    */
   @ExceptionHandler(FoundationInfoException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  public ResponseEntity<Mono<?>> foundationInfoExceptionHandler(FoundationException ex) {
+  public ResponseEntity<Mono<ErrorResponse>> foundationInfoExceptionHandler(FoundationInfoException ex) {
     log.error(ex.getMessage(), ex);
     ErrorResponse errorResponse = new ErrorResponse(new ErrorData(ex.getErrorCode()));
     return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(Mono.just(errorResponse));
@@ -175,7 +175,7 @@ public class ExceptionHandlers {
    */
   @ExceptionHandler(IcoInfoException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  public ResponseEntity<Mono<?>> icoInfoExceptionHandler(IcoInfoException ex) {
+  public ResponseEntity<Mono<ErrorResponse>> icoInfoExceptionHandler(IcoInfoException ex) {
     log.error(ex.getMessage(), ex);
     ErrorResponse errorResponse = new ErrorResponse(new ErrorData(ex.getErrorCode()));
     return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(Mono.just(errorResponse));
@@ -309,7 +309,7 @@ public class ExceptionHandlers {
 
   /**
    * Web exchange bind exception handler response entity
-   * Controller에서 @Valid 사용 했을 때는 WebExchangeBindException이 발생.
+   * Controller에서 @Valid 사용 시 발생하는 Exception.
    *
    * @param ex the ex
    * @return the response entity
@@ -319,17 +319,17 @@ public class ExceptionHandlers {
     log.error(ex.getMessage(), ex);
     ErrorData errorData;
     try {
-      StringBuffer stringBuffer = new StringBuffer();
-      for(FieldError e : ex.getFieldErrors()) {
-        stringBuffer.append(" ['");
-        stringBuffer.append(e.getField());
-        stringBuffer.append("' parameter is '");
-        stringBuffer.append(e.getRejectedValue());
-        stringBuffer.append("'. error:");
-        stringBuffer.append(e.getDefaultMessage());
-        stringBuffer.append("]");
+      StringBuilder stringBuilder = new StringBuilder();
+      for (FieldError e : ex.getFieldErrors()) {
+        stringBuilder.append(" ['");
+        stringBuilder.append(e.getField());
+        stringBuilder.append("' parameter is '");
+        stringBuilder.append(e.getRejectedValue());
+        stringBuilder.append("'. error:");
+        stringBuilder.append(e.getDefaultMessage());
+        stringBuilder.append("]");
       }
-      errorData = new ErrorData(ErrorCode.FAIL_VALIDATE_PARAMETER.getCode(), stringBuffer.toString());
+      errorData = new ErrorData(ErrorCode.FAIL_VALIDATE_PARAMETER.getCode(), stringBuilder.toString());
     } catch (Exception e) {
       errorData = new ErrorData(ErrorCode.FAIL_VALIDATE_PARAMETER);
     }
@@ -338,7 +338,7 @@ public class ExceptionHandlers {
 
   /**
    * Constraint violation exception handler response entity
-   * Service에서 @Valid 사용 했을 때는 ConstraintViolationException 발생.
+   * Service에서 @Valid 사용 시 발생하는 Exception.
    *
    * @param ex the ex
    * @return the response entity
@@ -348,17 +348,17 @@ public class ExceptionHandlers {
     log.error(ex.getMessage(), ex);
     ErrorData errorData;
     try {
-      StringBuffer stringBuffer = new StringBuffer();
-      for(ConstraintViolation e : ex.getConstraintViolations()) {
-        stringBuffer.append(" ['");
-        stringBuffer.append(e.getPropertyPath().toString().substring(e.getPropertyPath().toString().lastIndexOf(".") + 1));
-        stringBuffer.append("' parameter is '");
-        stringBuffer.append(e.getInvalidValue() == null ? "" : e.getInvalidValue().toString());
-        stringBuffer.append("'. error:");
-        stringBuffer.append(e.getMessage());
-        stringBuffer.append("]");
+      StringBuilder stringBuilder = new StringBuilder();
+      for (ConstraintViolation<?> e : ex.getConstraintViolations()) {
+        stringBuilder.append(" ['");
+        stringBuilder.append(e.getPropertyPath().toString().substring(e.getPropertyPath().toString().lastIndexOf(".") + 1));
+        stringBuilder.append("' parameter is '");
+        stringBuilder.append(e.getInvalidValue() == null ? "" : e.getInvalidValue().toString());
+        stringBuilder.append("'. error:");
+        stringBuilder.append(e.getMessage());
+        stringBuilder.append("]");
       }
-      errorData = new ErrorData(ErrorCode.FAIL_VALIDATE_PARAMETER.getCode(), stringBuffer.toString());
+      errorData = new ErrorData(ErrorCode.FAIL_VALIDATE_PARAMETER.getCode(), stringBuilder.toString());
     } catch (Exception e) {
       errorData = new ErrorData(ErrorCode.FAIL_VALIDATE_PARAMETER);
     }
@@ -375,12 +375,12 @@ public class ExceptionHandlers {
   @ExceptionHandler(ServerWebInputException.class)
   public ResponseEntity<Mono<ErrorResponse>> serverWebInputExceptionHandler(ServerWebInputException ex) {
     log.error(ex.getMessage(), ex);
-    ErrorData errorData;
     try {
-      errorData = new ErrorData(ErrorCode.FAIL_PARSING_PARAMETER.getCode(), ex.getCause().getMessage().substring(0, ex.getCause().getMessage().indexOf(" nested exception")));
+      return ResponseEntity.badRequest().body(Mono.just(new ErrorResponse(new ErrorData(
+          ErrorCode.FAIL_PARSING_PARAMETER.getCode(), ex.getCause().getMessage()
+          .substring(0, ex.getCause().getMessage().indexOf(" nested exception"))))));
     } catch (Exception e) {
-      errorData = new ErrorData(ErrorCode.FAIL_PARSING_PARAMETER);
+      return ResponseEntity.badRequest().body(Mono.just(new ErrorResponse(new ErrorData(ErrorCode.FAIL_PARSING_PARAMETER))));
     }
-    return ResponseEntity.badRequest().body(Mono.just(new ErrorResponse(errorData)));
   }
 }
