@@ -46,7 +46,7 @@ public class UserService {
    * @return the list
    */
   public Mono<List<UserResponse>> getList(LocalDate searchFromDate, LocalDate searchToDate, UserStatus userStatus, String keyword) {
-    return userDomainService.findList(searchFromDate, searchToDate, userStatus, keyword)
+    return userDomainService.findList(searchFromDate, searchToDate, userStatus)
         .map(UserMapper.INSTANCE::userInfoTouserResponse)
         .map(user -> {
           user.setEmail(AES256Util.decryptAES(awsProperties.getKmsKey(), user.getEmail()));

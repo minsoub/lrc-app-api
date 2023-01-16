@@ -22,11 +22,10 @@ public class UserDomainService {
    * @param searchFromDate the search from date
    * @param searchToDate   the search to date
    * @param userStatus     the user status
-   * @param keyword        the keyword
    * @return the flux
    */
   public Flux<UserInfo> findList(
-      LocalDate searchFromDate, LocalDate searchToDate, UserStatus userStatus, String keyword) {
-    return userCustomRepository.findList(searchFromDate, searchToDate, userStatus, keyword);
+      LocalDate searchFromDate, LocalDate searchToDate, UserStatus userStatus) {
+    return userCustomRepository.findList(searchFromDate, searchToDate, userStatus);
   }
 }
